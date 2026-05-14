@@ -1,173 +1,265 @@
 "use client";
 
-import { addDays, addMonths, eachDayOfInterval, endOfMonth, format, getDay, isBefore, isSameDay, startOfMonth, startOfToday, subMonths } from "date-fns";
 import { motion } from "motion/react";
-import { ArrowRight, CalendarCheck, ChevronLeft, ChevronRight, Clock, LockKeyhole, ShieldCheck } from "lucide-react";
-import { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { ArrowRight, Calendar, CheckCircle2, Lock, MessageCircle, ShieldCheck, Sparkles } from "lucide-react";
+import { Scribble } from "@/components/ui/Scribble";
+import { useState } from "react";
+import Link from "next/link";
 
-const timeSlots = ["09:00 AM", "10:30 AM", "12:00 PM", "02:00 PM", "03:30 PM", "05:00 PM"];
+const steps = [
+  {
+    icon: Calendar,
+    title: "Confirmation email arrives",
+    desc: "Within minutes of booking, you'll receive your Zoom link, date/time, and pre-session intake form.",
+  },
+  {
+    icon: MessageCircle,
+    title: "Karma reviews your intake",
+    desc: "Your intake form is read before the session so no time is wasted re-explaining your situation.",
+  },
+  {
+    icon: ShieldCheck,
+    title: "Session happens — stay private",
+    desc: "The session is confidential, unrecorded, and designed to give you clarity and actionable next steps.",
+  },
+];
 
-export default function Booking() {
-  const router = useRouter();
-  const today = startOfToday();
-  const [month, setMonth] = useState(startOfMonth(today));
-  const [selectedDate, setSelectedDate] = useState<Date | null>(addDays(today, 1));
-  const [selectedTime, setSelectedTime] = useState("10:30 AM");
+const faqs = [
+  {
+    question: "Will this session be recorded?",
+    answer: "No. Humanly sessions are never recorded. Your confidentiality is absolute.",
+  },
+  {
+    question: "What is your confidentiality policy?",
+    answer: "We do not contact your employer, share your information, or store session content beyond what's needed for your report. See our full Privacy Policy for details.",
+  },
+  {
+    question: "Can I cancel or reschedule?",
+    answer: "Yes. You can cancel or reschedule up to 24 hours before your session via the link in your confirmation email. Late cancellations may be subject to a fee.",
+  },
+  {
+    question: "What happens after I book?",
+    answer: "You'll receive a confirmation email with your Zoom link, session date/time, and a link to our pre-session intake form. Karma reviews every intake before the session.",
+  },
+  {
+    question: "Do you offer in-person sessions?",
+    answer: "All sessions are conducted virtually via Zoom or Google Meet. This ensures flexibility for professionals across the GCC and maintains confidentiality.",
+  },
+];
 
-  const days = useMemo(() => {
-    const monthDays = eachDayOfInterval({ start: startOfMonth(month), end: endOfMonth(month) });
-    const blanks = Array.from({ length: getDay(startOfMonth(month)) });
-    return { blanks, monthDays };
-  }, [month]);
-
-  const confirm = () => {
-    if (!selectedDate || !selectedTime) return;
-    router.push(`/checkout?date=${selectedDate.toISOString()}&time=${encodeURIComponent(selectedTime)}&plan=clarity`);
-  };
+export default function BookingPage() {
+  const [selected, setSelected] = useState("triage");
 
   return (
-    <div className="min-h-screen bg-[#FAFAFA] px-5 pb-24 pt-28">
-      <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.86fr_1.14fr] lg:items-start">
-        <section>
-          <p className="text-xs font-black uppercase tracking-[0.24em] text-primary-violet">Book a consultation</p>
-          <h1 className="mt-5 font-serif text-6xl font-black italic leading-[0.9] text-primary-purple md:text-8xl">
-            Pick a private time that gives you room to think.
-          </h1>
-          <p className="mt-7 max-w-xl text-xl leading-relaxed text-primary-purple/64">
-            A focused 45-minute consultation for workplace conflict, contracts, harassment concerns, PIPs, redundancy, severance, or any situation where HR does not feel neutral.
-          </p>
-          <div className="mt-10 grid gap-4">
-            {[
-              { icon: LockKeyhole, title: "No employer notification", copy: "Your booking and intake stay private." },
-              { icon: ShieldCheck, title: "Confidential preparation", copy: "Bring screenshots, contracts, notes, or just the story." },
-              { icon: Clock, title: "45-minute strategy window", copy: "Leave with language, options, and next steps." },
-            ].map((item) => (
-              <div key={item.title} className="flex gap-4 rounded-lg bg-white p-5 ring-1 ring-primary-purple/10">
-                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-primary-violet text-white">
-                  <item.icon size={20} />
+    <div className="min-h-screen bg-neutral-bg">
+      {/* Trust Header */}
+      <header className="px-5 md:px-[64px] max-w-7xl mx-auto pt-20 md:pt-28 text-center">
+        <div className="inline-flex items-center gap-2 rounded-full bg-primary-dark/5 px-4 py-2 mb-6">
+          <Lock className="text-primary-violet" size={14} />
+          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary-dark">
+            Everything discussed is strictly confidential
+          </span>
+        </div>
+        <h1 className="font-extrabold text-[32px] md:text-[48px] leading-[1.2] -tracking-[0.02em] text-primary-dark max-w-3xl mx-auto">
+          Book a confidential session
+        </h1>
+        <p className="mt-4 text-lg leading-relaxed text-neutral-500 max-w-xl mx-auto">
+          Choose the level of support that fits your situation. Every session begins with a confidential intake review by Karma.
+        </p>
+      </header>
+
+      {/* Service Selector */}
+      <section className="px-5 md:px-[64px] max-w-4xl mx-auto mt-14">
+        <div className="grid gap-4">
+          {[
+            {
+              value: "triage",
+              title: "The Triage",
+              sub: "60-minute advisory session",
+              price: "AED 550",
+              desc: "A private consultation for verbal guidance and clarity on immediate next steps.",
+            },
+            {
+              value: "strategy",
+              title: "The Strategy",
+              sub: "Triage + written follow-up report",
+              price: "AED 950",
+              desc: "A structured document with situation summary, risk assessment, recommended actions, and suggested scripts.",
+            },
+            {
+              value: "retainer",
+              title: "The Retainer",
+              sub: "Ongoing monthly support",
+              price: "AED 1,800/month",
+              desc: "Two strategy sessions per month, message review, priority access, and ongoing situation monitoring.",
+            },
+          ].map((service) => (
+            <label
+              key={service.value}
+              className={`cursor-pointer rounded-lg p-6 border-2 transition-all relative ${
+                selected === service.value
+                  ? "border-primary-violet bg-primary-violet/5 shadow-lg shadow-primary-violet/10"
+                  : "border-neutral-300 bg-white hover:border-primary-violet/50"
+              }`}
+            >
+              <input
+                type="radio"
+                name="service"
+                value={service.value}
+                checked={selected === service.value}
+                onChange={() => setSelected(service.value)}
+                className="sr-only"
+              />
+              <div className="flex items-start gap-4">
+                <div
+                  className={`shrink-0 w-5 h-5 mt-0.5 rounded-full border-2 flex items-center justify-center transition-colors ${
+                    selected === service.value
+                      ? "border-primary-violet bg-primary-violet"
+                      : "border-neutral-300"
+                  }`}
+                >
+                  {selected === service.value && <div className="w-2 h-2 rounded-full bg-white" />}
                 </div>
-                <div>
-                  <h2 className="font-black text-primary-purple">{item.title}</h2>
-                  <p className="mt-1 text-primary-purple/58">{item.copy}</p>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-4 flex-wrap">
+                    <h3 className="font-extrabold text-2xl text-primary-dark">{service.title}</h3>
+                    <span className="text-2xl font-extrabold text-primary-dark">{service.price}</span>
+                  </div>
+                  <p className="mt-1 font-semibold text-sm uppercase tracking-[0.12em] text-primary-violet">
+                    {service.sub}
+                  </p>
+                  <p className="mt-2 leading-relaxed text-neutral-500">{service.desc}</p>
                 </div>
               </div>
-            ))}
-          </div>
-        </section>
+              {selected === service.value && (
+                <Scribble variant="sparkle" className="absolute -top-3 -right-3 w-8 h-8 text-amber" />
+              )}
+            </label>
+          ))}
+        </div>
+      </section>
 
-        <motion.section
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="rounded-lg bg-white p-5 shadow-2xl shadow-primary-purple/10 ring-1 ring-primary-purple/10 md:p-8"
-        >
-          <div className="flex flex-col justify-between gap-4 border-b border-primary-purple/10 pb-6 md:flex-row md:items-center">
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.24em] text-primary-purple/42">Available slots update live</p>
-              <h2 className="mt-2 text-3xl font-black text-primary-purple">{format(month, "MMMM yyyy")}</h2>
-            </div>
-            <div className="flex gap-2">
-              <button
-                aria-label="Previous month"
-                onClick={() => setMonth((value) => subMonths(value, 1))}
-                className="flex h-11 w-11 items-center justify-center rounded-lg border border-primary-purple/10 text-primary-purple disabled:opacity-30"
-                disabled={isBefore(subMonths(month, 1), startOfMonth(today))}
-              >
-                <ChevronLeft size={20} />
-              </button>
-              <button
-                aria-label="Next month"
-                onClick={() => setMonth((value) => addMonths(value, 1))}
-                className="flex h-11 w-11 items-center justify-center rounded-lg border border-primary-purple/10 text-primary-purple"
-              >
-                <ChevronRight size={20} />
-              </button>
-            </div>
+      {/* Cal.com Embed Placeholder */}
+      <section className="px-5 md:px-[64px] max-w-4xl mx-auto mt-12">
+        <div className="rounded-lg bg-white border border-neutral-300 shadow-sm overflow-hidden">
+          <div className="bg-primary-dark px-6 py-4 flex items-center gap-3">
+            <Calendar className="text-amber" size={20} />
+            <span className="font-bold text-sm uppercase tracking-[0.12em] text-white">
+              Select your date & time
+            </span>
           </div>
-
-          <div className="mt-6 grid grid-cols-7 gap-2 text-center text-[10px] font-black uppercase tracking-[0.18em] text-primary-purple/42">
-            {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-              <div key={day}>{day}</div>
-            ))}
-          </div>
-          <div className="mt-3 grid grid-cols-7 gap-2">
-            {days.blanks.map((_, index) => (
-              <div key={`blank-${index}`} />
-            ))}
-            {days.monthDays.map((day) => {
-              const disabled = isBefore(day, today);
-              const active = selectedDate && isSameDay(day, selectedDate);
-              const weekend = [0, 6].includes(getDay(day));
-              return (
-                <button
-                  key={day.toISOString()}
-                  disabled={disabled}
-                  onClick={() => {
-                    setSelectedDate(day);
-                    if (!selectedTime) setSelectedTime(timeSlots[1]);
-                  }}
-                  className={`aspect-square rounded-lg border text-sm font-black transition md:text-base ${
-                    active
-                      ? "border-primary-violet bg-primary-violet text-white shadow-lg shadow-primary-violet/25"
-                      : disabled
-                        ? "border-transparent bg-gray-50 text-gray-300"
-                        : weekend
-                          ? "border-secondary-orange/20 bg-secondary-orange/10 text-primary-purple hover:border-secondary-orange"
-                          : "border-primary-purple/10 bg-[#FAFAFA] text-primary-purple hover:border-primary-violet"
-                  }`}
-                >
-                  {format(day, "d")}
-                </button>
-              );
-            })}
-          </div>
-
-          <div className="mt-8">
-            <div className="flex items-center justify-between gap-4">
-              <h3 className="text-xl font-black text-primary-purple">Available times</h3>
-              {selectedDate && <p className="text-sm font-bold text-primary-purple/52">{format(selectedDate, "EEEE, MMMM d")}</p>}
-            </div>
-            <div className="mt-4 grid gap-3 sm:grid-cols-3">
-              {timeSlots.map((slot) => (
-                <button
-                  key={slot}
-                  onClick={() => setSelectedTime(slot)}
-                  className={`rounded-lg border px-4 py-4 text-sm font-black uppercase tracking-[0.12em] transition ${
-                    selectedTime === slot
-                      ? "border-primary-purple bg-primary-purple text-white"
-                      : "border-primary-purple/10 bg-white text-primary-purple hover:border-primary-violet"
-                  }`}
-                >
-                  {slot}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="mt-8 rounded-lg bg-[#FAFAFA] p-5">
-            <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.22em] text-primary-purple/42">Selected consultation</p>
-                <p className="mt-2 text-xl font-black text-primary-purple">
-                  {selectedDate ? format(selectedDate, "MMMM d, yyyy") : "Choose a date"} at {selectedTime || "choose a time"}
+          <div className="p-6 min-h-[400px] flex items-center justify-center text-center">
+            <div className="max-w-sm">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary-violet/10 flex items-center justify-center">
+                <Calendar className="text-primary-violet" size={28} />
+              </div>
+              <p className="font-extrabold text-2xl text-primary-dark mb-2">
+                Cal.com scheduling
+              </p>
+              <p className="text-sm leading-relaxed text-neutral-500 mb-6">
+                The booking widget loads here — pre-filtered to{" "}
+                <span className="font-bold text-primary-violet">
+                  {selected === "triage" ? "The Triage" : selected === "strategy" ? "The Strategy" : "The Retainer"}
+                </span>.
+                Insert your Cal.com embed snippet to activate.
+              </p>
+              <div className="rounded-lg bg-amber/10 p-4 inline-block">
+                <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-amber">
+                  🔒 No payment details stored on this server. All payments processed securely via Stripe.
                 </p>
               </div>
-              <button
-                disabled={!selectedDate || !selectedTime}
-                onClick={confirm}
-                className="inline-flex items-center justify-center gap-3 rounded-lg bg-primary-purple px-6 py-4 text-sm font-black uppercase tracking-[0.16em] text-white transition hover:bg-primary-violet disabled:cursor-not-allowed disabled:bg-gray-300"
-              >
-                Continue to payment
-                <ArrowRight size={18} />
-              </button>
-            </div>
-            <div className="mt-5 flex items-center gap-2 text-xs font-black uppercase tracking-[0.18em] text-primary-purple/42">
-              <CalendarCheck size={15} className="text-primary-violet" />
-              Real-time calendar view with secure checkout next
             </div>
           </div>
-        </motion.section>
-      </div>
+        </div>
+      </section>
+
+      {/* Trust Markers Row */}
+      <section className="px-5 md:px-[64px] max-w-4xl mx-auto mt-6 grid grid-cols-3 gap-4 text-center">
+        {[
+          { icon: Lock, text: "No recording" },
+          { icon: ShieldCheck, text: "Confidential by design" },
+          { icon: MessageCircle, text: "Karma reads every intake" },
+        ].map((item) => (
+          <div key={item.text} className="rounded-lg bg-white border border-neutral-300 p-4">
+            <item.icon className="mx-auto text-primary-violet mb-2" size={18} />
+            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-primary-dark">{item.text}</p>
+          </div>
+        ))}
+      </section>
+
+      {/* What Happens Next */}
+      <section className="px-5 md:px-[64px] max-w-4xl mx-auto mt-20">
+        <h2 className="font-extrabold text-[32px] leading-[1.3] text-primary-dark text-center mb-10">
+          What happens next
+        </h2>
+        <div className="grid gap-6 md:grid-cols-3">
+          {steps.map((step, i) => (
+            <motion.div
+              key={step.title}
+              initial={{ opacity: 0, y: 14 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.06 }}
+              className="rounded-lg bg-white border border-neutral-300 p-8 shadow-sm"
+            >
+              <step.icon className="text-primary-violet mb-5" size={32} />
+              <h3 className="font-extrabold text-xl text-primary-dark mb-3">{step.title}</h3>
+              <p className="leading-relaxed text-neutral-500">{step.desc}</p>
+            </motion.div>
+          ))}
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="px-5 md:px-[64px] max-w-3xl mx-auto mt-20">
+        <h2 className="font-extrabold text-[32px] leading-[1.3] text-primary-dark text-center mb-10">
+          Frequently asked questions
+        </h2>
+        <div className="space-y-4">
+          {faqs.map((faq, i) => (
+            <motion.details
+              key={faq.question}
+              initial={{ opacity: 0, y: 8 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.04 }}
+              className="group rounded-lg bg-white border border-neutral-300 p-6"
+            >
+              <summary className="cursor-pointer font-bold text-primary-dark list-none flex items-center justify-between gap-4">
+                <span className="text-lg">{faq.question}</span>
+                <span className="shrink-0 text-primary-violet group-open:rotate-180 transition-transform">
+                  ▼
+                </span>
+              </summary>
+              <p className="mt-4 leading-relaxed text-neutral-500">{faq.answer}</p>
+            </motion.details>
+          ))}
+        </div>
+      </section>
+
+      {/* Micro-copy reassurance */}
+      <section className="px-5 md:px-[64px] max-w-4xl mx-auto mt-12 text-center">
+        <p className="text-xs text-neutral-400 italic">
+          No commitment until you confirm. Strictly confidential. Your employer will not be contacted.
+        </p>
+      </section>
+
+      {/* Footer-light — no full nav, just brand + legal */}
+      <footer className="mt-20 border-t border-neutral-300 bg-white py-10">
+        <div className="px-5 md:px-[64px] max-w-7xl mx-auto text-center">
+          <Link href="/" className="font-extrabold text-2xl text-primary-dark hover:text-primary-violet transition-colors">
+            Humanly
+          </Link>
+          <div className="mt-4 flex flex-wrap justify-center gap-6 text-xs text-neutral-500">
+            <Link href="/privacy" className="hover:text-primary-violet underline transition-colors">Privacy Policy</Link>
+            <Link href="/terms" className="hover:text-primary-violet underline transition-colors">Terms</Link>
+            <Link href="/faq" className="hover:text-primary-violet underline transition-colors">FAQ</Link>
+          </div>
+          <p className="mt-4 text-xs text-neutral-400">
+            © 2026 Humanly HR Advisory. All rights reserved. Neutral advocacy for the modern workplace.
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }

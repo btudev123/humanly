@@ -2,88 +2,133 @@
 
 import { motion } from "motion/react";
 import { Scribble } from "@/components/ui/Scribble";
-import { Shield, Lock, Eye, FileText, Server, UserCheck } from "lucide-react";
+import { ShieldCheck, Lock, EyeOff, HardDrive } from "lucide-react";
 
 export default function Privacy() {
-  const sections = [
-    {
-      title: "Radical Confidentiality",
-      icon: Shield,
-      content: "Your privacy is our core value. We do not share your identity, workplace concerns, or session transcripts with your employer or any third party without your explicit, written consent."
-    },
-    {
-      title: "Data Encryption",
-      icon: Lock,
-      content: "All profile data and message drafts are encrypted at rest and in transit. Our servers use bank-grade security protocols to ensure your information remains yours alone."
-    },
-    {
-      title: "Anonymous Browsing",
-      icon: Eye,
-      content: "You can browse our resource library and use our AI advisor tools anonymously. We only require personal information when you decide to book a formal consultation."
-    },
-    {
-      title: "Limited Retention",
-      icon: FileText,
-      content: "We only retain data for as long as necessary to provide our services. You can request a full data wipe at any time through your dashboard settings."
-    }
-  ];
-
   return (
-    <div className="pt-24 pb-32">
-      <div className="max-w-4xl mx-auto px-6">
-        <header className="text-center mb-24 relative">
-          <Scribble type="sparkle" className="absolute -top-10 left-0 w-24 h-24 text-secondary-orange/30" />
-          <h1 className="text-6xl font-black text-primary-purple mb-8">Privacy Policy</h1>
-          <p className="text-2xl text-gray-500 font-medium leading-relaxed">
-            Because in the modern workplace, <span className="relative inline-block text-primary-violet px-2 italic">confidentiality</span> is your greatest asset.
+    <div className="min-h-screen bg-neutral-bg">
+      <div className="max-w-4xl mx-auto px-5 md:px-[64px] pt-20 md:pt-28 pb-24">
+        {/* Header */}
+        <header className="text-center mb-16 relative">
+          <Scribble variant="sparkle" className="absolute -top-8 right-10 w-40 h-40 text-amber/10 -z-0" />
+          <div className="inline-flex items-center gap-2 rounded-full bg-primary-violet/10 px-4 py-2 mb-6">
+            <ShieldCheck className="text-primary-violet" size={14} />
+            <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary-violet">
+              Data first. Humans always.
+            </span>
+          </div>
+          <h1 className="font-extrabold text-[32px] md:text-[48px] leading-[1.2] -tracking-[0.02em] text-primary-dark">
+            Privacy Policy
+          </h1>
+          <p className="mt-4 text-lg leading-relaxed text-neutral-500 max-w-xl mx-auto">
+            How we handle information at Humanly — transparent, minimal, and never shared.
           </p>
         </header>
 
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-[50px] shadow-2xl border border-gray-100 p-12 lg:p-20 space-y-16"
+          className="bg-white rounded-lg border border-neutral-300 p-8 md:p-16 shadow-sm relative overflow-hidden"
         >
-          <div className="grid md:grid-cols-2 gap-12">
-            {sections.map((section, i) => (
-              <div key={i} className="space-y-4">
-                <div className="w-12 h-12 bg-primary-violet/10 rounded-2xl flex items-center justify-center text-primary-violet">
-                  <section.icon size={24} />
-                </div>
-                <h2 className="text-2xl font-black text-primary-purple">{section.title}</h2>
-                <p className="text-gray-500 font-medium leading-relaxed">{section.content}</p>
-              </div>
-            ))}
-          </div>
+          <Scribble variant="loop" className="absolute -bottom-10 -left-10 w-60 h-60 text-amber/5 -z-0" />
 
-          <div className="pt-16 border-t border-gray-100">
-            <h3 className="text-xl font-black text-primary-purple mb-6">1. Information We Collect</h3>
-            <p className="text-gray-600 font-medium mb-8">
-              We collect minimal information necessary to facilitate consultations: full name, contact email, and billing information (processed securely through Stripe). We do not scrape your workplace data or social media profiles.
-            </p>
+          <div className="relative z-10 space-y-12 leading-relaxed text-neutral-500">
+            {/* Section 1 */}
+            <section className="space-y-4">
+              <h2 className="font-extrabold text-2xl text-primary-dark flex items-center gap-3">
+                <EyeOff className="text-primary-violet shrink-0" size={24} />
+                1. Confidentiality Commitment
+              </h2>
+              <p>
+                Humanly does not contact your employer. Ever. Under no circumstances will we share
+                your identity, the content of your consultations, or any related documentation with
+                your organization, its representatives, or any third party without your express
+                written consent.
+              </p>
+            </section>
 
-            <h3 className="text-xl font-black text-primary-purple mb-6">2. Third-Party Services</h3>
-            <div className="bg-gray-50 p-8 rounded-3xl space-y-4">
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm text-[#6772e5]">
-                  <Server size={20} />
-                </div>
-                <span className="font-bold text-gray-700">Payment Gateway: Stripe</span>
+            {/* Section 2 */}
+            <section className="space-y-4">
+              <h2 className="font-extrabold text-2xl text-primary-dark flex items-center gap-3">
+                <HardDrive className="text-amber shrink-0" size={24} />
+                2. Data We Collect
+              </h2>
+              <p className="mb-4">
+                We gather only what's necessary to serve you effectively, securely, and confidentially:
+              </p>
+              <ul className="grid gap-3">
+                {[
+                  {
+                    label: "Name & email",
+                    detail: "Needed for booking, confirmation, and report delivery.",
+                  },
+                  {
+                    label: "Session intake notes",
+                    detail: "Stored encrypted; deleted after report delivery unless you request otherwise.",
+                  },
+                  {
+                    label: "Payment information",
+                    detail: "Processed entirely via Stripe. Humanly never sees or stores your full card details.",
+                  },
+                  {
+                    label: "Resource download data",
+                    detail: "Limited to email and name for gated content delivery.",
+                  },
+                ].map((item) => (
+                  <li
+                    key={item.label}
+                    className="flex gap-4 bg-neutral-bg p-5 rounded-lg border border-neutral-200"
+                  >
+                    <Lock className="shrink-0 text-primary-violet mt-0.5" size={18} />
+                    <div>
+                      <h4 className="font-extrabold text-primary-dark">{item.label}</h4>
+                      <p className="text-sm mt-0.5">{item.detail}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </section>
+
+            {/* Section 3 */}
+            <section className="space-y-4">
+              <h2 className="font-extrabold text-2xl text-primary-dark flex items-center gap-3">
+                <ShieldCheck className="text-primary-violet shrink-0" size={24} />
+                3. Data Sharing & Retention
+              </h2>
+              <div className="p-6 md:p-8 bg-amber/5 rounded-lg border-2 border-dashed border-amber/20 space-y-4">
+                <p>
+                  We do not sell, rent, or share personal information with third parties. We do not
+                  use your information for marketing or advertising. We do not run tracking scripts or
+                  third-party analytics that expose your browsing behavior.
+                </p>
+                <p>
+                  Admin metadata (appointment dates, payment records) is retained for financial
+                  compliance. All session notes are deleted after report delivery unless you request
+                  long-term storage for ongoing advisory relationships.
+                </p>
               </div>
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm text-primary-violet">
-                   <UserCheck size={20} />
-                </div>
-                <span className="font-bold text-gray-700">Authentication: Secure Token System</span>
-              </div>
-            </div>
+            </section>
+
+            {/* Section 4 */}
+            <section className="space-y-4">
+              <h2 className="font-extrabold text-2xl text-primary-dark flex items-center gap-3">
+                <Lock className="text-primary-dark shrink-0" size={24} />
+                4. Security
+              </h2>
+              <p>
+                We employ industry-standard encryption for data at rest and in transit. Our
+                infrastructure is hosted on encrypted servers, and we handle your story with the same
+                rigor we apply to financial institutions. No unauthorized third party will access your
+                data.
+              </p>
+            </section>
           </div>
         </motion.div>
 
-        <div className="mt-16 text-center">
-          <Scribble type="loop" className="mx-auto w-24 h-24 text-secondary-pink/20 mb-8" />
-          <p className="text-gray-400 font-bold uppercase tracking-widest">Last Updated: May 15, 2026</p>
-        </div>
+        {/* Last revised */}
+        <p className="mt-12 text-xs text-neutral-300 text-center uppercase tracking-[0.2em]">
+          Last revised: {new Date().getFullYear()} · talkhumanly.com
+        </p>
       </div>
     </div>
   );

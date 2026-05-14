@@ -1,137 +1,123 @@
-"use client";
+/**
+ * Scribble — reusable hand-drawn decorative SVG elements.
+ *
+ * Variants:
+ * - underline: wavy underline for headings
+ * - squiggle: a playful stroke
+ * - circle: dashed decorative circle
+ * - arrow: hand-drawn arrow
+ * - star: starburst sparkle
+ * - sparkle: alias for star
+ * - loop: loop-de-loop decorative
+ */
 
-import { motion } from "motion/react";
+type ScribbleVariant =
+  | "underline"
+  | "squiggle"
+  | "circle"
+  | "arrow"
+  | "star"
+  | "sparkle"
+  | "loop";
 
-type ScribbleType = "circle" | "underline" | "star" | "arrow" | "sparkle" | "loop" | "wave";
+export interface ScribbleProps {
+  variant: ScribbleVariant;
+  className?: string;
+  color?: string;
+}
 
-export const Scribble = ({ 
-  type = "circle", 
-  className = "", 
-  color = "currentColor",
-  delay = 0 
-}: { 
-  type?: ScribbleType, 
-  className?: string,
-  color?: string,
-  delay?: number
-}) => {
-  const variants = {
-    hidden: { pathLength: 0, opacity: 0 },
-    visible: { 
-      pathLength: 1, 
-      opacity: 1,
-      transition: { 
-        duration: 0.8, 
-        delay, 
-        ease: "easeInOut" as any
-      } 
-    }
+export function Scribble({
+  variant,
+  className = "",
+  color = "#FDA544",
+}: ScribbleProps) {
+  const commonProps = {
+    fill: "none" as const,
+    stroke: color,
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const,
+    strokeWidth: 3,
   };
 
-  if (type === "underline") {
-    return (
-      <svg viewBox="0 0 100 10" className={className} preserveAspectRatio="none">
-        <motion.path
-          d="M2 8 Q 25 2, 50 8 T 98 8"
-          fill="none"
-          stroke={color}
-          strokeWidth="3"
-          strokeLinecap="round"
-          variants={variants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-        />
-      </svg>
-    );
-  }
-
-  if (type === "loop") {
-    return (
-      <svg viewBox="0 0 40 40" className={className}>
-        <motion.path
-          d="M20 5 C 10 5, 5 15, 20 20 S 30 35, 20 35"
-          fill="none"
-          stroke={color}
-          strokeWidth="2"
-          strokeLinecap="round"
-          variants={variants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-        />
-      </svg>
-    );
-  }
-
-  if (type === "wave") {
-    return (
-      <svg viewBox="0 0 100 20" className={className} preserveAspectRatio="none">
-        <motion.path
-          d="M0 10 Q 12.5 0, 25 10 T 50 10 T 75 10 T 100 10"
-          fill="none"
-          stroke={color}
-          strokeWidth="2"
-          strokeLinecap="round"
-          variants={variants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-        />
-      </svg>
-    );
-  }
-
-  if (type === "star") {
-    return (
-      <svg viewBox="0 0 24 24" className={className}>
-        <motion.path
-          d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
-          fill="none"
-          stroke={color}
-          strokeWidth="1.5"
-          strokeLinejoin="round"
-          variants={variants}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-        />
-      </svg>
-    );
-  }
-
-  if (type === "sparkle") {
+  switch (variant) {
+    case "underline":
       return (
-          <svg viewBox="0 0 24 24" className={className} fill="none">
-              <motion.path
-                  d="M12 3v3m0 12v3M3 12h3m12 0h3m-15.5-6.5l2 2m10.5 10.5l2 2m-14.5 0l2-2m10.5-10.5l2-2"
-                  stroke={color}
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  variants={variants}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true }}
-              />
-          </svg>
+        <svg
+          className={`absolute -bottom-3 left-0 w-full h-4 pointer-events-none -z-10 ${className}`}
+          preserveAspectRatio="none"
+          viewBox="0 0 200 20"
+          xmlns="http://www.w3.org/2000/svg"
+          {...commonProps}
+        >
+          <path d="M5 15C45 5 120 2 195 10" />
+        </svg>
       );
-  }
 
-  return (
-    <svg viewBox="0 0 100 100" className={className}>
-      <motion.circle
-        cx="50"
-        cy="50"
-        r="40"
-        fill="none"
-        stroke={color}
-        strokeWidth="2"
-        strokeDasharray="5,5"
-        variants={variants}
-        initial="hidden"
-        whileInView="visible"
-        viewport={{ once: true }}
-      />
-    </svg>
-  );
-};
+    case "squiggle":
+      return (
+        <svg
+          className={`pointer-events-none ${className}`}
+          viewBox="0 0 100 30"
+          xmlns="http://www.w3.org/2000/svg"
+          {...commonProps}
+        >
+          <path d="M5 15C25 2 45 28 65 15T95 15" />
+        </svg>
+      );
+
+    case "circle":
+      return (
+        <svg
+          className={`pointer-events-none ${className}`}
+          viewBox="0 0 100 100"
+          xmlns="http://www.w3.org/2000/svg"
+          {...commonProps}
+          strokeDasharray="8 6"
+        >
+          <circle cx="50" cy="50" r="40" />
+        </svg>
+      );
+
+    case "arrow":
+      return (
+        <svg
+          className={`pointer-events-none ${className}`}
+          viewBox="0 0 50 50"
+          xmlns="http://www.w3.org/2000/svg"
+          {...commonProps}
+        >
+          <path d="M10 40L40 10M40 10L20 10M40 10L40 30" />
+        </svg>
+      );
+
+    case "star":
+    case "sparkle":
+      return (
+        <svg
+          className={`pointer-events-none ${className}`}
+          viewBox="0 0 64 64"
+          xmlns="http://www.w3.org/2000/svg"
+          {...commonProps}
+          strokeWidth={2}
+        >
+          <path d="M32 4V12M32 52V60M4 32H12M52 32H60M12 12L18 18M46 46L52 52M12 52L18 46M46 18L52 12" />
+          <path d="M30 6V14M8 30H16" strokeWidth={1} />
+        </svg>
+      );
+
+    case "loop":
+      return (
+        <svg
+          className={`pointer-events-none ${className}`}
+          viewBox="0 0 100 100"
+          xmlns="http://www.w3.org/2000/svg"
+          {...commonProps}
+        >
+          <path d="M50 10 C70 10, 90 30, 90 50 C90 70, 70 90, 50 90 C30 90, 10 70, 10 50 C10 30, 30 10, 60 15" />
+        </svg>
+      );
+
+    default:
+      return null;
+  }
+}

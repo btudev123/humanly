@@ -1,106 +1,142 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { AnimatePresence, motion } from "motion/react";
-import { CalendarCheck, Menu, ShieldCheck, X } from "lucide-react";
-import { useState } from "react";
 
-const navItems = [
-  { label: "Services", href: "/services" },
-  { label: "Resources", href: "/resources" },
-  { label: "About", href: "/about" },
-  { label: "FAQ", href: "/faq" },
-  { label: "Contact", href: "/contact" },
+  const navLinks = [
+  { href: "/", label: "Home" },
+  { href: "/services", label: "Services" },
+  { href: "/about", label: "About" },
+  { href: "/resources", label: "Resources" },
 ];
 
-export const Navbar = () => {
+export function Navbar() {
   const pathname = usePathname();
-  const [open, setOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  // On /booking page, no navigation links — dedicated conversion page
+  const isBookPage = pathname === "/booking";
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 30);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
 
   return (
-    <nav className="fixed left-0 right-0 top-0 z-50 border-b border-primary-purple/10 bg-white/86 backdrop-blur-2xl">
-      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-5 lg:px-6">
-        <Link href="/" className="flex items-center gap-3" onClick={() => setOpen(false)}>
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary-purple text-base font-black text-white shadow-lg shadow-primary-purple/20">
-            H
-          </div>
-          <div className="leading-none">
-            <span className="block text-2xl font-semibold tracking-[-0.03em] text-slate-950">Humanly</span>
-            <span className="mt-1 block text-[9px] font-black uppercase tracking-[0.28em] text-slate-500">HR with dignity</span>
-          </div>
+    <header
+      className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+        scrolled
+          ? "bg-neutral-bg/90 backdrop-blur-md border-b border-primary-dark/10 shadow-sm py-3"
+          : "bg-transparent py-5"
+      }`}
+    >
+      <nav
+        className="max-w-[1200px] mx-auto flex items-center justify-between px-[20px] md:px-[64px]"
+        aria-label="Main navigation"
+      >
+        {/* Brand */}
+        <Link
+          href="/"
+          className="font-extrabold text-[24px] md:text-[32px] text-primary-dark hover:text-primary-violet transition-colors tracking-tight"
+          aria-label="Humanly home"
+        >
+          Humanly
         </Link>
 
-        <div className="hidden items-center gap-9 lg:flex">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`relative text-xs font-black uppercase tracking-[0.18em] transition-colors ${
-                pathname === item.href ? "text-primary-violet" : "text-primary-purple/62 hover:text-primary-purple"
-              }`}
-            >
-              {item.label}
-              {pathname === item.href && (
-                <motion.span layoutId="nav-pill" className="absolute -bottom-3 left-0 h-0.5 w-full bg-secondary-orange" />
-              )}
-            </Link>
-          ))}
-        </div>
-
-        <div className="flex items-center gap-3">
-          <Link
-            href="/booking"
-            className="hidden items-center gap-2 rounded-lg bg-primary-purple px-5 py-3 text-xs font-black uppercase tracking-[0.16em] text-white shadow-lg shadow-primary-purple/20 transition hover:bg-primary-violet md:flex"
-          >
-            <CalendarCheck size={16} />
-            Book Consultation
-          </Link>
-          <button
-            type="button"
-            aria-label={open ? "Close navigation" : "Open navigation"}
-            aria-expanded={open}
-            onClick={() => setOpen((value) => !value)}
-            className="flex h-11 w-11 items-center justify-center rounded-lg border border-primary-purple/10 text-primary-purple lg:hidden"
-          >
-            {open ? <X size={22} /> : <Menu size={22} />}
-          </button>
-        </div>
-      </div>
-
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden border-t border-primary-purple/10 bg-white lg:hidden"
-          >
-            <div className="space-y-2 px-5 py-5">
-              {navItems.map((item) => (
+        {/* Desktop nav — hide on /book */}
+        {!isBookPage && (
+          <>
+            <div className="hidden md:flex items-center gap-8">
+              {navLinks.map((link) => (
                 <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setOpen(false)}
-                  className={`block rounded-lg px-4 py-4 text-sm font-black uppercase tracking-[0.16em] ${
-                    pathname === item.href ? "bg-primary-violet/10 text-primary-violet" : "text-primary-purple"
+                  key={link.href}
+                  href={link.href}
+                  className={`font-semibold text-[14px] transition-colors duration-200 ${
+                    pathname === link.href
+                      ? "text-primary-violet border-b-2 border-primary-violet"
+                      : "text-neutral-500 hover:text-primary-violet"
                   }`}
                 >
-                  {item.label}
+                  {link.label}
                 </Link>
               ))}
+            </div>
+
+            {/* CTA button — desktop */}
+            <div className="hidden md:block">
               <Link
                 href="/booking"
-                onClick={() => setOpen(false)}
-                className="mt-4 flex items-center justify-between rounded-lg bg-primary-purple px-4 py-4 text-sm font-black uppercase tracking-[0.16em] text-white"
+                className="inline-flex items-center gap-2 bg-primary-violet text-white font-semibold text-[14px] px-6 py-3 rounded-full hover:bg-primary-dark transition-colors duration-200"
               >
-                Book Consultation
-                <ShieldCheck size={18} />
+                <span>Get Support</span>
+                <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+                  arrow_forward
+                </span>
               </Link>
             </div>
-          </motion.div>
+
+            {/* Mobile hamburger */}
+            <button
+              className="md:hidden flex items-center justify-center p-2 text-neutral-900"
+              onClick={() => setMobileOpen(!mobileOpen)}
+              aria-expanded={mobileOpen}
+              aria-label="Toggle navigation menu"
+            >
+              <span className="material-symbols-outlined text-[28px]">
+                {mobileOpen ? "close" : "menu"}
+              </span>
+            </button>
+          </>
         )}
-      </AnimatePresence>
-    </nav>
+
+        {/* /book page — just back to home */}
+        {isBookPage && (
+          <Link
+            href="/"
+            className="text-[14px] font-semibold text-neutral-500 hover:text-primary-violet transition-colors"
+          >
+            ← Back to Home
+          </Link>
+        )}
+      </nav>
+
+      {/* Mobile menu drawer */}
+      {mobileOpen && !isBookPage && (
+        <div className="md:hidden bg-neutral-bg/95 backdrop-blur-md border-b border-primary-dark/10 shadow-lg animate-fade-in">
+          <div className="max-w-[1200px] mx-auto px-[20px] py-6 flex flex-col gap-4">
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className={`font-semibold text-[16px] py-2 ${
+                  pathname === link.href
+                    ? "text-primary-violet"
+                    : "text-neutral-500"
+                }`}
+              >
+                {link.label}
+              </Link>
+            ))}
+            <Link
+              href="/booking"
+              className="inline-flex items-center justify-center gap-2 bg-primary-violet text-white font-semibold text-[14px] px-6 py-3 rounded-full mt-2"
+            >
+              Get Support
+              <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+                arrow_forward
+              </span>
+            </Link>
+          </div>
+        </div>
+      )}
+    </header>
   );
-};
+}

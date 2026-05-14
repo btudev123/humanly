@@ -1,51 +1,184 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-serif: var(--font-serif), serif;
-  
-  --color-primary-purple: #3f1b73;
+  /* === Brand Typeface === */
+  --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
+
+  /* === Primary Palette (from Brand Deck) === */
+  --color-primary-dark: #3f1b73;
   --color-primary-violet: #7c35e3;
-  --color-secondary-pink: #f982db;
-  --color-secondary-orange: #fda544;
 
-  --animate-marquee: marquee 25s linear infinite;
-  --animate-marquee2: marquee2 25s linear infinite;
+  /* === Semantic Aliases (for code readability across pages) === */
+  --color-primary-purple: #3f1b73;   /* alias for primary-dark — used in pages */
+  --color-accent-orange: #fda544;     /* alias for amber */
+  --color-secondary-orange: #fda544; /* alias for amber */
+  --color-secondary-pink: #f982db;   /* decorative pink accent */
 
-  @keyframes marquee {
-    0% { transform: translateX(0%); }
-    100% { transform: translateX(-100%); }
+  /* === Secondary Palette (from Brand Deck) === */
+  --color-coral: #f32d2e;
+  --color-amber: #fda544;
+
+  /* === Neutrals === */
+  --color-neutral-bg: #f8f7f4;
+  --color-neutral-100: #faf9f9;
+  --color-neutral-200: #eeeeee;
+  --color-neutral-300: #dbdbdb;
+  --color-neutral-400: #a0a0a0;
+  --color-neutral-500: #5b5b5b;
+  --color-neutral-900: #1a1c1c;
+
+  /* === Surface/Outline tokens (from sticcht design system) === */
+  --color-surface: #faf9f9;
+  --color-surface-container: #eeeeee;
+  --color-surface-container-low: #f4f3f3;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-high: #e8e8e8;
+  --color-surface-dim: #dadada;
+  --color-surface-bright: #faf9f9;
+  --color-surface-variant: #e2e2e2;
+  --color-outline: #7b7482;
+  --color-outline-variant: #ccc3d2;
+  --color-on-surface: #1a1c1c;
+  --color-on-surface-variant: #4a4550;
+  --color-on-primary: #ffffff;
+  --color-on-primary-container: #ab88e4;
+  --color-on-secondary: #ffffff;
+  --color-on-secondary-container: #fffbff;
+  --color-on-background: #1a1c1c;
+  --color-on-tertiary-container: #d88627;
+  --color-inverse-primary: #d5baff;
+  --color-primary-container: #3f1b73;
+  --color-secondary: #752bdc;
+  --color-secondary-container: #8f4cf6;
+
+  /* === Typography Scale (Poppins) === */
+  --text-h1-desktop: 48px;
+  --text-h1-desktop--line-height: 1.2;
+  --text-h1-desktop--letter-spacing: -0.02em;
+  --text-h1-desktop--font-weight: 800;
+
+  --text-h1-mobile: 32px;
+  --text-h1-mobile--line-height: 1.2;
+  --text-h1-mobile--font-weight: 800;
+
+  --text-h2: 32px;
+  --text-h2--line-height: 1.3;
+  --text-h2--font-weight: 600;
+
+  --text-h3: 24px;
+  --text-h3--line-height: 1.4;
+  --text-h3--font-weight: 600;
+
+  --text-body-lg: 18px;
+  --text-body-lg--line-height: 1.6;
+  --text-body-lg--font-weight: 400;
+
+  --text-body-md: 16px;
+  --text-body-md--line-height: 1.6;
+  --text-body-md--font-weight: 400;
+
+  --text-label-bold: 14px;
+  --text-label-bold--line-height: 1.4;
+  --text-label-bold--font-weight: 600;
+
+  --text-caption: 12px;
+  --text-caption--line-height: 1.4;
+  --text-caption--font-weight: 400;
+
+  /* === Spacing === */
+  --spacing-margin-desktop: 64px;
+  --spacing-margin-mobile: 20px;
+  --spacing-gutter: 24px;
+  --spacing-max-width: 1200px;
+
+  /* === Animations === */
+  --animate-squiggle: squiggle 3s ease-in-out infinite;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-fade-in: fadeIn 0.6s ease-out forwards;
+
+  @keyframes squiggle {
+    0%, 100% { stroke-dashoffset: 0; }
+    50% { stroke-dashoffset: 100; }
   }
-  @keyframes marquee2 {
-    0% { transform: translateX(100%); }
-    100% { transform: translateX(0%); }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes dash {
+    to { stroke-dashoffset: -100; }
   }
 }
 
 @layer base {
   html {
     scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   body {
-    @apply bg-[#FAFAFA] text-primary-purple selection:bg-primary-violet selection:text-white;
+    @apply bg-neutral-bg text-neutral-900 font-sans;
+    font-feature-settings: "ss01", "ss02", "cv01", "cv02";
   }
 
-  h1, h2, h3 {
-    @apply tracking-tight leading-[1.05];
+  h1, h2, h3, h4 {
+    @apply tracking-tight;
   }
 
   button, a, input, textarea, select {
     @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary-violet;
   }
+
+  ::selection {
+    @apply bg-primary-violet/20 text-primary-dark;
+  }
 }
 
-.bg-grid-refined {
-  background-size: 40px 40px;
-  background-image: linear-gradient(to right, rgba(0,0,0,0.02) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(0,0,0,0.02) 1px, transparent 1px);
+/* === Hand-Drawn SVG Utilities === */
+.hand-drawn-underline {
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  width: 100%;
+  height: 8px;
+  pointer-events: none;
 }
 
+.hand-drawn-underline svg path {
+  stroke-dasharray: 300;
+  stroke-dashoffset: 0;
+  animation: squiggle 3s ease-in-out infinite;
+}
+
+/* === Scribble accent decoration === */
+.scribble-accent {
+  position: absolute;
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+/* === Dotted connector line === */
+.squashed-line {
+  stroke-dasharray: 8 8;
+  animation: dash 20s linear infinite;
+}
+
+/* === Glass panel (subtle) === */
+.glass-panel {
+  background: linear-gradient(135deg, rgba(255,255,255,0.92), rgba(255,255,255,0.68));
+  border: 1px solid rgba(63, 27, 115, 0.08);
+  box-shadow: 0 20px 60px rgba(63, 27, 115, 0.08);
+  backdrop-filter: blur(20px);
+}
+
+/* === Noise overlay texture === */
 .noise-overlay {
   position: fixed;
   top: 0;
@@ -53,25 +186,26 @@
   width: 100%;
   height: 100%;
   pointer-events: none;
-  opacity: 0.05;
+  opacity: 0.03;
   z-index: 9999;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-.glass-panel {
-  background: linear-gradient(135deg, rgba(255,255,255,0.88), rgba(255,255,255,0.62));
-  border: 1px solid rgba(63, 27, 115, 0.1);
-  box-shadow: 0 30px 90px rgba(63, 27, 115, 0.12);
-  backdrop-filter: blur(24px);
-}
-
-/* Custom scrollbar for better look */
+/* === Custom scrollbar === */
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 8px;
 }
 ::-webkit-scrollbar-track {
-  @apply bg-white;
+  @apply bg-neutral-bg;
 }
 ::-webkit-scrollbar-thumb {
   @apply bg-primary-violet/20 rounded-full hover:bg-primary-violet/40 transition-colors;
+}
+
+/* === Material Symbols base === */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+.material-symbols-filled {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }

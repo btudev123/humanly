@@ -1,119 +1,160 @@
 "use client";
 
 import { motion } from "motion/react";
-import { Scribble } from "@/components/ui/Scribble";
-import { CheckCircle2, Calendar as CalendarIcon, Mail, ArrowRight, Sparkles, PartyPopper } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { ArrowRight, CheckCircle2, ClipboardList, Clock, FileText, Mail, ShieldCheck, Video } from "lucide-react";
+import { Scribble } from "@/components/ui/Scribble";
 
-export default function Success() {
-  const [showConfetti, setShowConfetti] = useState(false);
+const prepSteps = [
+  "Gather any relevant documents: emails, performance reviews, messages that capture your situation.",
+  "Jot down a timeline of events — dates matter when discussing patterns and potential legal exposure.",
+  "Note what outcome you're hoping for: clarity, a decision framework, scripted conversations, or ongoing support.",
+  "Find a quiet, private space for your session where you can speak freely.",
+];
 
-  useEffect(() => {
-    const timer = setTimeout(() => setShowConfetti(true), 500);
-    return () => clearTimeout(timer);
-  }, []);
-
+export default function SuccessPage() {
   return (
-    <div className="pt-20 pb-32 px-6 flex flex-col items-center justify-center min-h-[80vh] relative overflow-hidden">
-      {/* Background celebration */}
-      <Scribble type="sparkle" className="absolute top-20 left-20 w-40 h-40 text-secondary-orange/20" delay={0.2} />
-      <Scribble type="star" className="absolute bottom-40 right-20 w-32 h-32 text-secondary-pink/20" delay={0.4} />
-      <Scribble type="loop" className="absolute top-1/2 left-10 w-24 h-24 text-primary-violet/10" delay={0.6} />
-
-      <motion.div
-        initial={{ opacity: 0, scale: 0.8, y: 40 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ type: "spring", damping: 12, stiffness: 100 }}
-        className="max-w-3xl w-full bg-white p-16 lg:p-24 rounded-[70px] shadow-2xl border border-gray-100 text-center relative z-10"
-      >
-        <div className="w-24 h-24 bg-green-500 rounded-[30px] flex items-center justify-center text-white mx-auto mb-10 shadow-xl shadow-green-500/30">
-          <CheckCircle2 size={56} strokeWidth={2.5} />
-        </div>
-
-        <h1 className="text-5xl lg:text-7xl font-black text-primary-purple mb-8 leading-tight">
-          You're all <span className="relative inline-block text-secondary-orange italic">
-            set!
-            <Scribble type="underline" className="absolute -bottom-2 left-0 w-full h-3 text-secondary-pink" color="#f982db" />
-          </span>
-        </h1>
-        
-        <p className="text-2xl text-gray-500 font-medium mb-12 leading-relaxed">
-          Your booking is confirmed. We've sent a calendar invite and a preparation guide to your email.
-        </p>
-
-        <div className="grid md:grid-cols-2 gap-6 mb-16">
-          <div className="bg-gray-50 p-8 rounded-[40px] flex flex-col items-center border border-gray-100">
-             <div className="w-12 h-12 bg-primary-violet/10 rounded-2xl flex items-center justify-center text-primary-violet mb-4">
-                <CalendarIcon size={24} />
-             </div>
-             <p className="text-gray-400 font-bold uppercase tracking-widest text-[10px] mb-1">Check Calendar</p>
-             <h4 className="text-primary-purple font-black">Invite Sent</h4>
-          </div>
-          <div className="bg-gray-50 p-8 rounded-[40px] flex flex-col items-center border border-gray-100">
-             <div className="w-12 h-12 bg-secondary-pink/10 rounded-2xl flex items-center justify-center text-secondary-pink mb-4">
-                <Mail size={24} />
-             </div>
-             <p className="text-gray-400 font-bold uppercase tracking-widest text-[10px] mb-1">Check Email</p>
-             <h4 className="text-primary-purple font-black">Preparation Guide</h4>
-          </div>
-        </div>
-
-        <div className="space-y-6">
-          <Link href="/resources">
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              className="w-full py-6 bg-primary-violet text-white font-black rounded-3xl text-xl shadow-2xl shadow-primary-violet/20 flex items-center justify-center gap-3 transition-colors hover:bg-primary-purple"
-            >
-              <Sparkles size={24} />
-              Read Pre-Consultation Guide
-            </motion.button>
-          </Link>
-          <Link href="/">
-             <button className="text-primary-violet font-black underline underline-offset-8 transition-all hover:text-primary-purple">
-               Return to Home
-             </button>
-          </Link>
-        </div>
-
-        {/* Fun doodle at the bottom */}
-        <Scribble type="sparkle" className="mx-auto w-16 h-16 text-secondary-orange/40 mt-12" />
-      </motion.div>
-
-      {/* Floating party elements if showConfetti */}
-      {showConfetti && (
-        <motion.div 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="absolute inset-0 pointer-events-none"
+    <div className="min-h-screen bg-neutral-bg">
+      {/* Confirmation Hero */}
+      <header className="px-5 md:px-[64px] max-w-3xl mx-auto pt-20 md:pt-28 text-center">
+        <motion.div
+          initial={{ scale: 0.8, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 200, damping: 18 }}
+          className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6"
         >
-          {Array.from({ length: 20 }).map((_, i) => (
-            <motion.div
-              key={i}
-              initial={{ 
-                x: Math.random() * 100 + "%", 
-                y: "110%", 
-                rotate: 0,
-                opacity: 1 
-              }}
-              animate={{ 
-                y: "-10%", 
-                rotate: 360,
-                opacity: 0
-              }}
-              transition={{ 
-                duration: Math.random() * 3 + 2, 
-                delay: Math.random() * 2,
-                repeat: Infinity 
-              }}
-              className="absolute"
-            >
-              <PartyPopper size={24} className={i % 2 === 0 ? "text-secondary-orange" : "text-secondary-pink"} />
-            </motion.div>
-          ))}
+          <CheckCircle2 className="text-green-600" size={40} />
         </motion.div>
-      )}
+        <h1 className="font-extrabold text-[32px] md:text-[48px] leading-[1.2] -tracking-[0.02em] text-primary-dark">
+          Your session is confirmed
+        </h1>
+        <p className="mt-4 text-lg leading-relaxed text-neutral-500">
+          You&rsquo;ve done the hard part. We&rsquo;ll take it from here.
+        </p>
+      </header>
+
+      {/* Session Details */}
+      <section className="px-5 md:px-[64px] max-w-2xl mx-auto mt-12">
+        <div className="rounded-lg bg-white border border-neutral-300 p-8 shadow-sm">
+          <div className="flex items-center gap-3 mb-6">
+            <Clock className="text-primary-violet" size={22} />
+            <h2 className="font-extrabold text-2xl text-primary-dark">Session details</h2>
+          </div>
+
+          <div className="space-y-5">
+            <div className="flex items-center justify-between py-4 border-b border-neutral-200">
+              <span className="text-neutral-500">Date & time</span>
+              <span className="font-extrabold text-primary-dark">[Set by Cal.com]</span>
+            </div>
+            <div className="flex items-center justify-between py-4 border-b border-neutral-200">
+              <span className="text-neutral-500">Service</span>
+              <span className="font-extrabold text-primary-dark">The Triage — 60 min</span>
+            </div>
+            <div className="flex items-center justify-between py-4">
+              <span className="text-neutral-500">Status</span>
+              <span className="inline-flex items-center gap-1.5 font-bold text-sm uppercase tracking-[0.08em] text-green-600">
+                <CheckCircle2 size={14} />
+                Confirmed
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Zoom Link */}
+      <section className="px-5 md:px-[64px] max-w-2xl mx-auto mt-4">
+        <div className="rounded-lg bg-primary-dark p-8 text-center text-white shadow-sm">
+          <Video className="mx-auto text-amber mb-4" size={32} />
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-amber mb-3">Join your session</p>
+          <p className="text-lg mb-6">
+            A Zoom link has been sent to your email. You can also use the link below.
+          </p>
+          <a
+            href="#"
+            className="inline-flex items-center gap-2 rounded-lg bg-white text-primary-dark px-8 py-4 font-bold uppercase tracking-[0.1em] text-xs hover:bg-amber hover:text-primary-dark transition-colors"
+          >
+            <Video size={16} />
+            Open Zoom link
+          </a>
+        </div>
+      </section>
+
+      {/* What's in your inbox */}
+      <section className="px-5 md:px-[64px] max-w-2xl mx-auto mt-4">
+        <div className="rounded-lg bg-white border border-neutral-300 p-8 shadow-sm">
+          <div className="flex items-center gap-3 mb-6">
+            <Mail className="text-primary-violet" size={22} />
+            <h2 className="font-extrabold text-2xl text-primary-dark">What&rsquo;s in your inbox</h2>
+          </div>
+          <div className="space-y-4">
+            {[
+              { icon: CheckCircle2, text: "Confirmation email with session date, time, and calendar invite" },
+              { icon: FileText, text: "Link to your pre-session intake form (Karma reads every intake before your session)" },
+              { icon: Video, text: "Zoom / Google Meet link — join from any device, no downloads required" },
+            ].map((item, i) => (
+              <div key={item.text} className="flex items-start gap-3">
+                <item.icon className="shrink-0 text-green-600 mt-0.5" size={18} />
+                <p className="leading-relaxed text-neutral-500">{item.text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Prepare checklist */}
+      <section className="px-5 md:px-[64px] max-w-2xl mx-auto mt-4">
+        <div className="rounded-lg bg-white border border-neutral-300 p-8 shadow-sm">
+          <div className="flex items-center gap-3 mb-6">
+            <ClipboardList className="text-primary-violet" size={22} />
+            <h2 className="font-extrabold text-2xl text-primary-dark">Prepare for your session</h2>
+          </div>
+          <ol className="space-y-4">
+            {prepSteps.map((step, i) => (
+              <li key={step} className="flex items-start gap-3">
+                <span className="shrink-0 w-7 h-7 rounded-full bg-primary-violet/10 text-primary-violet flex items-center justify-center font-extrabold text-xs">
+                  {i + 1}
+                </span>
+                <p className="leading-relaxed text-neutral-500 pt-0.5">{step}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </section>
+
+      {/* Upsell CTA */}
+      <section className="px-5 md:px-[64px] max-w-2xl mx-auto mt-12">
+        <div className="rounded-lg bg-amber/5 border-2 border-amber p-8 text-center relative overflow-hidden">
+          <Scribble variant="sparkle" className="absolute top-4 right-4 w-16 h-16 text-amber/30" />
+          <div className="relative z-10">
+            <FileText className="mx-auto text-amber mb-4" size={32} />
+            <h3 className="font-extrabold text-2xl text-primary-dark mb-3">
+              Add a written strategy report
+            </h3>
+            <p className="leading-relaxed text-neutral-500 max-w-md mx-auto mb-6">
+              Upgrade to The Strategy and receive a structured report summarizing your situation, risk assessment, recommended actions, and suggested scripts.
+            </p>
+            <span className="block font-extrabold text-3xl text-primary-dark mb-6">
+              AED 950
+              <span className="text-sm font-normal text-neutral-500 ml-2">one-time</span>
+            </span>
+            <a
+              href="#"
+              className="inline-flex items-center gap-2 bg-amber text-primary-dark px-8 py-4 rounded-full font-bold uppercase tracking-[0.1em] text-xs hover:bg-amber/90 transition-colors"
+            >
+              Upgrade to The Strategy
+              <ArrowRight size={16} />
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Trust footer */}
+      <section className="px-5 md:px-[64px] max-w-2xl mx-auto mt-8 mb-20 text-center">
+        <div className="flex items-center justify-center gap-2 text-xs text-neutral-400">
+          <ShieldCheck size={14} />
+          <span>Confidential by design. No recording. Your employer will not be contacted.</span>
+        </div>
+      </section>
     </div>
   );
 }
