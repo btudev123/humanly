@@ -2,8 +2,7 @@
 
 import Link from "next/link";
 import { motion, AnimatePresence } from "motion/react";
-import { useState, useEffect, useRef } from "react";
-import { FullScreenScrollFX, type FullScreenFXAPI } from "@/components/ui/full-screen-scroll-fx";
+import { useState, useEffect } from "react";
 import { Scribble } from "@/components/ui/Scribble";
 import { TestimonialsCarousel, type Testimonial } from "@/components/reviews/TestimonialsCarousel";
 import {
@@ -19,53 +18,6 @@ import {
   Users,
   Sparkles,
 } from "lucide-react";
-
-/* ------------------------------------------------------------------ */
-/*  Full-Screen Scroll Sections — HR themed                           */
-/* ------------------------------------------------------------------ */
-
-const heroSections = [
-  {
-    id: "hero",
-    leftLabel: "Your HR",
-    title: "Isn't On Your Side",
-    rightLabel: "We Are",
-    background:
-      "https://images.unsplash.com/photo-1497366216548-37526070297c?w=1200&q=80&fm=jpg&fit=crop",
-  },
-  {
-    id: "safe",
-    leftLabel: "100% Private",
-    title: "Safe Space",
-    rightLabel: "Zero Exposure",
-    background:
-      "https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=1200&q=80&fm=jpg&fit=crop",
-  },
-  {
-    id: "clarity",
-    leftLabel: "Evidence-Based",
-    title: "Reality Check",
-    rightLabel: "No Sugarcoating",
-    background:
-      "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=1200&q=80&fm=jpg&fit=crop",
-  },
-  {
-    id: "action",
-    leftLabel: "Written Plan",
-    title: "Clear Next Steps",
-    rightLabel: "48-Hour Turnaround",
-    background:
-      "https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200&q=80&fm=jpg&fit=crop",
-  },
-  {
-    id: "dignity",
-    leftLabel: "Dignified Exit",
-    title: "Your Terms",
-    rightLabel: "No Retaliation",
-    background:
-      "https://images.unsplash.com/photo-1556761175-b413da4baf72?w=1200&q=80&fm=jpg&fit=crop",
-  },
-];
 
 /* ------------------------------------------------------------------ */
 /*  Copy & data                                                       */
@@ -158,25 +110,43 @@ const trustSignals: Testimonial[] = [
     id: "ts-1",
     author: "Karma Harb",
     role: "Founder credibility",
+    company: undefined,
     quote: "Founded by Karma Harb after 20+ years inside HR leadership across UAE, Saudi Arabia, and international environments.",
     date: "2025-01-01",
     verified: true,
+    rating: undefined,
+    thumbnail: undefined,
+    mediaUrl: undefined,
+    mediaType: undefined,
+    transcript: undefined,
   },
   {
     id: "ts-2",
     author: "Humanly",
     role: "Early-stage transparency",
+    company: undefined,
     quote: "Humanly does not publish testimonials until they are verified, consented, and privacy-safe.",
     date: "2025-01-01",
     verified: true,
+    rating: undefined,
+    thumbnail: undefined,
+    mediaUrl: undefined,
+    mediaType: undefined,
+    transcript: undefined,
   },
   {
     id: "ts-3",
     author: "Humanly",
     role: "Performance-first proof",
+    company: undefined,
     quote: "Future video or Instagram testimonials will load as lightweight thumbnails with transcripts before third-party embeds.",
     date: "2025-01-01",
     verified: true,
+    rating: undefined,
+    thumbnail: undefined,
+    mediaUrl: undefined,
+    mediaType: undefined,
+    transcript: undefined,
   },
 ];
 
@@ -202,6 +172,7 @@ const faqs = [
     a: "Yes. You can reschedule or cancel up to 24 hours before your session with no charge. We understand that workplace situations are unpredictable.",
   },
 ];
+
 
 function FAQAccordion() {
   const [open, setOpen] = useState<number | null>(null);
@@ -242,50 +213,130 @@ function FAQAccordion() {
 /* ------------------------------------------------------------------ */
 
 export default function Home() {
-  const scrollApiRef = useRef<FullScreenFXAPI>(null);
+  /* Sticky mobile CTA bar after 30% scroll */
   const [showSticky, setShowSticky] = useState(false);
-
   useEffect(() => {
-    const onScroll = () => setShowSticky(window.scrollY > window.innerHeight * 0.5);
+    const onScroll = () => setShowSticky(window.scrollY > window.innerHeight * 0.3);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   return (
-    <div className="bg-surface text-on-surface antialiased">
-      {/* ============ FULL-SCREEN SCROLL HERO ============ */}
-      <FullScreenScrollFX
-        sections={heroSections}
-        apiRef={scrollApiRef}
-        header={
-          <>
-            <div className="text-[clamp(1.5rem,6vw,4.5rem)] font-black leading-none tracking-[-0.02em] text-[var(--fx-text)]">
-              Humanly
+    <div className="bg-surface text-on-surface font-body-md antialiased">
+
+      {/* ============ HERO ============ */}
+      <section className="relative overflow-hidden px-margin-mobile md:px-margin-desktop pt-28 pb-16 md:pt-36 md:pb-24">
+        {/* Background gradient */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_10%,rgba(124,53,227,0.10),transparent_40%),linear-gradient(180deg,#ffffff_0%,#faf9f9_100%)]" />
+        <Scribble variant="loop" className="absolute top-20 left-10 w-48 h-48 text-secondary-orange/15 -rotate-12 hidden md:block" />
+        <Scribble variant="sparkle" className="absolute bottom-10 right-10 w-32 h-32 text-secondary/10 hidden md:block" />
+
+        <div className="relative mx-auto max-w-max-width grid gap-12 lg:grid-cols-[1.02fr_0.98fr] lg:items-center">
+          {/* Left: Copy */}
+          <div className="relative z-10">
+            <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-outline-variant bg-surface-container-lowest px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] text-on-surface-variant shadow-sm">
+              <LockKeyhole size={14} className="text-secondary" />
+              100% Confidential · GCC Professionals · 20+ Yrs Experience
             </div>
-            <div className="mt-2 text-[clamp(0.7rem,1.4vw,1.1rem)] font-semibold uppercase tracking-[0.18em] text-[#fda544]">
-              Independent HR Advisory
+
+            <h1 className="max-w-4xl font-h1-mobile text-h1-mobile md:font-h1-desktop md:text-h1-desktop text-primary relative inline-block">
+              Your HR isn't on your side.
+              <br />
+              <span className="relative inline-block">
+                We are.
+                <Scribble variant="underline" className="absolute -bottom-3 left-0 w-full h-4 text-secondary-orange" color="#FDA544" />
+              </span>
+            </h1>
+
+            <p className="mt-6 max-w-2xl font-body-lg text-body-lg text-on-surface-variant">
+              Independent, neutral, and confidential HR advisory for professionals navigating workplace challenges in the UAE and GCC.
+            </p>
+
+            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+              <Link
+                href="/booking"
+                className="inline-flex items-center justify-center gap-3 rounded-full bg-secondary text-on-secondary px-8 py-4 font-label-bold text-label-bold hover:bg-primary-container transition-colors shadow-xl shadow-secondary/20"
+              >
+                <CalendarCheck size={18} />
+                Book a Confidential Session
+              </Link>
+              <Link
+                href="/services"
+                className="inline-flex items-center justify-center gap-3 rounded-full border border-outline-variant bg-surface-container-lowest px-8 py-4 font-label-bold text-label-bold text-on-surface hover:border-secondary transition-colors"
+              >
+                View Services
+                <ArrowRight size={18} />
+              </Link>
             </div>
-          </>
-        }
-        footer={
-          <Link
-            href="/booking"
-            className="inline-flex items-center gap-2 rounded-full bg-[#fda544] px-6 py-3 text-sm font-bold text-[#3f1b73] transition-colors hover:bg-[#fdb844]"
-          >
-            <CalendarCheck size={18} />
-            Book a Confidential Session
-          </Link>
-        }
-        colors={{
-          text: "rgba(255,255,255,0.94)",
-          overlay: "rgba(63,27,115,0.52)",
-          pageBg: "#ffffff",
-          stageBg: "#3f1b73",
-        }}
-        fontFamily="Poppins, system-ui, sans-serif"
-        showProgress
-        durations={{ change: 0.7, snap: 800 }}
-      />
+
+            {/* Trust markers */}
+            <div className="mt-10 grid max-w-2xl gap-3 sm:grid-cols-2">
+              {[
+                "No employer notification",
+                "Strictly confidential by design",
+                "UAE & GCC labour law expertise",
+                "Written action plan within 48 hours",
+              ].map((item) => (
+                <div key={item} className="flex items-start gap-3 text-sm font-medium text-on-surface-variant">
+                  <CheckCircle2 className="mt-0.5 shrink-0 text-secondary" size={18} />
+                  {item}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Right: Floating visual */}
+          <div className="relative min-h-[480px] md:min-h-[560px]">
+            <motion.div
+              animate={{ y: [0, -12, 0], rotateX: [0, 2, 0] }}
+              transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute inset-x-0 top-0 mx-auto max-w-[480px] rounded-[2rem] border border-outline-variant bg-surface-container-lowest p-5 shadow-2xl shadow-primary/10"
+            >
+              <div className="rounded-[1.4rem] bg-primary-container p-6 text-on-primary">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-on-primary/60">Private Case Room</p>
+                    <h2 className="mt-2 text-2xl font-semibold text-on-primary">Workplace Strategy Plan</h2>
+                  </div>
+                  <span className="rounded-full bg-emerald-400/20 px-3 py-1 text-xs font-bold text-emerald-200">Encrypted</span>
+                </div>
+                <div className="mt-8 grid gap-4">
+                  {[
+                    ["Concern", "Manager retaliation after formal complaint"],
+                    ["Priority", "Protect record and preserve evidence"],
+                    ["Next Step", "Draft neutral escalation email"],
+                  ].map(([label, value]) => (
+                    <div key={label} className="rounded-2xl border border-on-primary/10 bg-on-primary/10 p-4">
+                      <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-on-primary/50">{label}</p>
+                      <p className="mt-2 font-medium text-on-primary/90">{value}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              animate={{ y: [0, 16, 0] }}
+              transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute bottom-16 left-0 w-[260px] rounded-2xl border border-outline-variant bg-surface-container-lowest p-5 shadow-xl"
+            >
+              <ShieldCheck className="text-secondary" size={26} />
+              <p className="mt-4 text-sm font-bold uppercase tracking-[0.14em] text-on-surface-variant">Confidentiality Promise</p>
+              <p className="mt-2 text-lg font-semibold leading-snug text-on-surface">No employer notification. No shared access. No recordings.</p>
+            </motion.div>
+
+            <motion.div
+              animate={{ y: [0, -10, 0] }}
+              transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute bottom-0 right-4 w-[230px] rounded-2xl bg-primary p-5 text-on-primary shadow-xl shadow-primary/25"
+            >
+              <Users size={24} className="text-secondary-orange" />
+              <p className="mt-4 text-4xl font-extrabold">45 min</p>
+              <p className="mt-1 text-sm text-on-primary/70">Focused strategy session with written action summary.</p>
+            </motion.div>
+          </div>
+        </div>
+      </section>
 
       {/* ============ STATS BAR ============ */}
       <section className="border-y border-outline-variant bg-surface-container-low px-margin-mobile md:px-margin-desktop py-10">
@@ -300,7 +351,109 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ============ THREE PILLARS ============ */}
+      {/* ============ THE PROBLEM — Unsafe Middle Ground ============ */}
+      <section className="px-margin-mobile md:px-margin-desktop py-20 md:py-24">
+        <div className="mx-auto max-w-max-width">
+          <div className="text-center mb-16 relative">
+            <h2 className="font-h1-mobile text-h1-mobile md:font-h1-desktop md:text-h1-desktop text-primary relative inline-block">
+              Caught in the unsafe middle ground?
+              <Scribble variant="underline" className="absolute -bottom-4 left-0 w-full h-4 text-secondary-orange" color="#FDA544" />
+            </h2>
+            <p className="font-body-lg text-body-lg text-on-surface-variant mt-6 max-w-2xl mx-auto">
+              Navigating workplace issues often leaves employees trapped between conflicting interests. It doesn't have to be this way.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter items-stretch">
+            {/* Internal HR */}
+            <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-8 relative flex flex-col h-full">
+              <div className="absolute -top-6 -right-6 text-error rotate-12 z-20">
+                <svg fill="none" height="48" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" viewBox="0 0 48 48" width="48">
+                  <path d="M24 4L4 40H44L24 4Z" strokeLinejoin="round" />
+                  <path d="M24 16V28" />
+                  <circle cx="24" cy="36" fill="currentColor" r="1" />
+                  <path d="M3 41 C15 42, 35 39, 45 41" strokeWidth="1.5" />
+                </svg>
+              </div>
+              <div className="mb-6">
+                <div className="w-12 h-12 bg-secondary/10 rounded-full flex items-center justify-center text-secondary mb-4">
+                  <span className="material-symbols-outlined text-[28px]">corporate_fare</span>
+                </div>
+                <h3 className="font-h3 text-h3 text-primary mb-2">Internal HR</h3>
+                <p className="font-label-bold text-label-bold text-on-surface-variant uppercase tracking-wider text-xs">The Company</p>
+              </div>
+              <div className="space-y-6 flex-grow border-t border-outline-variant pt-6">
+                <div>
+                  <h4 className="font-label-bold text-label-bold text-on-surface mb-1">Mandate:</h4>
+                  <p className="font-body-md text-body-md text-on-surface-variant">Protect the Business</p>
+                </div>
+                <div>
+                  <h4 className="font-label-bold text-label-bold text-on-surface mb-1">Perception:</h4>
+                  <p className="font-body-md text-body-md text-on-surface-variant">Unsafe for the employee.</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Humanly (highlighted) */}
+            <div className="bg-primary-container text-on-primary rounded-xl p-8 relative flex flex-col h-full transform md:-translate-y-4 shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-[#56348a] z-10">
+              <div className="absolute -top-8 -left-8 text-secondary-orange -rotate-12 z-20">
+                <svg fill="none" height="64" stroke="currentColor" strokeLinecap="round" strokeWidth="2" viewBox="0 0 64 64" width="64">
+                  <path d="M32 4V12M32 52V60M4 32H12M52 32H60M12 12L18 18M46 46L52 52M12 52L18 46M46 18L52 12" />
+                  <path d="M30 6V14M8 30H16" strokeWidth="1" />
+                </svg>
+              </div>
+              <div className="mb-6">
+                <div className="w-12 h-12 bg-secondary rounded-full flex items-center justify-center text-on-secondary mb-4">
+                  <span className="material-symbols-outlined text-[28px] fill-icon">balance</span>
+                </div>
+                <h3 className="font-h3 text-h3 text-on-primary mb-2">Humanly</h3>
+                <p className="font-label-bold text-label-bold text-secondary-fixed uppercase tracking-wider text-xs">The Sweet Spot</p>
+              </div>
+              <div className="space-y-6 flex-grow border-t border-on-primary-fixed-variant pt-6">
+                <div>
+                  <h4 className="font-label-bold text-label-bold text-on-primary mb-1">Mandate:</h4>
+                  <p className="font-body-md text-body-md text-inverse-primary">Protect the Individual</p>
+                </div>
+                <div>
+                  <h4 className="font-label-bold text-label-bold text-on-primary mb-1">Perception:</h4>
+                  <p className="font-body-md text-body-md text-inverse-primary">Dignified & Neutral.</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Employment Lawyers */}
+            <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-8 relative flex flex-col h-full">
+              <div className="absolute -top-6 -right-4 text-outline rotate-45 z-20">
+                <svg fill="none" height="48" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 48 48" width="48">
+                  <path d="M16 20L28 32" />
+                  <rect height="24" rx="2" transform="rotate(45 22 8)" width="16" x="22" y="8" />
+                  <path d="M8 38H40" />
+                  <path d="M15 19L29 33M23 9L39 25" strokeWidth="1" />
+                </svg>
+              </div>
+              <div className="mb-6">
+                <div className="w-12 h-12 bg-secondary/10 rounded-full flex items-center justify-center text-secondary mb-4">
+                  <span className="material-symbols-outlined text-[28px]">gavel</span>
+                </div>
+                <h3 className="font-h3 text-h3 text-primary mb-2">Employment Lawyers</h3>
+                <p className="font-label-bold text-label-bold text-on-surface-variant uppercase tracking-wider text-xs">The Extreme</p>
+              </div>
+              <div className="space-y-6 flex-grow border-t border-outline-variant pt-6">
+                <div>
+                  <h4 className="font-label-bold text-label-bold text-on-surface mb-1">Mandate:</h4>
+                  <p className="font-body-md text-body-md text-on-surface-variant">Litigation</p>
+                </div>
+                <div>
+                  <h4 className="font-label-bold text-label-bold text-on-surface mb-1">Perception:</h4>
+                  <p className="font-body-md text-body-md text-on-surface-variant">Expensive & Aggressive.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ============ WHAT HUMANLY IS — 3 Pillars ============ */}
       <section className="bg-surface-container-low px-margin-mobile md:px-margin-desktop py-20 md:py-24">
         <div className="mx-auto max-w-max-width">
           <div className="text-center mb-16">
@@ -401,6 +554,7 @@ export default function Home() {
       <section className="bg-surface-container-low px-margin-mobile md:px-margin-desktop py-20 md:py-24">
         <div className="mx-auto max-w-max-width">
           <div className="grid grid-cols-1 md:grid-cols-12 gap-gutter items-center">
+            {/* Left: Photo */}
             <div className="md:col-span-5 md:col-start-1 relative order-2 md:order-1 mt-12 md:mt-0">
               <div className="rounded-xl overflow-hidden border border-outline-variant bg-surface-container-lowest relative aspect-[4/5]">
                 <div className="w-full h-full bg-surface-container-high flex items-center justify-center text-on-surface-variant text-lg">
@@ -414,6 +568,7 @@ export default function Home() {
               <Scribble variant="loop" className="absolute -top-8 -left-8 w-24 h-24 text-secondary-orange opacity-80 pointer-events-none" color="#FDA544" />
             </div>
 
+            {/* Right: Copy */}
             <div className="md:col-span-6 md:col-start-7 flex flex-col gap-8 order-1 md:order-2">
               <h2 className="font-h1-mobile text-h1-mobile md:font-h1-desktop md:text-h1-desktop text-on-surface">
                 Executive Experience.
@@ -452,7 +607,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ============ TRIGGER GRID ============ */}
+      {/* ============ WHO THIS IS FOR — Trigger Grid ============ */}
       <section className="px-margin-mobile md:px-margin-desktop py-20 md:py-24">
         <div className="mx-auto max-w-max-width">
           <div className="text-center mb-16 relative">
@@ -508,6 +663,7 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-gutter relative">
+            {/* Connecting line (desktop) */}
             <div className="hidden md:block absolute top-[60px] left-[15%] right-[15%] h-[4px] z-0">
               <svg className="text-secondary-orange w-full h-full" fill="none" preserveAspectRatio="none" viewBox="0 0 1000 20" xmlns="http://www.w3.org/2000/svg">
                 <path d="M0,10 Q250,20 500,10 T1000,10" stroke="currentColor" strokeDasharray="8 8" strokeLinecap="round" strokeWidth="4" />
@@ -558,7 +714,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ============ BOOKING ============ */}
+      {/* ============ BOOKING EMBED ============ */}
       <section className="bg-surface-container-low px-margin-mobile md:px-margin-desktop py-20 md:py-24" id="book">
         <div className="mx-auto max-w-3xl text-center">
           <h2 className="font-h2 text-h2 md:text-[40px] text-primary mb-4">Book Your Confidential Session</h2>
@@ -571,7 +727,8 @@ export default function Home() {
               <CalendarCheck size={48} className="mx-auto text-secondary mb-4" />
               <p className="font-h3 text-h3 text-primary mb-2">Payment-first booking funnel</p>
               <p className="text-on-surface-variant mb-6 max-w-md">
-                The funnel collects a short confidential intake, sends you to Stripe Checkout, and redirects paid clients to Cal.com scheduling.
+                The funnel collects a short confidential intake, sends you to Stripe Checkout,
+                and redirects paid clients to Cal.com scheduling.
               </p>
               <Link
                 href="/booking"
@@ -583,6 +740,7 @@ export default function Home() {
             </div>
           </div>
 
+          {/* Trust markers near booking */}
           <div className="flex flex-wrap justify-center gap-6 mt-8 text-on-surface-variant">
             <div className="flex items-center gap-2">
               <LockKeyhole size={16} className="text-secondary" />
@@ -600,7 +758,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ============ FAQ ============ */}
+      {/* ============ FAQ (schema-marked) ============ */}
       <section className="px-margin-mobile md:px-margin-desktop py-20 md:py-24">
         <div className="mx-auto max-w-max-width">
           <div className="grid gap-10 lg:grid-cols-[1fr_0.9fr] lg:items-start">
@@ -664,4 +822,19 @@ export default function Home() {
       )}
     </div>
   );
+}
+
+/* needed for Material Symbols inline */
+const globalStyles = `
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+.fill-icon {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+`;
+if (typeof document !== "undefined") {
+  const style = document.createElement("style");
+  style.textContent = globalStyles;
+  document.head.appendChild(style);
 }
