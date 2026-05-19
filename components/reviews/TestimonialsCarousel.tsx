@@ -185,7 +185,7 @@ export function TestimonialsCarousel({
   const [active, setActive] = useState(0);
   const [modal, setModal] = useState<Testimonial | null>(null);
   const [isPaused, setIsPaused] = useState(false);
-  const intervalRef = useRef<ReturnType<typeof setInterval>>();
+  const intervalRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
   const len = testimonials.length || 1;
 
   const next = useCallback(
