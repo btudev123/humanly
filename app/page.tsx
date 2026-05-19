@@ -2,14 +2,13 @@
 
 import Link from "next/link";
 import { motion, AnimatePresence } from "motion/react";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { Scribble } from "@/components/ui/Scribble";
+import { TestimonialsCarousel, type Testimonial } from "@/components/reviews/TestimonialsCarousel";
 import {
   ArrowRight,
   CalendarCheck,
   CheckCircle2,
-  ChevronLeft,
-  ChevronRight,
   FileText,
   LockKeyhole,
   ShieldCheck,
@@ -106,21 +105,48 @@ const steps = [
   },
 ];
 
-const trustSignals = [
+const trustSignals: Testimonial[] = [
   {
-    quote: "Founded by Karma Harb after 20+ years inside HR leadership across UAE, Saudi Arabia, and international environments.",
+    id: "ts-1",
+    author: "Karma Harb",
     role: "Founder credibility",
-    outcome: "Real operator experience, not invented reviews",
+    company: undefined,
+    quote: "Founded by Karma Harb after 20+ years inside HR leadership across UAE, Saudi Arabia, and international environments.",
+    date: "2025-01-01",
+    verified: true,
+    rating: undefined,
+    thumbnail: undefined,
+    mediaUrl: undefined,
+    mediaType: undefined,
+    transcript: undefined,
   },
   {
-    quote: "Humanly does not publish testimonials until they are verified, consented, and privacy-safe.",
+    id: "ts-2",
+    author: "Humanly",
     role: "Early-stage transparency",
-    outcome: "No fake client quotes or borrowed social proof",
+    company: undefined,
+    quote: "Humanly does not publish testimonials until they are verified, consented, and privacy-safe.",
+    date: "2025-01-01",
+    verified: true,
+    rating: undefined,
+    thumbnail: undefined,
+    mediaUrl: undefined,
+    mediaType: undefined,
+    transcript: undefined,
   },
   {
-    quote: "Future video or Instagram testimonials will load as lightweight thumbnails with transcripts before third-party embeds.",
+    id: "ts-3",
+    author: "Humanly",
     role: "Performance-first proof",
-    outcome: "SEO context without slowing the page",
+    company: undefined,
+    quote: "Future video or Instagram testimonials will load as lightweight thumbnails with transcripts before third-party embeds.",
+    date: "2025-01-01",
+    verified: true,
+    rating: undefined,
+    thumbnail: undefined,
+    mediaUrl: undefined,
+    mediaType: undefined,
+    transcript: undefined,
   },
 ];
 
@@ -147,70 +173,6 @@ const faqs = [
   },
 ];
 
-/* ------------------------------------------------------------------ */
-/*  Sub-components                                                     */
-/* ------------------------------------------------------------------ */
-
-function TestimonialCarousel() {
-  const [index, setIndex] = useState(0);
-  const current = trustSignals[index];
-
-  const prev = useCallback(() => setIndex((v) => (v - 1 + trustSignals.length) % trustSignals.length), []);
-  const next = useCallback(() => setIndex((v) => (v + 1) % trustSignals.length), []);
-
-  return (
-    <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-8 shadow-sm relative overflow-hidden">
-      <Scribble variant="sparkle" className="absolute top-4 right-8 w-16 h-16 text-secondary-orange/20" />
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={current.quote}
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -12 }}
-          transition={{ duration: 0.25 }}
-        >
-          <p className="text-2xl font-semibold leading-snug text-on-surface italic">
-            &ldquo;{current.quote}&rdquo;
-          </p>
-          <div className="mt-8 border-t border-outline-variant pt-5">
-            <p className="text-sm font-bold uppercase tracking-[0.14em] text-secondary">{current.role}</p>
-            <p className="mt-2 text-on-surface-variant">{current.outcome}</p>
-          </div>
-        </motion.div>
-      </AnimatePresence>
-      <div className="mt-8 flex items-center justify-between">
-        <div className="flex gap-2">
-          {trustSignals.map((_, i) => (
-            <button
-              key={i}
-              aria-label={`Story ${i + 1}`}
-              onClick={() => setIndex(i)}
-              className={`h-2 rounded-full transition-all duration-300 ${
-                index === i ? "w-10 bg-secondary" : "w-2 bg-outline-variant"
-              }`}
-            />
-          ))}
-        </div>
-        <div className="flex gap-2">
-          <button
-            aria-label="Previous"
-            onClick={prev}
-            className="flex h-10 w-10 items-center justify-center rounded-xl border border-outline-variant text-on-surface-variant hover:bg-primary-container hover:text-on-primary transition-colors"
-          >
-            <ChevronLeft size={18} />
-          </button>
-          <button
-            aria-label="Next"
-            onClick={next}
-            className="flex h-10 w-10 items-center justify-center rounded-xl border border-outline-variant text-on-surface-variant hover:bg-primary-container hover:text-on-primary transition-colors"
-          >
-            <ChevronRight size={18} />
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 function FAQAccordion() {
   const [open, setOpen] = useState<number | null>(null);
@@ -743,7 +705,11 @@ export default function Home() {
                 <ArrowRight size={18} />
               </Link>
             </div>
-            <TestimonialCarousel />
+            <TestimonialsCarousel
+              testimonials={trustSignals}
+              title="No fake reviews. Trust starts cleaner than that."
+              subtitle="Humanly is early-stage, so this section focuses on founder expertise, process transparency, and future verified testimonial slots."
+            />
           </div>
         </div>
       </section>
