@@ -18,6 +18,18 @@ const nextConfig = {
         protocol: "https",
         hostname: "talkhumanly.com",
       },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
+      {
+        protocol: "https",
+        hostname: "images.pexels.com",
+      },
+      {
+        protocol: "https",
+        hostname: "**.ufs.sh",
+      },
     ],
   },
 

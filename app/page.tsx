@@ -61,10 +61,10 @@ const services = [
   },
   {
     name: "The Strategy",
-    price: "1,650 AED",
+    price: "950 AED",
     duration: "Written Follow-Up Report",
     description: "A structured document including situation summary, risk view, recommended actions, and suggested scripts.",
-    features: ["Two strategy sessions", "Document review checklist", "Written report", "Email & meeting scripts", "7 days follow-up"],
+    features: ["Confidential session", "Document review checklist", "Written report", "Email & meeting scripts", "48-hour turnaround"],
     featured: true,
     icon: FileText,
   },
@@ -106,21 +106,21 @@ const steps = [
   },
 ];
 
-const testimonials = [
+const trustSignals = [
   {
-    quote: "The advice was specific enough to use the same day. I stopped guessing and knew exactly how to respond.",
-    role: "Senior Operations Manager",
-    outcome: "Documented a workplace concern before escalation",
+    quote: "Founded by Karma Harb after 20+ years inside HR leadership across UAE, Saudi Arabia, and international environments.",
+    role: "Founder credibility",
+    outcome: "Real operator experience, not invented reviews",
   },
   {
-    quote: "I needed someone who understood HR systems but was clearly not on the company's side. That distinction mattered.",
-    role: "Technology Professional",
-    outcome: "Prepared a PIP response and meeting script",
+    quote: "Humanly does not publish testimonials until they are verified, consented, and privacy-safe.",
+    role: "Early-stage transparency",
+    outcome: "No fake client quotes or borrowed social proof",
   },
   {
-    quote: "The session helped me negotiate an exit without burning the relationship or signing too quickly.",
-    role: "Commercial Director",
-    outcome: "Reviewed redundancy and severance options",
+    quote: "Future video or Instagram testimonials will load as lightweight thumbnails with transcripts before third-party embeds.",
+    role: "Performance-first proof",
+    outcome: "SEO context without slowing the page",
   },
 ];
 
@@ -153,10 +153,10 @@ const faqs = [
 
 function TestimonialCarousel() {
   const [index, setIndex] = useState(0);
-  const current = testimonials[index];
+  const current = trustSignals[index];
 
-  const prev = useCallback(() => setIndex((v) => (v - 1 + testimonials.length) % testimonials.length), []);
-  const next = useCallback(() => setIndex((v) => (v + 1) % testimonials.length), []);
+  const prev = useCallback(() => setIndex((v) => (v - 1 + trustSignals.length) % trustSignals.length), []);
+  const next = useCallback(() => setIndex((v) => (v + 1) % trustSignals.length), []);
 
   return (
     <div className="rounded-xl border border-outline-variant bg-surface-container-lowest p-8 shadow-sm relative overflow-hidden">
@@ -180,7 +180,7 @@ function TestimonialCarousel() {
       </AnimatePresence>
       <div className="mt-8 flex items-center justify-between">
         <div className="flex gap-2">
-          {testimonials.map((_, i) => (
+          {trustSignals.map((_, i) => (
             <button
               key={i}
               aria-label={`Story ${i + 1}`}
@@ -733,10 +733,10 @@ export default function Home() {
         <div className="mx-auto max-w-max-width">
           <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
             <div>
-              <p className="font-label-bold text-label-bold text-secondary uppercase tracking-widest mb-4">Success Stories</p>
-              <h2 className="font-h2 text-h2 md:text-[40px] text-primary">Credible outcomes, anonymized by design.</h2>
+              <p className="font-label-bold text-label-bold text-secondary uppercase tracking-widest mb-4">Trust Signals</p>
+              <h2 className="font-h2 text-h2 md:text-[40px] text-primary">No fake reviews. Trust starts cleaner than that.</h2>
               <p className="mt-6 font-body-lg text-body-lg text-on-surface-variant">
-                No fake enterprise logo strip. Humanly builds trust through clear process, precise outcomes, and privacy-preserving stories.
+                Humanly is early-stage, so this section focuses on founder expertise, process transparency, and future verified testimonial slots.
               </p>
               <Link href="/booking" className="mt-8 inline-flex items-center gap-3 text-secondary font-label-bold text-label-bold hover:text-primary-container transition-colors">
                 Start your story
@@ -753,25 +753,22 @@ export default function Home() {
         <div className="mx-auto max-w-3xl text-center">
           <h2 className="font-h2 text-h2 md:text-[40px] text-primary mb-4">Book Your Confidential Session</h2>
           <p className="font-body-lg text-body-lg text-on-surface-variant mb-10">
-            Select a time that works for you. Karma reads every intake form before your session.
+            Pay securely through Stripe first. Once payment succeeds, your private scheduling page unlocks.
           </p>
 
-          {/* Cal.com inline embed placeholder — replace data-cal-link with actual Cal.com link */}
           <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-8 shadow-sm min-h-[400px] flex items-center justify-center">
             <div className="text-center">
               <CalendarCheck size={48} className="mx-auto text-secondary mb-4" />
-              <p className="font-h3 text-h3 text-primary mb-2">Booking Calendar</p>
-              <p className="text-on-surface-variant mb-6">
-                Cal.com booking embed will load here.<br />
-                Replace with your Cal.com data-cal-link attribute.
+              <p className="font-h3 text-h3 text-primary mb-2">Payment-first booking funnel</p>
+              <p className="text-on-surface-variant mb-6 max-w-md">
+                The funnel collects a short confidential intake, sends you to Stripe Checkout,
+                and redirects paid clients to Cal.com scheduling.
               </p>
               <Link
-                href="https://cal.com/talkhumanly"
-                target="_blank"
-                rel="noopener noreferrer"
+                href="/booking"
                 className="inline-flex items-center gap-3 rounded-full bg-secondary text-on-secondary px-8 py-4 font-label-bold text-label-bold hover:bg-primary-container transition-colors"
               >
-                Open Booking Page
+                Start Secure Booking
                 <ArrowRight size={18} />
               </Link>
             </div>

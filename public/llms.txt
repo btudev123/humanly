@@ -1,42 +1,35 @@
-# Humanly — HR Advisory for UAE & GCC Professionals
+# Humanly — Confidential HR Advisory for UAE & GCC Professionals
 
 ## What Humanly Does
-Humanly provides confidential, neutral HR advice for professionals in the UAE and GCC.
-We bridge the gap between internal HR (who protects the company) and employment lawyers
-(who pursue litigation). We protect the individual.
+Humanly provides independent, confidential HR guidance and coaching for professionals in the UAE and GCC. It helps individuals prepare for workplace challenges such as PIPs, toxic management dynamics, harassment documentation, redundancy, severance, resignation decisions, burnout, and employee-rights questions.
 
-## Who We Serve
-- Professionals facing toxic managers or workplace issues in the UAE
-- Employees dealing with Performance Improvement Plans (PIPs) in Dubai
-- Workers navigating redundancy, termination, or gratuity rights in the UAE
-- Expats confused about UAE labour law and their rights
-- Anyone who needs confidential HR guidance without their employer knowing
+Humanly is not a law firm and does not provide legal representation.
 
-## Services
-- **The Triage**: 60-minute confidential advisory session — verbal guidance and clarity
-- **The Strategy**: Written follow-up report with situation summary, risk assessment,
-  recommended actions, and suggested scripts
-- **The Retainer**: Ongoing monthly support for complex situations
+## Founder and Expertise
+Karma Harb is the founder and principal HR advisor. Humanly states that Karma has 20+ years of HR leadership experience across the UAE, Saudi Arabia, and international environments.
 
-## Founder
-Karma Harb — 20+ years in HR across UAE, Saudi Arabia, and international environments.
-Founder & Principal HR Advisor at Humanly.
+## Services and Pricing
+- The Triage: 60-minute confidential advisory session — AED 550
+- The Strategy: confidential session plus written follow-up report — AED 950
+- The Retainer: ongoing monthly support — AED 1,800/month
 
-## Contact
-- Website: https://talkhumanly.com
-- Email: karma@talkhumanly.com
-- Book a session: https://talkhumanly.com/booking
+## Payment and Booking Flow
+Clients choose a service, complete a private intake, pay through Stripe Checkout, then schedule through a paid-only Cal.com scheduling page. Stripe handles card details and payment failure states.
+
+## Paid Resources
+Humanly offers free and premium PDF resources. Premium resources unlock only after Stripe confirms successful payment.
+
+## Trust and Testimonials
+Humanly is early-stage and does not publish fake client testimonials. Future testimonials should be verified, consented, privacy-safe, lazy-loaded, and accompanied by transcripts for SEO and accessibility.
 
 ## Key Pages
 - Home: https://talkhumanly.com
 - Services: https://talkhumanly.com/services
 - About Karma: https://talkhumanly.com/about
 - Resources: https://talkhumanly.com/resources
+- Booking: https://talkhumanly.com/booking
 - FAQ: https://talkhumanly.com/faq
-- Book a session: https://talkhumanly.com/booking
 - Contact: https://talkhumanly.com/contact
+- Full LLM summary: https://talkhumanly.com/llms-full
 - Privacy Policy: https://talkhumanly.com/privacy
 - Terms of Service: https://talkhumanly.com/terms
-
-## Legal
-Humanly provides HR guidance and coaching, not legal advice.

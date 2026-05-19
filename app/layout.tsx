@@ -1,14 +1,16 @@
 import type { Metadata, Viewport } from "next";
-import Script from "next/script";
 import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
+import { MaybeClerkProvider } from "@/components/auth/MaybeClerkProvider";
 
 export const viewport: Viewport = {
   themeColor: "#f8f7f4",
   width: "device-width",
   initialScale: 1,
 };
+
+const googleSiteVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION;
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://talkhumanly.com"),
@@ -55,10 +57,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: "https://talkhumanly.com",
   },
-  verification: {
-    // Google Search Console — verified day 1 placeholder
-    google: "GOOGLE_SEARCH_CONSOLE_VERIFICATION_CODE",
-  },
+  verification: googleSiteVerification ? { google: googleSiteVerification } : undefined,
 };
 
 const organizationSchema = {
@@ -84,6 +83,35 @@ const organizationSchema = {
   },
 };
 
+const founderSchema = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: "Karma Harb",
+  jobTitle: "Founder & Principal HR Advisor",
+  worksFor: {
+    "@type": "Organization",
+    name: "Humanly HR Advisory",
+  },
+  knowsAbout: [
+    "Human Resources",
+    "Employee relations",
+    "UAE labour law",
+    "GCC workplace advisory",
+    "Performance improvement plans",
+  ],
+};
+
+const serviceSchema = {
+  "@context": "https://schema.org",
+  "@type": "ProfessionalService",
+  name: "Humanly HR Advisory",
+  areaServed: ["United Arab Emirates", "Gulf Cooperation Council"],
+  serviceType: "Confidential HR advisory for employees",
+  url: "https://talkhumanly.com",
+  founder: founderSchema,
+  priceRange: "AED 550-1800",
+};
+
 const websiteSchema = {
   "@context": "https://schema.org",
   "@type": "WebSite",
@@ -107,47 +135,57 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <head>
-        {/* Preconnect for fonts */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
+    <MaybeClerkProvider>
+      <html lang="en">
+        <head>
+          {/* Preconnect for fonts */}
+          <link rel="preconnect" href="https://fonts.googleapis.com" />
+          <link
+            rel="preconnect"
+            href="https://fonts.gstatic.com"
+            crossOrigin="anonymous"
+          />
 
-        {/* Poppins: ExtraBold (800) + SemiBold (600) + Regular (400) */}
-        <link
-          href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap"
-          rel="stylesheet"
-        />
+          {/* Poppins: ExtraBold (800) + SemiBold (600) + Regular (400) */}
+          <link
+            href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap"
+            rel="stylesheet"
+          />
 
-        {/* Material Symbols Outlined + Filled */}
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
-        />
+          {/* Material Symbols Outlined + Filled */}
+          <link
+            rel="stylesheet"
+            href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+          />
 
-        {/* JSON-LD Structured Data */}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
-        />
-      </head>
+          {/* JSON-LD Structured Data */}
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+          />
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(founderSchema) }}
+          />
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }}
+          />
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+          />
+        </head>
 
-      {/* Noise overlay texture (purely decorative, no performance hit) */}
-      <body className="min-h-screen flex flex-col relative">
-        <div className="noise-overlay" aria-hidden="true" />
+        {/* Noise overlay texture (purely decorative, no performance hit) */}
+        <body className="min-h-screen flex flex-col relative">
+          <div className="noise-overlay" aria-hidden="true" />
 
-        <Navbar />
-        <main className="flex-grow">{children}</main>
-        <Footer />
-      </body>
-    </html>
+          <Navbar />
+          <main className="flex-grow">{children}</main>
+          <Footer />
+        </body>
+      </html>
+    </MaybeClerkProvider>
   );
 }

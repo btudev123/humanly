@@ -1,0 +1,57 @@
+import { Resend } from "resend";
+import { BookingConfirmationEmail } from "@/emails/BookingConfirmationEmail";
+import { recordEmailEvent } from "@/lib/db/repository";
+import { siteConfig } from "@/lib/site";
+
+let resend: Resend | null = null;
+
+function getResend() {
+  if (!process.env.RESEND_API_KEY) {
+    throw new Error("RESEND_API_KEY is required to send email.");
+  }
+
+  if (!resend) {
+    resend = new Resend(process.env.RESEND_API_KEY);
+  }
+
+  return resend;
+}
+
+export async function sendBookingConfirmation(input: {
+  to: string;
+  name: string;
+  service: string;
+  startTime?: string | null;
+  endTime?: string | null;
+  meetingUrl?: string | null;
+  invoiceUrl?: string | null;
+  invoicePdfUrl?: string | null;
+}) {
+  if (!process.env.RESEND_API_KEY) {
+    await recordEmailEvent({
+      kind: "booking_confirmation",
+      recipient: input.to,
+      status: "skipped_missing_resend_key",
+      metadata: input,
+    });
+    return null;
+  }
+
+  const from = process.env.RESEND_FROM || `${siteConfig.name} <hello@talkhumanly.com>`;
+  const result = await getResend().emails.send({
+    from,
+    to: [input.to],
+    subject: `Your Humanly session is confirmed: ${input.service}`,
+    react: <BookingConfirmationEmail {...input} />,
+  });
+
+  await recordEmailEvent({
+    kind: "booking_confirmation",
+    recipient: input.to,
+    status: result.error ? "error" : "sent",
+    providerId: result.data?.id,
+    metadata: result.error ? { error: result.error.message } : input,
+  });
+
+  return result;
+}

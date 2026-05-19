@@ -38,7 +38,7 @@ const faqData = [
       },
       {
         q: "What's the difference between The Triage and The Strategy?",
-        a: "The Triage (60 min, AED 450) is a live conversation where you receive immediate verbal guidance, clarity, and next-step direction. The Strategy (AED 950) includes everything in The Triage plus a structured written report with situation summary, risk assessment, recommended actions, and suggested scripts you can use immediately.",
+        a: "The Triage (60 min, AED 550) is a live conversation where you receive immediate verbal guidance, clarity, and next-step direction. The Strategy (AED 950) includes everything in The Triage plus a structured written report with situation summary, risk assessment, recommended actions, and suggested scripts you can use immediately.",
       },
     ],
   },
