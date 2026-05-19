@@ -26,6 +26,10 @@ export async function sendBookingConfirmation(input: {
   meetingUrl?: string | null;
   invoiceUrl?: string | null;
   invoicePdfUrl?: string | null;
+  attendeeCompany?: string | null;
+  attendeeRole?: string | null;
+  bookingUid?: string | null;
+  priceFormatted?: string | null;
 }) {
   if (!process.env.RESEND_API_KEY) {
     await recordEmailEvent({

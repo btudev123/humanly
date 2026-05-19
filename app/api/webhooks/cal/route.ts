@@ -55,36 +55,68 @@ export async function POST(request: Request) {
     stringValue(payload.attendeeEmail) ||
     "";
 
+  const attendeeCompany =
+    stringValue(firstAttendee.company) ||
+    stringValue(payload.company) ||
+    stringValue(metadata.company) ||
+    null;
+  const attendeeRole =
+    stringValue(firstAttendee.role) ||
+    stringValue(payload.role) ||
+    stringValue(metadata.role) ||
+    null;
+
+  const startTime = stringValue(payload.startTime) || stringValue(payload.start);
+  const endTime = stringValue(payload.endTime) || stringValue(payload.end);
+  const meetingUrl =
+    stringValue(payload.meetingUrl) ||
+    stringValue(payload.location) ||
+    nestedString(payload, ["location", "value"]);
+  const title = stringValue(payload.title) || stringValue(payload.eventTypeSlug);
+
   const booking = await recordBooking({
     orderId,
     uid,
-    title: stringValue(payload.title) || stringValue(payload.eventTypeSlug),
+    title,
     attendeeName,
     attendeeEmail,
-    startTime: stringValue(payload.startTime) || stringValue(payload.start),
-    endTime: stringValue(payload.endTime) || stringValue(payload.end),
-    meetingUrl:
-      stringValue(payload.meetingUrl) ||
-      stringValue(payload.location) ||
-      nestedString(payload, ["location", "value"]),
+    startTime,
+    endTime,
+    meetingUrl,
     status: stringValue(payload.status) || "accepted",
     rawPayload: body,
   });
 
   const order = orderId ? await getOrderById(orderId) : null;
+  const service = order?.product_slug || title || "Humanly consultation";
+
+  let priceFormatted: string | null = null;
+  if (order?.amount && order?.currency) {
+    try {
+      priceFormatted = new Intl.NumberFormat("en-AE", {
+        style: "currency",
+        currency: order.currency.toUpperCase(),
+        maximumFractionDigits: 0,
+      }).format(order.amount / 100);
+    } catch {
+      // ignore formatting errors
+    }
+  }
+
   if (attendeeEmail) {
     await sendBookingConfirmation({
       to: attendeeEmail,
       name: attendeeName,
-      service: order?.product_slug || stringValue(payload.title) || "Humanly consultation",
-      startTime: stringValue(payload.startTime) || stringValue(payload.start),
-      endTime: stringValue(payload.endTime) || stringValue(payload.end),
-      meetingUrl:
-        stringValue(payload.meetingUrl) ||
-        stringValue(payload.location) ||
-        nestedString(payload, ["location", "value"]),
+      service,
+      startTime,
+      endTime,
+      meetingUrl,
       invoiceUrl: order?.stripe_invoice_url,
       invoicePdfUrl: order?.stripe_invoice_pdf_url,
+      attendeeCompany,
+      attendeeRole,
+      bookingUid: uid,
+      priceFormatted,
     });
   }
 

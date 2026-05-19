@@ -8,6 +8,10 @@ import {
   Preview,
   Section,
   Text,
+  Row,
+  Column,
+  Hr,
+  Link,
 } from "@react-email/components";
 import * as React from "react";
 
@@ -19,6 +23,10 @@ export function BookingConfirmationEmail({
   meetingUrl,
   invoiceUrl,
   invoicePdfUrl,
+  attendeeCompany,
+  attendeeRole,
+  bookingUid,
+  priceFormatted,
 }: {
   to: string;
   name: string;
@@ -28,122 +36,355 @@ export function BookingConfirmationEmail({
   meetingUrl?: string | null;
   invoiceUrl?: string | null;
   invoicePdfUrl?: string | null;
+  attendeeCompany?: string | null;
+  attendeeRole?: string | null;
+  bookingUid?: string | null;
+  priceFormatted?: string | null;
 }) {
+  const displayName = name || "there";
+
   return (
     <Html>
       <Head />
-      <Preview>Your confidential Humanly session is confirmed.</Preview>
+      <Preview>Your Humanly session is confirmed — {service}</Preview>
       <Body style={main}>
         <Container style={container}>
+          {/* Header */}
+          <Section style={headerSection}>
+            <Row>
+              <Column align="center">
+                <Text style={logo}>humanly</Text>
+              </Column>
+            </Row>
+          </Section>
+
           <Heading style={heading}>Your session is confirmed</Heading>
-          <Text style={paragraph}>Hi {name || "there"},</Text>
+
+          <Text style={greeting}>Hi {displayName},</Text>
+
           <Text style={paragraph}>
-            Thank you for booking {service}. Your session is confidential, unrecorded, and prepared
-            around the details you shared.
+            Your confidential session has been booked. Everything you share is private,
+            unrecorded, and handled with care.
           </Text>
-          <Section style={panel}>
-            <Text style={label}>Service</Text>
-            <Text style={value}>{service}</Text>
-            {startTime && (
-              <>
-                <Text style={label}>Start</Text>
-                <Text style={value}>{startTime}</Text>
-              </>
+
+          {/* Person Details Card */}
+          <Section style={card}>
+            <Text style={cardTitle}>Booking Details</Text>
+
+            {bookingUid && (
+              <Row style={detailRow}>
+                <Column style={labelCol}>
+                  <Text style={label}>Booking ID</Text>
+                </Column>
+                <Column style={valueCol}>
+                  <Text style={value}>{bookingUid}</Text>
+                </Column>
+              </Row>
             )}
-            {endTime && (
-              <>
-                <Text style={label}>End</Text>
-                <Text style={value}>{endTime}</Text>
-              </>
+
+            <Row style={detailRow}>
+              <Column style={labelCol}>
+                <Text style={label}>Name</Text>
+              </Column>
+              <Column style={valueCol}>
+                <Text style={value}>{displayName}</Text>
+              </Column>
+            </Row>
+
+            {attendeeCompany && (
+              <Row style={detailRow}>
+                <Column style={labelCol}>
+                  <Text style={label}>Company</Text>
+                </Column>
+                <Column style={valueCol}>
+                  <Text style={value}>{attendeeCompany}</Text>
+                </Column>
+              </Row>
+            )}
+
+            {attendeeRole && (
+              <Row style={detailRow}>
+                <Column style={labelCol}>
+                  <Text style={label}>Role</Text>
+                </Column>
+                <Column style={valueCol}>
+                  <Text style={value}>{attendeeRole}</Text>
+                </Column>
+              </Row>
+            )}
+
+            <Row style={detailRow}>
+              <Column style={labelCol}>
+                <Text style={label}>Service</Text>
+              </Column>
+              <Column style={valueCol}>
+                <Text style={value}>{service}</Text>
+              </Column>
+            </Row>
+
+            {startTime && (
+              <Row style={detailRow}>
+                <Column style={labelCol}>
+                  <Text style={label}>When</Text>
+                </Column>
+                <Column style={valueCol}>
+                  <Text style={value}>{startTime}</Text>
+                  {endTime && <Text style={valueSecondary}>to {endTime}</Text>}
+                </Column>
+              </Row>
+            )}
+
+            {priceFormatted && (
+              <Row style={detailRow}>
+                <Column style={labelCol}>
+                  <Text style={label}>Paid</Text>
+                </Column>
+                <Column style={valueCol}>
+                  <Text style={value}>{priceFormatted}</Text>
+                </Column>
+              </Row>
             )}
           </Section>
+
+          {/* CTA */}
           {meetingUrl && (
-            <Button href={meetingUrl} style={button}>
-              Join your session
-            </Button>
+            <Section style={ctaSection}>
+              <Button href={meetingUrl} style={button}>
+                Join your session →
+              </Button>
+            </Section>
           )}
+
+          {/* Invoice Section */}
           {(invoiceUrl || invoicePdfUrl) && (
-            <Text style={paragraph}>
-              Your Stripe invoice is ready:{" "}
-              {invoiceUrl && <a href={invoiceUrl}>view invoice</a>}
-              {invoiceUrl && invoicePdfUrl ? " or " : ""}
-              {invoicePdfUrl && <a href={invoicePdfUrl}>download PDF</a>}.
-            </Text>
+            <Section style={invoiceSection}>
+              <Text style={invoiceTitle}>Your Invoice</Text>
+              <Text style={paragraph}>
+                Your Stripe receipt is ready.{" "}
+                {invoiceUrl && (
+                  <Link href={invoiceUrl} style={link}>
+                    View invoice online
+                  </Link>
+                )}
+                {invoiceUrl && invoicePdfUrl && " or "}
+                {invoicePdfUrl && (
+                  <Link href={invoicePdfUrl} style={link}>
+                    download PDF
+                  </Link>
+                )}
+                .
+              </Text>
+            </Section>
           )}
-          <Text style={paragraph}>
-            Before the call, gather any emails, timelines, contracts, performance notes, or
-            messages that may help Karma understand what happened.
-          </Text>
-          <Text style={footnote}>
-            Humanly provides HR guidance and coaching, not legal advice. Your employer is not
-            contacted.
-          </Text>
+
+          <Hr style={hr} />
+
+          {/* Preparation tips */}
+          <Section style={tipsSection}>
+            <Text style={tipsTitle}>Before your call</Text>
+            <Text style={paragraph}>
+              Gather any emails, timelines, contracts, performance notes, or messages
+              that may help your consultant understand what happened. The more context
+              you provide, the better guidance you'll receive.
+            </Text>
+          </Section>
+
+          {/* Footer */}
+          <Section style={footerSection}>
+            <Text style={footnote}>
+              Humanly provides HR guidance and coaching, not legal advice.
+              Your employer is not contacted. Your session is 100% confidential.
+            </Text>
+            <Text style={footnoteSecondary}>
+              © {new Date().getFullYear()} Humanly · hello@talkhumanly.com
+            </Text>
+          </Section>
         </Container>
       </Body>
     </Html>
   );
 }
 
-const main = {
+// Styles
+const main: React.CSSProperties = {
   backgroundColor: "#f8f7f4",
   color: "#1a1c1c",
-  fontFamily: "Arial, sans-serif",
+  fontFamily: "'Poppins', 'Helvetica Neue', Arial, sans-serif",
 };
 
-const container = {
+const container: React.CSSProperties = {
   margin: "0 auto",
-  padding: "32px 20px",
-  maxWidth: "560px",
-};
-
-const heading = {
-  color: "#3f1b73",
-  fontSize: "32px",
-  lineHeight: "1.2",
-};
-
-const paragraph = {
-  fontSize: "16px",
-  lineHeight: "1.6",
-};
-
-const panel = {
+  padding: "0",
+  maxWidth: "600px",
   backgroundColor: "#ffffff",
+  borderRadius: "12px",
+  overflow: "hidden",
+  boxShadow: "0 2px 16px rgba(0,0,0,0.06)",
+};
+
+const headerSection: React.CSSProperties = {
+  backgroundColor: "#3f1b73",
+  background: "linear-gradient(135deg, #3f1b73 0%, #7c35e3 50%, #fda544 100%)",
+  padding: "32px 24px",
+  textAlign: "center",
+};
+
+const logo: React.CSSProperties = {
+  color: "#ffffff",
+  fontSize: "28px",
+  fontWeight: "800",
+  letterSpacing: "-0.02em",
+  margin: "0",
+  textTransform: "lowercase",
+};
+
+const heading: React.CSSProperties = {
+  color: "#3f1b73",
+  fontSize: "28px",
+  fontWeight: "800",
+  lineHeight: "1.2",
+  padding: "24px 24px 0",
+  margin: "0",
+};
+
+const greeting: React.CSSProperties = {
+  fontSize: "17px",
+  fontWeight: "600",
+  lineHeight: "1.5",
+  padding: "8px 24px 0",
+  margin: "0",
+  color: "#1a1c1c",
+};
+
+const paragraph: React.CSSProperties = {
+  fontSize: "15px",
+  lineHeight: "1.6",
+  color: "#1a1c1c",
+  padding: "0 24px",
+  margin: "10px 0",
+};
+
+const card: React.CSSProperties = {
+  backgroundColor: "#f8f7f4",
   border: "1px solid #dbdbdb",
   borderRadius: "8px",
-  padding: "18px",
-  margin: "24px 0",
+  margin: "20px 24px",
+  padding: "20px",
 };
 
-const label = {
+const cardTitle: React.CSSProperties = {
   color: "#7c35e3",
-  fontSize: "11px",
+  fontSize: "12px",
   fontWeight: "700",
   letterSpacing: "0.12em",
-  margin: "14px 0 4px",
-  textTransform: "uppercase" as const,
+  textTransform: "uppercase",
+  margin: "0 0 16px",
 };
 
-const value = {
-  color: "#3f1b73",
-  fontSize: "17px",
+const detailRow: React.CSSProperties = {
+  marginBottom: "10px",
+};
+
+const labelCol: React.CSSProperties = {
+  width: "100px",
+  verticalAlign: "top",
+};
+
+const valueCol: React.CSSProperties = {
+  verticalAlign: "top",
+};
+
+const label: React.CSSProperties = {
+  color: "#5b5b5b",
+  fontSize: "12px",
   fontWeight: "700",
-  margin: "0 0 8px",
+  letterSpacing: "0.08em",
+  textTransform: "uppercase",
+  margin: "0",
 };
 
-const button = {
+const value: React.CSSProperties = {
+  color: "#3f1b73",
+  fontSize: "15px",
+  fontWeight: "600",
+  margin: "0",
+};
+
+const valueSecondary: React.CSSProperties = {
+  color: "#5b5b5b",
+  fontSize: "13px",
+  fontWeight: "400",
+  margin: "2px 0 0",
+};
+
+const ctaSection: React.CSSProperties = {
+  textAlign: "center",
+  padding: "12px 24px 8px",
+};
+
+const button: React.CSSProperties = {
   backgroundColor: "#7c35e3",
   borderRadius: "999px",
   color: "#ffffff",
   display: "inline-block",
   fontWeight: "700",
-  margin: "8px 0 24px",
-  padding: "14px 22px",
+  fontSize: "15px",
+  padding: "14px 28px",
   textDecoration: "none",
+  textAlign: "center",
 };
 
-const footnote = {
+const invoiceSection: React.CSSProperties = {
+  padding: "12px 24px",
+};
+
+const invoiceTitle: React.CSSProperties = {
+  color: "#7c35e3",
+  fontSize: "12px",
+  fontWeight: "700",
+  letterSpacing: "0.12em",
+  textTransform: "uppercase",
+  margin: "0 0 6px",
+};
+
+const link: React.CSSProperties = {
+  color: "#7c35e3",
+  textDecoration: "underline",
+  fontWeight: "600",
+};
+
+const hr: React.CSSProperties = {
+  borderColor: "#dbdbdb",
+  margin: "16px 24px",
+};
+
+const tipsSection: React.CSSProperties = {
+  padding: "0 24px 16px",
+};
+
+const tipsTitle: React.CSSProperties = {
+  color: "#3f1b73",
+  fontSize: "14px",
+  fontWeight: "700",
+  margin: "0 0 6px",
+};
+
+const footerSection: React.CSSProperties = {
+  backgroundColor: "#f8f7f4",
+  padding: "20px 24px",
+  textAlign: "center",
+};
+
+const footnote: React.CSSProperties = {
   color: "#5b5b5b",
-  fontSize: "13px",
+  fontSize: "12px",
   lineHeight: "1.5",
+  margin: "0 0 8px",
+};
+
+const footnoteSecondary: React.CSSProperties = {
+  color: "#a0a0a0",
+  fontSize: "11px",
+  lineHeight: "1.5",
+  margin: "0",
 };
