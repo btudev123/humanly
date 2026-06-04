@@ -26,25 +26,27 @@ export function ResourcesBrowser({ resources }: { resources: Resource[] }) {
 
   return (
     <>
-      <section className="mx-auto max-w-7xl px-5 md:px-[64px]">
+      <section className="mx-auto max-w-max-width px-margin-mobile md:px-margin-desktop">
         <div className="grid gap-10 lg:grid-cols-[0.95fr_1.05fr] lg:items-end">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.24em] text-primary-violet">Resource Hub</p>
-            <h1 className="mt-4 text-[32px] font-extrabold leading-[1.2] text-primary-dark md:text-[48px]">
+            <span className="inline-flex items-center gap-2 rounded-full border-2 border-primary-dark bg-neutral-100 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-primary-dark shadow-pop-sm">
+              <span className="h-2 w-2 rounded-full bg-accent-orange" /> Resource Hub
+            </span>
+            <h1 className="mt-5 font-display text-h1-mobile font-extrabold tracking-tight text-primary-dark md:text-h1-desktop">
               Practical guides for moments HR makes complicated.
             </h1>
           </div>
           <div>
-            <p className="text-lg leading-relaxed text-neutral-500">
+            <p className="text-body-lg leading-relaxed text-neutral-500">
               Guides, explainers, scripts, and scenario-based resources for employees navigating UAE and GCC workplace questions.
             </p>
-            <div className="mt-6 flex items-center gap-3 rounded-lg border border-neutral-300 bg-white p-3 shadow-sm">
-              <Search className="ml-2 text-primary-violet" size={20} />
+            <div className="mt-6 flex items-center gap-2 rounded-full border-2 border-primary-dark bg-neutral-100 p-2 pl-4 transition focus-within:shadow-pop-sm">
+              <Search className="text-primary-violet" size={20} />
               <input
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
                 placeholder="Search rights, harassment, PIP, severance..."
-                className="min-w-0 flex-1 bg-transparent px-2 py-3 text-primary-dark outline-none placeholder:text-neutral-400"
+                className="min-w-0 flex-1 bg-transparent px-2 py-2.5 text-primary-dark outline-none placeholder:text-neutral-400"
               />
             </div>
           </div>
@@ -54,10 +56,10 @@ export function ResourcesBrowser({ resources }: { resources: Resource[] }) {
             <button
               key={item}
               onClick={() => setCategory(item)}
-              className={`shrink-0 rounded-lg border px-4 py-3 text-xs font-bold uppercase tracking-[0.16em] transition-all ${
+              className={`shrink-0 rounded-full border-2 border-primary-dark px-4 py-2.5 text-xs font-bold uppercase tracking-[0.14em] transition-all ${
                 category === item
-                  ? "border-primary-violet bg-primary-violet text-white"
-                  : "border-neutral-300 bg-white text-primary-dark hover:border-primary-violet"
+                  ? "bg-accent-orange text-primary-dark shadow-pop-sm"
+                  : "bg-neutral-100 text-primary-dark hover:bg-violet-tint"
               }`}
             >
               {item}
@@ -65,24 +67,24 @@ export function ResourcesBrowser({ resources }: { resources: Resource[] }) {
           ))}
         </div>
       </section>
-      <section className="mx-auto mt-12 max-w-7xl px-5 md:px-[64px]">
+      <section className="mx-auto mt-12 max-w-max-width px-margin-mobile md:px-margin-desktop">
         <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
           {filtered.map((resource) => (
             <article
               key={resource.slug}
-              className="flex min-h-[360px] flex-col rounded-lg border border-neutral-300 bg-white p-6 shadow-sm transition-shadow hover:shadow-lg"
+              className="flex min-h-[360px] flex-col rounded-3xl border-2 border-primary-dark bg-neutral-100 p-6 transition-transform hover:-translate-y-1"
             >
               <div className="flex items-start justify-between gap-6">
-                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary-violet/10 text-primary-violet">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl border-2 border-primary-dark bg-violet-tint text-primary-violet">
                   {resource.gated ? <BookOpen size={22} /> : <FileText size={22} />}
                 </div>
                 <div className="flex items-center gap-2">
                   {resource.gated && (
-                    <span className="rounded-lg bg-amber/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-amber">
+                    <span className="rounded-full border-2 border-primary-dark bg-accent-orange px-3 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-primary-dark">
                       {resource.amount ? formatAed(resource.amount) : "Premium"}
                     </span>
                   )}
-                  <span className="rounded-lg bg-neutral-bg px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-neutral-500">
+                  <span className="rounded-full border border-neutral-300 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-neutral-500">
                     {resource.minutes} min
                   </span>
                 </div>
@@ -90,7 +92,7 @@ export function ResourcesBrowser({ resources }: { resources: Resource[] }) {
               <p className="mt-6 text-[10px] font-bold uppercase tracking-[0.2em] text-primary-violet">
                 {resource.category}
               </p>
-              <h2 className="mt-2 text-2xl font-extrabold leading-tight text-primary-dark">{resource.title}</h2>
+              <h2 className="mt-2 font-display text-2xl font-bold leading-tight text-primary-dark">{resource.title}</h2>
               <p className="mt-3 flex-1 leading-relaxed text-neutral-500">{resource.summary}</p>
               <p className="mt-5 text-xs text-neutral-400">
                 Updated {resource.updatedAt} · Reviewed by {resource.reviewer}
@@ -98,18 +100,18 @@ export function ResourcesBrowser({ resources }: { resources: Resource[] }) {
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link
                   href={`/resources/${resource.slug}`}
-                  className="inline-flex items-center justify-center gap-2 rounded-lg border border-neutral-300 px-4 py-3 text-xs font-bold uppercase tracking-[0.14em] text-primary-dark transition-colors hover:border-primary-violet"
+                  className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-primary-dark bg-neutral-100 px-4 py-3 text-xs font-bold uppercase tracking-[0.12em] text-primary-dark transition-colors hover:bg-violet-tint"
                 >
                   Read article
-                  <ArrowRight size={16} />
+                  <ArrowRight size={16} strokeWidth={2.5} />
                 </Link>
                 {!resource.gated && (
                   <a
                     href={resource.pdf}
                     download
-                    className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary-dark px-4 py-3 text-xs font-bold uppercase tracking-[0.14em] text-white transition-colors hover:bg-primary-violet"
+                    className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-primary-dark bg-primary-dark px-4 py-3 text-xs font-bold uppercase tracking-[0.12em] text-on-primary transition-colors hover:bg-primary-violet"
                   >
-                    <Download size={16} />
+                    <Download size={16} strokeWidth={2.5} />
                     PDF
                   </a>
                 )}

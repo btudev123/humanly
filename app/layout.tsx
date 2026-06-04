@@ -5,7 +5,7 @@ import { Footer } from "@/components/layout/Footer";
 import { MaybeClerkProvider } from "@/components/auth/MaybeClerkProvider";
 
 export const viewport: Viewport = {
-  themeColor: "#f8f7f4",
+  themeColor: "#fbf7f1",
   width: "device-width",
   initialScale: 1,
 };
@@ -146,9 +146,9 @@ export default function RootLayout({
             crossOrigin="anonymous"
           />
 
-          {/* Poppins: ExtraBold (800) + SemiBold (600) + Regular (400) */}
+          {/* Body: Poppins (400/500/600/800) + Display: Bricolage Grotesque (600/700/800) */}
           <link
-            href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap"
+            href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Poppins:wght@400;500;600;800&display=swap"
             rel="stylesheet"
           />
 

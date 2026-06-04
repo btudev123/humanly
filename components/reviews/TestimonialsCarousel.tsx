@@ -70,7 +70,7 @@ function MediaThumbnail({
         className="aspect-video w-full object-cover opacity-70 transition-opacity group-hover:opacity-90"
       />
       <div className="absolute inset-0 flex items-center justify-center">
-        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary-orange/90 text-white shadow-lg transition-transform group-hover:scale-110">
+        <div className="flex h-14 w-14 items-center justify-center rounded-full border-2 border-primary-dark bg-accent-orange text-primary-dark shadow-lg transition-transform group-hover:scale-110">
           {testimonial.mediaType === "instagram" ? (
             <Instagram size={22} />
           ) : (
@@ -217,28 +217,8 @@ export function TestimonialsCarousel({
   const current = testimonials[active];
 
   return (
-    <section className="relative overflow-hidden bg-neutral-50 px-5 py-24 md:px-[64px]">
-      {/* Subtle gradient accent */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -right-32 -top-32 h-96 w-96 rounded-full bg-primary-orange/5 blur-3xl"
-      />
-
+    <section className="relative">
       <div className="mx-auto max-w-5xl">
-        {/* Header */}
-        <header className="mb-12 text-center">
-          <p className="text-xs font-bold uppercase tracking-[0.24em] text-primary-orange">
-            Social proof
-          </p>
-          <h2 className="mt-4 text-[32px] font-extrabold leading-[1.2] text-neutral-900 md:text-[44px]">
-            {title}
-          </h2>
-          {subtitle && (
-            <p className="mx-auto mt-4 max-w-xl leading-relaxed text-neutral-600">
-              {subtitle}
-            </p>
-          )}
-        </header>
 
         {/* Carousel */}
         <div
@@ -253,12 +233,12 @@ export function TestimonialsCarousel({
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -30 }}
               transition={{ duration: 0.35, ease: "easeInOut" }}
-              className="rounded-2xl border border-neutral-200 bg-white p-8 shadow-lg md:p-12"
+              className="rounded-3xl border-2 border-primary-dark bg-neutral-100 p-8 shadow-pop md:p-12"
             >
               <div className="flex flex-col gap-6 md:flex-row md:gap-10">
                 {/* Text */}
                 <div className="flex-1">
-                  <Quote className="mb-4 text-primary-orange/30" size={36} />
+                  <Quote className="mb-4 text-accent-orange/50" size={36} />
                   <blockquote className="text-lg leading-relaxed text-neutral-700 md:text-xl">
                     &ldquo;{current.quote}&rdquo;
                   </blockquote>
@@ -316,7 +296,7 @@ export function TestimonialsCarousel({
             <button
               aria-label="Previous testimonial"
               onClick={prev}
-              className="flex h-12 w-12 items-center justify-center rounded-full border border-neutral-300 bg-white text-neutral-700 transition-colors hover:bg-neutral-100"
+              className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-primary-dark bg-neutral-100 text-primary-dark transition-colors hover:bg-violet-tint"
             >
               <ChevronLeft size={20} />
             </button>
@@ -330,7 +310,7 @@ export function TestimonialsCarousel({
                   onClick={() => setActive(i)}
                   className={`h-2.5 rounded-full transition-all duration-300 ${
                     active === i
-                      ? "w-8 bg-primary-orange"
+                      ? "w-8 bg-accent-orange"
                       : "w-2.5 bg-neutral-300 hover:bg-neutral-400"
                   }`}
                 />
@@ -340,7 +320,7 @@ export function TestimonialsCarousel({
             <button
               aria-label="Next testimonial"
               onClick={next}
-              className="flex h-12 w-12 items-center justify-center rounded-full border border-neutral-300 bg-white text-neutral-700 transition-colors hover:bg-neutral-100"
+              className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-primary-dark bg-neutral-100 text-primary-dark transition-colors hover:bg-violet-tint"
             >
               <ChevronRight size={20} />
             </button>

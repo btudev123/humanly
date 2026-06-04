@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { BookingFunnel } from "@/components/booking/BookingFunnel";
+import { Scribble } from "@/components/ui/Scribble";
 import { absoluteUrl } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -17,22 +18,25 @@ export const metadata: Metadata = {
 
 export default function BookingPage() {
   return (
-    <div className="min-h-screen bg-neutral-bg pb-24 pt-28">
-      <header className="mx-auto max-w-4xl px-5 text-center md:px-[64px]">
-        <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-primary-dark/5 px-4 py-2">
-          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary-dark">
-            Confidential by design · Stripe secured · UAE & GCC focused
+    <div className="min-h-screen overflow-clip bg-surface pb-24 pt-32 md:pt-40">
+      <header className="relative mx-auto max-w-4xl px-margin-mobile text-center md:px-margin-desktop">
+        <div className="dot-grid pointer-events-none absolute inset-0 -z-10 opacity-50" />
+        <span className="inline-flex items-center gap-2 rounded-full border-2 border-primary-dark bg-neutral-100 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.12em] text-primary-dark shadow-pop-sm">
+          <span className="h-2 w-2 rounded-full bg-accent-orange" />
+          Confidential · Stripe secured · UAE &amp; GCC
+        </span>
+        <h1 className="mx-auto mt-6 max-w-3xl font-display text-h1-mobile font-extrabold tracking-tight text-primary-dark md:text-h1-desktop">
+          Pay securely, then book your{" "}
+          <span className="relative inline-block">
+            private session
+            <Scribble variant="underline-bold" color="#ff6a1a" strokeWidth={5} className="absolute -bottom-3 left-0 h-4 w-full" />
           </span>
-        </div>
-        <h1 className="mx-auto max-w-3xl text-[32px] font-extrabold leading-[1.2] text-primary-dark md:text-[48px]">
-          Pay securely, then book your private HR session.
         </h1>
-        <p className="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-neutral-500">
-          Choose the level of support that fits your situation. After successful payment,
-          Stripe redirects you to the scheduling page.
+        <p className="mx-auto mt-5 max-w-2xl text-body-lg text-neutral-500">
+          Choose the level of support that fits your situation. After successful payment, Stripe redirects you to the scheduling page.
         </p>
       </header>
-      <section className="mx-auto mt-14 max-w-7xl px-5 md:px-[64px]">
+      <section className="mx-auto mt-14 max-w-max-width px-margin-mobile md:px-margin-desktop">
         <BookingFunnel />
       </section>
     </div>

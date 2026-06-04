@@ -12,22 +12,22 @@ export const metadata: Metadata = {
 
 export default function PaymentFailedPage() {
   return (
-    <div className="min-h-screen bg-neutral-bg px-5 py-32 text-center md:px-[64px]">
-      <div className="mx-auto max-w-xl">
-        <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-red-100">
-          <AlertCircle className="text-red-600" size={42} />
+    <div className="min-h-screen bg-surface px-margin-mobile py-40 text-center md:px-margin-desktop">
+      <div className="mx-auto max-w-xl rounded-[2rem] border-2 border-primary-dark bg-neutral-100 p-10 shadow-pop md:p-14">
+        <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full border-2 border-primary-dark bg-coral/15">
+          <AlertCircle className="text-coral" size={42} />
         </div>
-        <h1 className="text-[32px] font-extrabold leading-[1.2] text-primary-dark md:text-[48px]">
+        <h1 className="font-display text-h1-mobile font-extrabold tracking-tight text-primary-dark md:text-h1-desktop">
           Payment was not completed
         </h1>
-        <p className="mt-4 text-lg leading-relaxed text-neutral-500">
+        <p className="mt-4 text-body-lg leading-relaxed text-neutral-500">
           Stripe did not confirm a successful payment, so booking and paid downloads remain locked.
         </p>
         <Link
           href="/booking"
-          className="mt-8 inline-flex items-center gap-2 rounded-full bg-primary-violet px-8 py-4 text-sm font-bold uppercase tracking-[0.12em] text-white"
+          className="btn-pop mt-8 inline-flex items-center gap-2 rounded-full border-2 border-primary-dark bg-accent-orange px-8 py-4 text-[15px] font-bold text-primary-dark shadow-pop-sm"
         >
-          <ArrowLeft size={18} />
+          <ArrowLeft size={18} strokeWidth={2.5} />
           Try again
         </Link>
       </div>

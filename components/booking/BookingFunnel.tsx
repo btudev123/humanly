@@ -49,7 +49,7 @@ export function BookingFunnel() {
 
   return (
     <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
-      <section className="rounded-lg border border-neutral-300 bg-white p-6 shadow-sm md:p-8">
+      <section className="rounded-3xl border-2 border-primary-dark bg-neutral-100 p-6 shadow-pop-sm md:p-8">
         <div className="mb-6 flex items-center gap-3">
           <Calendar className="text-primary-violet" size={22} />
           <h2 className="text-2xl font-extrabold text-primary-dark">Choose your support</h2>
@@ -59,10 +59,10 @@ export function BookingFunnel() {
             <label
               key={service.slug}
               className={cn(
-                "cursor-pointer rounded-lg border-2 p-5 transition-all",
+                "cursor-pointer rounded-2xl border-2 p-5 transition-all",
                 selected === service.slug
-                  ? "border-primary-violet bg-primary-violet/5 shadow-lg shadow-primary-violet/10"
-                  : "border-neutral-300 bg-white hover:border-primary-violet/50"
+                  ? "border-primary-dark bg-violet-tint shadow-pop-sm"
+                  : "border-primary-dark/30 bg-neutral-100 hover:border-primary-dark"
               )}
             >
               <input
@@ -77,7 +77,7 @@ export function BookingFunnel() {
                 <div
                   className={cn(
                     "mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2",
-                    selected === service.slug ? "border-primary-violet bg-primary-violet" : "border-neutral-300"
+                    selected === service.slug ? "border-primary-dark bg-accent-orange" : "border-neutral-300"
                   )}
                 >
                   {selected === service.slug && <div className="h-2 w-2 rounded-full bg-white" />}
@@ -100,7 +100,7 @@ export function BookingFunnel() {
         </div>
       </section>
 
-      <section className="rounded-lg border border-neutral-300 bg-white p-6 shadow-sm md:p-8">
+      <section className="rounded-3xl border-2 border-primary-dark bg-neutral-100 p-6 shadow-pop-sm md:p-8">
         <div className="mb-6 flex items-start gap-3">
           <Lock className="mt-1 text-primary-violet" size={22} />
           <div>
@@ -114,21 +114,21 @@ export function BookingFunnel() {
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="grid gap-2 text-xs font-bold uppercase tracking-[0.14em] text-neutral-500">
               Name
-              <input name="name" required className="rounded-lg border border-neutral-300 px-4 py-3 text-base text-primary-dark" />
+              <input name="name" required className="rounded-2xl border-2 border-primary-dark/30 px-4 py-3 text-base text-primary-dark outline-none transition focus:border-primary-dark" />
             </label>
             <label className="grid gap-2 text-xs font-bold uppercase tracking-[0.14em] text-neutral-500">
               Email
-              <input name="email" type="email" required className="rounded-lg border border-neutral-300 px-4 py-3 text-base text-primary-dark" />
+              <input name="email" type="email" required className="rounded-2xl border-2 border-primary-dark/30 px-4 py-3 text-base text-primary-dark outline-none transition focus:border-primary-dark" />
             </label>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             <label className="grid gap-2 text-xs font-bold uppercase tracking-[0.14em] text-neutral-500">
               Phone
-              <input name="phone" className="rounded-lg border border-neutral-300 px-4 py-3 text-base text-primary-dark" />
+              <input name="phone" className="rounded-2xl border-2 border-primary-dark/30 px-4 py-3 text-base text-primary-dark outline-none transition focus:border-primary-dark" />
             </label>
             <label className="grid gap-2 text-xs font-bold uppercase tracking-[0.14em] text-neutral-500">
               Urgency
-              <select name="urgency" className="rounded-lg border border-neutral-300 px-4 py-3 text-base text-primary-dark">
+              <select name="urgency" className="rounded-2xl border-2 border-primary-dark/30 px-4 py-3 text-base text-primary-dark outline-none transition focus:border-primary-dark">
                 <option>This week</option>
                 <option>Next 48 hours</option>
                 <option>Planning ahead</option>
@@ -137,7 +137,7 @@ export function BookingFunnel() {
           </div>
           <label className="grid gap-2 text-xs font-bold uppercase tracking-[0.14em] text-neutral-500">
             Situation
-            <select name="concern" className="rounded-lg border border-neutral-300 px-4 py-3 text-base text-primary-dark">
+            <select name="concern" className="rounded-2xl border-2 border-primary-dark/30 px-4 py-3 text-base text-primary-dark outline-none transition focus:border-primary-dark">
               {concerns.map((concern) => (
                 <option key={concern}>{concern}</option>
               ))}
@@ -148,7 +148,7 @@ export function BookingFunnel() {
             <textarea
               name="message"
               rows={5}
-              className="rounded-lg border border-neutral-300 px-4 py-3 text-base text-primary-dark"
+              className="rounded-2xl border-2 border-primary-dark/30 px-4 py-3 text-base text-primary-dark outline-none transition focus:border-primary-dark"
               placeholder="A short version is enough. Karma will review this before the call."
             />
           </label>
@@ -156,13 +156,13 @@ export function BookingFunnel() {
           <button
             type="submit"
             disabled={isPending}
-            className="inline-flex items-center justify-center gap-3 rounded-full bg-primary-violet px-8 py-4 text-sm font-bold uppercase tracking-[0.12em] text-white hover:bg-primary-dark disabled:opacity-60"
+            className="btn-pop inline-flex items-center justify-center gap-3 rounded-full border-2 border-primary-dark bg-accent-orange px-8 py-4 text-sm font-bold uppercase tracking-[0.1em] text-primary-dark shadow-pop-sm disabled:opacity-60"
           >
-            <ShieldCheck size={18} />
+            <ShieldCheck size={18} strokeWidth={2.5} />
             {isPending ? "Opening Stripe..." : `Pay ${formatAed(selectedProduct.amount)} with Stripe`}
-            {!isPending && <ArrowRight size={18} />}
+            {!isPending && <ArrowRight size={18} strokeWidth={2.5} />}
           </button>
-          <div className="grid gap-3 rounded-lg bg-neutral-bg p-4 text-sm text-neutral-500 sm:grid-cols-3">
+          <div className="grid gap-3 rounded-2xl border-2 border-dashed border-neutral-300 p-4 text-sm text-neutral-500 sm:grid-cols-3">
             {["Stripe handles payment", "Scheduling unlocks after payment", "No employer notification"].map((item) => (
               <span key={item} className="flex items-center gap-2">
                 <CheckCircle2 size={16} className="text-primary-violet" />

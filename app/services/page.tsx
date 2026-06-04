@@ -2,7 +2,7 @@
 
 import { motion } from "motion/react";
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, ShieldCheck, Sparkles } from "lucide-react";
+import { ArrowRight, ArrowUpRight, CheckCircle2, ShieldCheck, Sparkles } from "lucide-react";
 import { Scribble } from "@/components/ui/Scribble";
 
 const services = [
@@ -39,7 +39,7 @@ const services = [
     title: "The Retainer",
     sub: "Ongoing Monthly Support",
     scope: "For complex situations requiring message review, strategy check-ins, and emotional containment over time.",
-    price: "AED 1,800/month",
+    price: "AED 1,800/mo",
     process: [
       "Two strategy sessions per month",
       "Message and document review between sessions",
@@ -52,132 +52,126 @@ const services = [
   },
 ];
 
+const comparison = [
+  { aspect: "Who they protect", hr: "The company", humanly: "You, the individual", lawyer: "Your legal position" },
+  { aspect: "Confidentiality", hr: "Limited — reports to management", humanly: "Absolute — no employer contact", lawyer: "Attorney-client privilege" },
+  { aspect: "Cost", hr: "Free (but conflicted)", humanly: "AED 550–1,800", lawyer: "AED 2,000–5,000+" },
+  { aspect: "Approach", hr: "Policy-driven", humanly: "Human-centered, practical", lawyer: "Litigation-focused" },
+  { aspect: "Speed", hr: "Slow — internal processes", humanly: "Same-week sessions, 48h reports", lawyer: "Weeks to months" },
+  { aspect: "Emotional support", hr: "Not their role", humanly: "Core to the approach", lawyer: "Not their role" },
+];
+
 export default function ServicesPage() {
   return (
-    <div className="min-h-screen bg-neutral-bg pb-24 pt-28">
+    <div className="overflow-clip bg-surface pb-24 pt-32 md:pt-40">
       {/* Header */}
-      <section className="px-5 md:px-[64px] max-w-7xl mx-auto text-center relative">
-        <Scribble variant="sparkle" className="absolute -top-8 -left-8 md:-left-16 w-24 h-24 text-amber/30" />
-        <p className="text-xs font-bold uppercase tracking-[0.24em] text-primary-violet">Services</p>
-        <h1 className="mt-5 font-extrabold text-[32px] md:text-[48px] leading-[1.2] -tracking-[0.02em] text-primary-dark max-w-3xl mx-auto relative inline-block">
-          A Confidential Reality Check.
-          <Scribble variant="underline" className="absolute -bottom-3 left-0 w-full h-4 text-amber" />
+      <section className="relative mx-auto max-w-max-width px-margin-mobile text-center md:px-margin-desktop">
+        <div className="dot-grid pointer-events-none absolute inset-0 -z-10 opacity-50" />
+        <Scribble variant="star-fill" color="#ff6a1a" className="absolute left-[10%] top-0 hidden h-8 w-8 animate-float md:block" />
+        <Scribble variant="spiral" color="#9d5cff" className="absolute right-[10%] top-6 hidden h-16 w-16 opacity-50 md:block" />
+
+        <span className="inline-flex items-center gap-2 rounded-full border-2 border-primary-dark bg-neutral-100 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-primary-dark shadow-pop-sm">
+          <span className="h-2 w-2 rounded-full bg-accent-orange" /> Services
+        </span>
+        <h1 className="mx-auto mt-6 inline-block font-display text-h1-mobile font-extrabold tracking-tight text-primary-dark md:text-h1-desktop">
+          A confidential{" "}
+          <span className="relative inline-block">
+            reality check
+            <Scribble variant="underline-bold" color="#ff6a1a" strokeWidth={5} className="absolute -bottom-3 left-0 h-4 w-full" animate />
+          </span>
         </h1>
-        <p className="mt-6 text-lg leading-relaxed text-neutral-500 max-w-xl mx-auto">
+        <p className="mx-auto mt-6 max-w-xl text-body-lg text-neutral-500">
           Practical strategy without legal complexity. Three tiers, one mission: getting you clarity and control.
         </p>
       </section>
 
-      {/* Services Grid */}
-      <section className="px-5 md:px-[64px] max-w-7xl mx-auto mt-16 grid gap-6 md:grid-cols-3">
+      {/* Services grid */}
+      <section className="mx-auto mt-16 grid max-w-max-width gap-6 px-margin-mobile md:grid-cols-3 md:px-margin-desktop">
         {services.map((service, index) => (
           <motion.article
             key={service.title}
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: index * 0.08 }}
-            className={`rounded-lg p-8 flex flex-col gap-6 relative group ${
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }}
+            className={`relative flex flex-col gap-6 rounded-3xl border-2 border-primary-dark p-8 ${
               service.highlight
-                ? "bg-primary-dark text-white shadow-2xl shadow-primary-dark/25 ring-2 ring-primary-violet md:-translate-y-4"
-                : "bg-white border border-neutral-300 shadow-sm hover:shadow-lg"
+                ? "bg-primary-dark text-on-primary shadow-pop-orange md:-translate-y-4 md:rotate-[-1deg]"
+                : "bg-neutral-100 transition-transform hover:-translate-y-1"
             }`}
           >
             {service.highlight && (
               <>
-                <Scribble variant="circle" className="absolute -top-6 -right-6 w-16 h-16 text-amber" color="#FDA544" />
-                <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber text-primary-dark font-bold text-[10px] uppercase tracking-[0.2em] px-4 py-1 rounded-full z-10">
+                <Scribble variant="star-fill" color="#ff6a1a" className="absolute -right-3 -top-3 h-9 w-9 animate-wiggle" />
+                <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full border-2 border-primary-dark bg-accent-orange px-4 py-1 text-[11px] font-bold uppercase tracking-wider text-primary-dark">
                   Most Popular
                 </span>
               </>
             )}
 
-            <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 ${
-              service.highlight ? "bg-primary-violet text-white" : "bg-primary-violet/10 text-primary-violet"
-            }`}>
+            <div className={`flex h-12 w-12 items-center justify-center rounded-2xl border-2 ${service.highlight ? "border-accent-orange bg-accent-orange text-primary-dark" : "border-primary-dark bg-violet-tint text-primary-violet"}`}>
               <Sparkles size={22} />
             </div>
 
             <div>
-              <h2 className={`text-2xl font-extrabold leading-tight ${service.highlight ? "text-white" : "text-primary-dark"}`}>
-                {service.title}
-              </h2>
-              <p className={`mt-1 font-semibold text-sm uppercase tracking-[0.12em] ${service.highlight ? "text-amber" : "text-primary-violet"}`}>
-                {service.sub}
-              </p>
+              <h2 className={`font-display text-h3 font-bold ${service.highlight ? "text-on-primary" : "text-primary-dark"}`}>{service.title}</h2>
+              <p className={`mt-1 text-sm font-bold uppercase tracking-wider ${service.highlight ? "text-orange-light" : "text-primary-violet"}`}>{service.sub}</p>
             </div>
 
-            <p className={`text-base leading-relaxed ${service.highlight ? "text-white/70" : "text-neutral-500"}`}>
-              {service.scope}
-            </p>
+            <p className={`leading-relaxed ${service.highlight ? "text-on-primary/70" : "text-neutral-500"}`}>{service.scope}</p>
 
-            <div className={`pt-4 border-t ${service.highlight ? "border-white/10" : "border-neutral-300"}`}>
-              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-amber mb-3">What You Get</p>
+            <div className={`border-t-2 border-dashed pt-5 ${service.highlight ? "border-white/15" : "border-neutral-300"}`}>
+              <p className={`mb-3 text-[11px] font-bold uppercase tracking-[0.16em] ${service.highlight ? "text-orange-light" : "text-accent-orange"}`}>What you get</p>
               <ul className="space-y-2.5">
                 {service.process.map((item) => (
-                  <li key={item} className={`flex gap-2.5 text-sm ${service.highlight ? "text-white/80" : "text-neutral-500"}`}>
-                    <CheckCircle2 className="mt-0.5 shrink-0 text-primary-violet" size={16} />
+                  <li key={item} className={`flex gap-2.5 text-sm ${service.highlight ? "text-on-primary/80" : "text-neutral-500"}`}>
+                    <CheckCircle2 className={service.highlight ? "mt-0.5 shrink-0 text-accent-orange" : "mt-0.5 shrink-0 text-primary-violet"} size={16} />
                     <span>{item}</span>
                   </li>
                 ))}
               </ul>
             </div>
 
-            <div className={`pt-4 border-t ${service.highlight ? "border-white/10" : "border-neutral-300"}`}>
-              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-amber mb-2">Who It's For</p>
-              <p className={`text-sm leading-relaxed ${service.highlight ? "text-white/70" : "text-neutral-500"}`}>
-                {service.for}
-              </p>
+            <div className={`border-t-2 border-dashed pt-5 ${service.highlight ? "border-white/15" : "border-neutral-300"}`}>
+              <p className={`mb-2 text-[11px] font-bold uppercase tracking-[0.16em] ${service.highlight ? "text-orange-light" : "text-accent-orange"}`}>Who it&apos;s for</p>
+              <p className={`text-sm leading-relaxed ${service.highlight ? "text-on-primary/70" : "text-neutral-500"}`}>{service.for}</p>
             </div>
 
-            <div className="mt-auto pt-4">
-              <p className={`text-2xl font-extrabold mb-4 ${service.highlight ? "text-white" : "text-primary-dark"}`}>
-                {service.price}
-              </p>
+            <div className="mt-auto pt-2">
+              <p className={`mb-4 font-display text-4xl font-extrabold ${service.highlight ? "text-on-primary" : "text-primary-dark"}`}>{service.price}</p>
               <Link
                 href="/booking"
-                className={`inline-flex items-center gap-2 px-6 py-3.5 rounded-full text-sm font-bold uppercase tracking-[0.12em] transition-all ${
-                  service.highlight
-                    ? "bg-amber text-primary-dark hover:bg-amber/90"
-                    : "bg-primary-violet text-white hover:bg-primary-dark"
+                className={`btn-pop inline-flex items-center gap-2 rounded-full border-2 border-primary-dark px-6 py-3.5 text-[15px] font-bold ${
+                  service.highlight ? "bg-accent-orange text-primary-dark shadow-pop-sm" : "bg-primary-dark text-on-primary"
                 }`}
               >
                 Book Now
-                <ArrowRight size={16} />
+                <ArrowUpRight size={16} strokeWidth={2.5} />
               </Link>
             </div>
           </motion.article>
         ))}
       </section>
 
-      {/* Comparison Table */}
-      <section className="px-5 md:px-[64px] max-w-7xl mx-auto mt-24">
-        <h2 className="font-extrabold text-[32px] leading-[1.3] text-primary-dark text-center mb-12">
-          How Humanly Compares
-        </h2>
-        <div className="overflow-x-auto rounded-lg border border-neutral-300 bg-white shadow-sm">
-          <table className="w-full text-left">
+      {/* Comparison */}
+      <section className="mx-auto mt-24 max-w-max-width px-margin-mobile md:px-margin-desktop">
+        <h2 className="mb-12 text-center font-display text-h2 font-extrabold tracking-tight text-primary-dark">How Humanly compares</h2>
+        <div className="overflow-x-auto rounded-3xl border-2 border-primary-dark bg-neutral-100 shadow-pop-sm">
+          <table className="w-full min-w-[640px] text-left">
             <thead>
-              <tr className="border-b border-neutral-300">
-                <th className="p-5 font-bold text-sm uppercase tracking-[0.12em] text-primary-dark">Aspect</th>
-                <th className="p-5 font-bold text-sm uppercase tracking-[0.12em] text-neutral-500">Internal HR</th>
-                <th className="p-5 font-bold text-sm uppercase tracking-[0.12em] text-primary-violet bg-primary-violet/5">Humanly</th>
-                <th className="p-5 font-bold text-sm uppercase tracking-[0.12em] text-neutral-500">Employment Lawyer</th>
+              <tr className="border-b-2 border-primary-dark">
+                <th className="p-5 text-sm font-bold uppercase tracking-wider text-primary-dark">Aspect</th>
+                <th className="p-5 text-sm font-bold uppercase tracking-wider text-neutral-400">Internal HR</th>
+                <th className="bg-violet-tint p-5 text-sm font-bold uppercase tracking-wider text-primary-violet">Humanly</th>
+                <th className="p-5 text-sm font-bold uppercase tracking-wider text-neutral-400">Employment Lawyer</th>
               </tr>
             </thead>
             <tbody className="text-sm text-neutral-500">
-              {[
-                { aspect: "Who they protect", hr: "The company", humanly: "You, the individual", lawyer: "Your legal position" },
-                { aspect: "Confidentiality", hr: "Limited — reports to management", humanly: "Absolute — no employer contact", lawyer: "Attorney-client privilege" },
-                { aspect: "Cost", hr: "Free (but conflicted)", humanly: "AED 550–1,800", lawyer: "AED 2,000–5,000+" },
-                { aspect: "Approach", hr: "Policy-driven", humanly: "Human-centered, practical", lawyer: "Litigation-focused" },
-                { aspect: "Speed", hr: "Slow — internal processes", humanly: "Same-week sessions, 48h reports", lawyer: "Weeks to months" },
-                { aspect: "Emotional support", hr: "Not their role", humanly: "Core to the approach", lawyer: "Not their role" },
-              ].map((row, i) => (
-                <tr key={row.aspect} className={`border-t border-neutral-300 ${i % 2 === 0 ? "bg-neutral-bg/50" : ""}`}>
-                  <td className="p-5 font-semibold text-primary-dark">{row.aspect}</td>
+              {comparison.map((row, i) => (
+                <tr key={row.aspect} className={`border-t border-neutral-300 ${i % 2 === 0 ? "bg-surface-container-low/40" : ""}`}>
+                  <td className="p-5 font-bold text-primary-dark">{row.aspect}</td>
                   <td className="p-5">{row.hr}</td>
-                  <td className="p-5 font-semibold text-primary-violet bg-primary-violet/5">{row.humanly}</td>
+                  <td className="bg-violet-tint p-5 font-semibold text-primary-violet">{row.humanly}</td>
                   <td className="p-5">{row.lawyer}</td>
                 </tr>
               ))}
@@ -186,29 +180,29 @@ export default function ServicesPage() {
         </div>
       </section>
 
-      {/* Confidentiality Promise */}
-      <section className="px-5 md:px-[64px] max-w-7xl mx-auto mt-24">
-        <div className="rounded-lg bg-primary-dark p-10 md:p-14 text-white relative overflow-hidden">
-          <Scribble variant="sparkle" className="absolute top-6 right-6 w-20 h-20 text-amber/30" />
-          <div className="relative z-10 grid md:grid-cols-[1fr_1fr] gap-10 items-center">
+      {/* Confidentiality promise */}
+      <section className="mx-auto mt-24 max-w-max-width px-margin-mobile md:px-margin-desktop">
+        <div className="relative overflow-hidden rounded-[2.5rem] border-2 border-primary-dark bg-primary-dark p-10 text-on-primary shadow-pop-orange md:p-14">
+          <Scribble variant="spiral" color="#ff6a1a" className="absolute right-8 top-8 hidden h-20 w-20 opacity-30 md:block" />
+          <div className="relative z-10 grid items-center gap-10 md:grid-cols-2">
             <div>
-              <ShieldCheck className="text-amber mb-6" size={40} />
-              <h2 className="font-extrabold text-[32px] leading-[1.3] mb-4">The Confidentiality Promise</h2>
-              <p className="text-lg leading-relaxed text-white/70">
+              <ShieldCheck className="mb-6 text-accent-orange" size={40} />
+              <h2 className="font-display text-h2 font-extrabold tracking-tight">The Confidentiality Promise</h2>
+              <p className="mt-4 text-body-lg leading-relaxed text-on-primary/70">
                 We do not alert employers, sell workplace data, or accept employer-side advisory work that would compromise individual trust. What you share stays in the room.
               </p>
             </div>
-            <div className="rounded-lg bg-white/10 p-8 ring-1 ring-white/10">
-              <h3 className="font-extrabold text-2xl mb-3">Most professionals book The Triage first.</h3>
-              <p className="text-white/70 leading-relaxed mb-6">
+            <div className="rounded-3xl border border-white/15 bg-white/5 p-8">
+              <h3 className="font-display text-2xl font-bold">Most professionals book The Triage first.</h3>
+              <p className="mt-3 leading-relaxed text-on-primary/70">
                 No commitment. Strictly confidential. A one-hour session to get your bearings and decide what comes next.
               </p>
               <Link
                 href="/booking"
-                className="inline-flex items-center gap-2 bg-amber text-primary-dark px-6 py-3.5 rounded-full text-sm font-bold uppercase tracking-[0.12em] hover:bg-amber/90 transition-colors"
+                className="btn-pop mt-6 inline-flex items-center gap-2 rounded-full border-2 border-primary-dark bg-accent-orange px-6 py-3.5 text-[15px] font-bold text-primary-dark shadow-[5px_5px_0_0_#9d5cff]"
               >
                 Book Your Triage
-                <ArrowRight size={16} />
+                <ArrowRight size={16} strokeWidth={2.5} />
               </Link>
             </div>
           </div>

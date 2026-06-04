@@ -26,7 +26,7 @@ export function PaidScheduler({
         theme: "light",
         styles: {
           branding: {
-            brandColor: "#7c35e3",
+            brandColor: "#7c3aed",
           },
         },
       });
@@ -34,21 +34,21 @@ export function PaidScheduler({
   }, []);
 
   return (
-    <div className="mx-auto max-w-6xl px-5 py-28 md:px-[64px]">
-      <div className="mb-8 rounded-lg border border-green-200 bg-green-50 p-5 text-green-800">
+    <div className="mx-auto max-w-6xl px-margin-mobile py-32 md:px-margin-desktop md:pt-40">
+      <div className="mb-8 rounded-3xl border-2 border-primary-dark bg-[#25D366]/12 p-6 text-primary-dark">
         <div className="flex items-start gap-3">
-          <CheckCircle2 className="mt-1 shrink-0" size={22} />
+          <CheckCircle2 className="mt-1 shrink-0 text-[#1da851]" size={22} />
           <div>
-            <h1 className="text-2xl font-extrabold">Payment confirmed. Choose your time.</h1>
-            <p className="mt-1 text-green-700">
+            <h1 className="font-display text-2xl font-bold">Payment confirmed. Choose your time.</h1>
+            <p className="mt-1 text-neutral-500">
               This scheduling page is unlocked for {order.customer_email}. Your booking will be linked to order {order.id}.
             </p>
           </div>
         </div>
       </div>
-      <div className="overflow-hidden rounded-lg border border-neutral-300 bg-white shadow-sm">
-        <div className="flex items-center gap-3 bg-primary-dark px-6 py-4 text-white">
-          <Lock className="text-amber" size={19} />
+      <div className="overflow-hidden rounded-3xl border-2 border-primary-dark bg-neutral-100 shadow-pop">
+        <div className="flex items-center gap-3 bg-primary-dark px-6 py-4 text-on-primary">
+          <Lock className="text-accent-orange" size={19} />
           <span className="text-sm font-bold uppercase tracking-[0.14em]">{product.name} scheduling</span>
         </div>
         <Cal

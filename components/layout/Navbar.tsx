@@ -3,140 +3,160 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import { AnimatePresence, motion } from "motion/react";
+import { ArrowUpRight, Menu, X } from "lucide-react";
+import { Scribble } from "@/components/ui/Scribble";
 
-  const navLinks = [
+const navLinks = [
   { href: "/", label: "Home" },
   { href: "/services", label: "Services" },
   { href: "/about", label: "About" },
   { href: "/resources", label: "Resources" },
 ];
 
+function Wordmark() {
+  return (
+    <span className="relative inline-flex items-end font-display text-[26px] md:text-[30px] font-extrabold tracking-tight text-primary-dark leading-none">
+      Humanly
+      <span className="ml-0.5 h-2.5 w-2.5 rounded-full bg-accent-orange translate-y-[-2px]" />
+      <Scribble
+        variant="underline"
+        strokeWidth={4}
+        color="#ff6a1a"
+        className="absolute -bottom-2 left-0 h-3 w-[88%] opacity-0 transition-opacity duration-300 group-hover/logo:opacity-100"
+      />
+    </span>
+  );
+}
+
 export function Navbar() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
-  // On /booking page, no navigation links — dedicated conversion page
   const isBookPage = pathname === "/booking";
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 30);
+    const onScroll = () => setScrolled(window.scrollY > 24);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Close mobile menu on route change
   useEffect(() => {
     setMobileOpen(false);
   }, [pathname]);
 
   return (
-    <header
-      className={`fixed top-0 w-full z-50 transition-all duration-300 ${
-        scrolled
-          ? "bg-neutral-bg/90 backdrop-blur-md border-b border-primary-dark/10 shadow-sm py-3"
-          : "bg-transparent py-5"
-      }`}
-    >
+    <header className="fixed inset-x-0 top-0 z-50 px-margin-mobile md:px-margin-desktop pt-3 md:pt-4">
       <nav
-        className="max-w-[1200px] mx-auto flex items-center justify-between px-[20px] md:px-[64px]"
         aria-label="Main navigation"
+        className={`mx-auto flex max-w-max-width items-center justify-between rounded-full px-4 py-2.5 transition-all duration-300 md:px-5 ${
+          scrolled || mobileOpen
+            ? "border border-primary-dark/10 bg-neutral-bg/85 shadow-soft backdrop-blur-xl"
+            : "border border-transparent bg-transparent"
+        }`}
       >
         {/* Brand */}
-        <Link
-          href="/"
-          className="font-extrabold text-[24px] md:text-[32px] text-primary-dark hover:text-primary-violet transition-colors tracking-tight"
-          aria-label="Humanly home"
-        >
-          Humanly
+        <Link href="/" aria-label="Humanly home" className="group/logo relative shrink-0">
+          <Wordmark />
         </Link>
 
-        {/* Desktop nav — hide on /book */}
         {!isBookPage && (
           <>
-            <div className="hidden md:flex items-center gap-8">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className={`font-semibold text-[14px] transition-colors duration-200 ${
-                    pathname === link.href
-                      ? "text-primary-violet border-b-2 border-primary-violet"
-                      : "text-neutral-500 hover:text-primary-violet"
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              ))}
+            {/* Desktop links */}
+            <div className="hidden items-center gap-1 rounded-full md:flex">
+              {navLinks.map((link) => {
+                const active = pathname === link.href;
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={`relative rounded-full px-4 py-2 text-[14px] font-semibold transition-colors duration-200 ${
+                      active
+                        ? "text-primary-violet"
+                        : "text-neutral-500 hover:text-primary-dark"
+                    }`}
+                  >
+                    {active && (
+                      <motion.span
+                        layoutId="nav-pill"
+                        className="absolute inset-0 -z-10 rounded-full bg-violet-tint"
+                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                      />
+                    )}
+                    {link.label}
+                  </Link>
+                );
+              })}
             </div>
 
-            {/* CTA button — desktop */}
-            <div className="hidden md:block">
-              <Link
-                href="/booking"
-                className="inline-flex items-center gap-2 bg-primary-violet text-white font-semibold text-[14px] px-6 py-3 rounded-full hover:bg-primary-dark transition-colors duration-200"
-              >
-                <span>Get Support</span>
-                <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-                  arrow_forward
-                </span>
-              </Link>
-            </div>
+            {/* Desktop CTA */}
+            <Link
+              href="/booking"
+              className="btn-pop hidden items-center gap-1.5 rounded-full border-2 border-primary-dark bg-accent-orange px-5 py-2.5 text-[14px] font-bold text-primary-dark shadow-pop-sm md:inline-flex"
+            >
+              Get Support
+              <ArrowUpRight size={17} strokeWidth={2.5} />
+            </Link>
 
-            {/* Mobile hamburger */}
+            {/* Mobile toggle */}
             <button
-              className="md:hidden flex items-center justify-center p-2 text-neutral-900"
-              onClick={() => setMobileOpen(!mobileOpen)}
+              onClick={() => setMobileOpen((o) => !o)}
               aria-expanded={mobileOpen}
               aria-label="Toggle navigation menu"
+              className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-primary-dark bg-neutral-100 text-primary-dark md:hidden"
             >
-              <span className="material-symbols-outlined text-[28px]">
-                {mobileOpen ? "close" : "menu"}
-              </span>
+              {mobileOpen ? <X size={20} strokeWidth={2.5} /> : <Menu size={20} strokeWidth={2.5} />}
             </button>
           </>
         )}
 
-        {/* /book page — just back to home */}
         {isBookPage && (
           <Link
             href="/"
-            className="text-[14px] font-semibold text-neutral-500 hover:text-primary-violet transition-colors"
+            className="text-[14px] font-semibold text-neutral-500 transition-colors hover:text-primary-violet"
           >
             ← Back to Home
           </Link>
         )}
       </nav>
 
-      {/* Mobile menu drawer */}
-      {mobileOpen && !isBookPage && (
-        <div className="md:hidden bg-neutral-bg/95 backdrop-blur-md border-b border-primary-dark/10 shadow-lg animate-fade-in">
-          <div className="max-w-[1200px] mx-auto px-[20px] py-6 flex flex-col gap-4">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`font-semibold text-[16px] py-2 ${
-                  pathname === link.href
-                    ? "text-primary-violet"
-                    : "text-neutral-500"
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
+      {/* Mobile drawer */}
+      <AnimatePresence>
+        {mobileOpen && !isBookPage && (
+          <motion.div
+            initial={{ opacity: 0, y: -12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.22 }}
+            className="mx-auto mt-2 max-w-max-width overflow-hidden rounded-3xl border border-primary-dark/10 bg-neutral-100 p-3 shadow-soft md:hidden"
+          >
+            <div className="flex flex-col gap-1">
+              {navLinks.map((link) => {
+                const active = pathname === link.href;
+                return (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className={`rounded-2xl px-4 py-3 text-[16px] font-semibold transition-colors ${
+                      active ? "bg-violet-tint text-primary-violet" : "text-neutral-500"
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                );
+              })}
+            </div>
             <Link
               href="/booking"
-              className="inline-flex items-center justify-center gap-2 bg-primary-violet text-white font-semibold text-[14px] px-6 py-3 rounded-full mt-2"
+              className="mt-2 flex items-center justify-center gap-2 rounded-2xl border-2 border-primary-dark bg-accent-orange px-6 py-3.5 text-[15px] font-bold text-primary-dark shadow-pop-sm"
             >
               Get Support
-              <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-                arrow_forward
-              </span>
+              <ArrowUpRight size={18} strokeWidth={2.5} />
             </Link>
-          </div>
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }

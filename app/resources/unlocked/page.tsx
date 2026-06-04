@@ -33,31 +33,33 @@ export default async function ResourceUnlockedPage({
 
   if (!sessionId || !order || !resource) {
     return (
-      <div className="mx-auto max-w-xl px-5 py-32 text-center">
-        <h1 className="text-4xl font-extrabold text-primary-dark">Resource is still locked</h1>
-        <p className="mt-4 text-neutral-500">Payment has not been confirmed for this download link.</p>
-        <Link href="/resources" className="mt-8 inline-flex rounded-full bg-primary-violet px-8 py-4 text-white">
-          Back to resources
-        </Link>
+      <div className="mx-auto max-w-xl px-margin-mobile py-36 text-center md:px-margin-desktop">
+        <div className="rounded-[2rem] border-2 border-primary-dark bg-neutral-100 p-10 shadow-pop">
+          <h1 className="font-display text-4xl font-extrabold tracking-tight text-primary-dark">Resource is still locked</h1>
+          <p className="mt-4 text-neutral-500">Payment has not been confirmed for this download link.</p>
+          <Link href="/resources" className="btn-pop mt-8 inline-flex items-center gap-2 rounded-full border-2 border-primary-dark bg-accent-orange px-8 py-4 text-[15px] font-bold text-primary-dark shadow-pop-sm">
+            Back to resources
+          </Link>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-neutral-bg px-5 py-32 text-center md:px-[64px]">
-      <div className="mx-auto max-w-xl">
-        <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-green-100">
-          <CheckCircle2 className="text-green-600" size={42} />
+    <div className="min-h-screen bg-surface px-margin-mobile py-36 text-center md:px-margin-desktop">
+      <div className="mx-auto max-w-xl rounded-[2rem] border-2 border-primary-dark bg-neutral-100 p-10 shadow-pop md:p-14">
+        <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full border-2 border-primary-dark bg-[#25D366]/15">
+          <CheckCircle2 className="text-[#1da851]" size={42} />
         </div>
-        <h1 className="text-[32px] font-extrabold leading-[1.2] text-primary-dark md:text-[48px]">
+        <h1 className="font-display text-h1-mobile font-extrabold tracking-tight text-primary-dark md:text-h1-desktop">
           Resource unlocked
         </h1>
-        <p className="mt-4 text-lg leading-relaxed text-neutral-500">{resource.title}</p>
+        <p className="mt-4 text-body-lg leading-relaxed text-neutral-500">{resource.title}</p>
         <a
           href={`/api/resources/download?session_id=${encodeURIComponent(sessionId)}&slug=${encodeURIComponent(resource.slug)}`}
-          className="mt-8 inline-flex items-center gap-2 rounded-full bg-primary-violet px-8 py-4 text-sm font-bold uppercase tracking-[0.12em] text-white"
+          className="btn-pop mt-8 inline-flex items-center gap-2 rounded-full border-2 border-primary-dark bg-accent-orange px-8 py-4 text-sm font-bold uppercase tracking-[0.1em] text-primary-dark shadow-pop-sm"
         >
-          <Download size={18} />
+          <Download size={18} strokeWidth={2.5} />
           Download PDF
         </a>
       </div>

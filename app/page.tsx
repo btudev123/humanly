@@ -7,6 +7,7 @@ import { Scribble } from "@/components/ui/Scribble";
 import { TestimonialsCarousel, type Testimonial } from "@/components/reviews/TestimonialsCarousel";
 import {
   ArrowRight,
+  ArrowUpRight,
   CalendarCheck,
   CheckCircle2,
   FileText,
@@ -17,6 +18,8 @@ import {
   ClipboardCheck,
   Users,
   Sparkles,
+  Plus,
+  Minus,
 } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
@@ -26,25 +29,37 @@ import {
 const stats = [
   { value: "100%", label: "Confidential", detail: "No employer notification or shared access." },
   { value: "45 min", label: "Strategy Sessions", detail: "Focused guidance with written next steps." },
-  { value: "UAE", label: "Regional Focus", detail: "Built for GCC workplace rights and employee concerns." },
-  { value: "0", label: "Corporate Conflict", detail: "Humanly advocates exclusively for the individual." },
+  { value: "UAE", label: "Regional Focus", detail: "Built for GCC workplace rights and concerns." },
+  { value: "20+", label: "Years In HR", detail: "Executive experience now in your corner." },
 ];
 
 const pillars = [
   {
     icon: ShieldCheck,
     title: "Safe Space",
-    description: "Speak freely without fear of your employer finding out. Every conversation is privileged and confidential by design.",
+    description:
+      "Speak freely without fear of your employer finding out. Every conversation is privileged and confidential by design.",
+    tint: "bg-violet-tint",
+    doodle: "heart" as const,
+    doodleColor: "#7c3aed",
   },
   {
     icon: Search,
     title: "Reality Check",
-    description: "Get an honest, evidence-based assessment of your situation — what the law says, what your employer is likely to do, and where your leverage is.",
+    description:
+      "An honest, evidence-based read on your situation — what the law says, what your employer will likely do, and where your leverage is.",
+    tint: "bg-orange-tint",
+    doodle: "star-fill" as const,
+    doodleColor: "#ff6a1a",
   },
   {
     icon: ClipboardCheck,
     title: "Clear Next Steps",
-    description: "Leave with scripts, questions to ask, documents to prepare, and a calm sequence of actions you can take the same day.",
+    description:
+      "Leave with scripts, questions to ask, documents to prepare, and a calm sequence of actions you can take the same day.",
+    tint: "bg-violet-tint",
+    doodle: "bolt" as const,
+    doodleColor: "#7c3aed",
   },
 ];
 
@@ -62,7 +77,7 @@ const services = [
     name: "The Strategy",
     price: "950 AED",
     duration: "Written Follow-Up Report",
-    description: "A structured document including situation summary, risk view, recommended actions, and suggested scripts.",
+    description: "A structured document: situation summary, risk view, recommended actions, and suggested scripts.",
     features: ["Confidential session", "Document review checklist", "Written report", "Email & meeting scripts", "48-hour turnaround"],
     featured: true,
     icon: FileText,
@@ -71,7 +86,7 @@ const services = [
     name: "The Retainer",
     price: "Custom",
     duration: "Ongoing Monthly Support",
-    description: "For complex situations requiring message review, strategy check-ins, and ongoing containment.",
+    description: "For complex situations needing message review, strategy check-ins, and ongoing containment.",
     features: ["Monthly strategy sessions", "Message & email review", "Real-time guidance", "Priority access"],
     featured: false,
     icon: Users,
@@ -91,17 +106,17 @@ const steps = [
   {
     icon: MessageSquare,
     title: "Private Intake",
-    copy: "Share your workplace issue in plain language. No complex forms — just a human-centred understanding of your unique situation.",
+    copy: "Share your workplace issue in plain language. No complex forms — just a human-centred understanding of your situation.",
   },
   {
     icon: Search,
     title: "Virtual Session",
-    copy: "Meet face-to-face over Zoom. We provide a safe, neutral space to map risks, options, and your next move.",
+    copy: "Meet face-to-face over Zoom. A safe, neutral space to map risks, options, and your next move.",
   },
   {
     icon: ClipboardCheck,
     title: "48-Hour Report",
-    copy: "Walk away with a comprehensive action plan within 48 hours. Clarity, legal grounding, and peace of mind delivered fast.",
+    copy: "Walk away with a comprehensive action plan within 48 hours. Clarity, grounding, and peace of mind — fast.",
   },
 ];
 
@@ -114,11 +129,7 @@ const trustSignals: Testimonial[] = [
     quote: "Founded by Karma Harb after 20+ years inside HR leadership across UAE, Saudi Arabia, and international environments.",
     date: "2025-01-01",
     verified: true,
-    rating: undefined,
-    thumbnail: undefined,
-    mediaUrl: undefined,
-    mediaType: undefined,
-    transcript: undefined,
+    rating: undefined, thumbnail: undefined, mediaUrl: undefined, mediaType: undefined, transcript: undefined,
   },
   {
     id: "ts-2",
@@ -128,11 +139,7 @@ const trustSignals: Testimonial[] = [
     quote: "Humanly does not publish testimonials until they are verified, consented, and privacy-safe.",
     date: "2025-01-01",
     verified: true,
-    rating: undefined,
-    thumbnail: undefined,
-    mediaUrl: undefined,
-    mediaType: undefined,
-    transcript: undefined,
+    rating: undefined, thumbnail: undefined, mediaUrl: undefined, mediaType: undefined, transcript: undefined,
   },
   {
     id: "ts-3",
@@ -142,11 +149,7 @@ const trustSignals: Testimonial[] = [
     quote: "Future video or Instagram testimonials will load as lightweight thumbnails with transcripts before third-party embeds.",
     date: "2025-01-01",
     verified: true,
-    rating: undefined,
-    thumbnail: undefined,
-    mediaUrl: undefined,
-    mediaType: undefined,
-    transcript: undefined,
+    rating: undefined, thumbnail: undefined, mediaUrl: undefined, mediaType: undefined, transcript: undefined,
   },
 ];
 
@@ -169,41 +172,89 @@ const faqs = [
   },
   {
     q: "Can I cancel or reschedule?",
-    a: "Yes. You can reschedule or cancel up to 24 hours before your session with no charge. We understand that workplace situations are unpredictable.",
+    a: "Yes. You can reschedule or cancel up to 24 hours before your session with no charge. Workplace situations are unpredictable.",
   },
 ];
 
+const marqueeItems = [
+  "Strictly Confidential",
+  "No Employer Notification",
+  "UAE & GCC Labour Law",
+  "Written Action Plan",
+  "Neutral & Independent",
+  "20+ Years In HR",
+  "Zero Corporate Conflict",
+];
+
+/* ------------------------------------------------------------------ */
+/*  Small building blocks                                             */
+/* ------------------------------------------------------------------ */
+
+function Eyebrow({ children, color = "orange" }: { children: React.ReactNode; color?: "orange" | "violet" }) {
+  return (
+    <span
+      className={`inline-flex items-center gap-2 rounded-full border-2 border-primary-dark bg-neutral-100 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-primary-dark shadow-pop-sm`}
+    >
+      <span className={`h-2 w-2 rounded-full ${color === "orange" ? "bg-accent-orange" : "bg-primary-violet"}`} />
+      {children}
+    </span>
+  );
+}
+
+function Reveal({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-80px" }}
+      transition={{ duration: 0.5, delay, ease: [0.22, 1, 0.36, 1] }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  );
+}
 
 function FAQAccordion() {
-  const [open, setOpen] = useState<number | null>(null);
-
+  const [open, setOpen] = useState<number | null>(0);
   return (
-    <div className="divide-y divide-outline-variant rounded-xl border border-outline-variant bg-surface-container-lowest">
-      {faqs.map((faq, i) => (
-        <div key={faq.q} className="p-6">
-          <button
-            className="flex w-full items-center justify-between gap-5 text-left"
-            onClick={() => setOpen(open === i ? null : i)}
+    <div className="space-y-4">
+      {faqs.map((faq, i) => {
+        const isOpen = open === i;
+        return (
+          <div
+            key={faq.q}
+            className={`rounded-3xl border-2 border-primary-dark bg-neutral-100 p-6 transition-shadow ${isOpen ? "shadow-pop-sm" : ""}`}
           >
-            <span className="text-lg font-semibold text-on-surface">{faq.q}</span>
-            <span className={`text-2xl transition-colors ${open === i ? "text-secondary" : "text-on-surface-variant"}`}>
-              {open === i ? "−" : "+"}
-            </span>
-          </button>
-          <AnimatePresence>
-            {open === i && (
-              <motion.p
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                className="overflow-hidden pt-4 leading-relaxed text-on-surface-variant"
+            <button
+              className="flex w-full items-center justify-between gap-5 text-left"
+              onClick={() => setOpen(isOpen ? null : i)}
+            >
+              <span className="font-display text-lg font-bold text-primary-dark">{faq.q}</span>
+              <span
+                className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 border-primary-dark transition-colors ${
+                  isOpen ? "bg-accent-orange" : "bg-neutral-100"
+                }`}
               >
-                {faq.a}
-              </motion.p>
-            )}
-          </AnimatePresence>
-        </div>
-      ))}
+                {isOpen ? <Minus size={16} strokeWidth={3} /> : <Plus size={16} strokeWidth={3} />}
+              </span>
+            </button>
+            <AnimatePresence initial={false}>
+              {isOpen && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="overflow-hidden"
+                >
+                  <p className="pt-4 leading-relaxed text-neutral-500">{faq.a}</p>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -213,628 +264,613 @@ function FAQAccordion() {
 /* ------------------------------------------------------------------ */
 
 export default function Home() {
-  /* Sticky mobile CTA bar after 30% scroll */
   const [showSticky, setShowSticky] = useState(false);
   useEffect(() => {
-    const onScroll = () => setShowSticky(window.scrollY > window.innerHeight * 0.3);
+    const onScroll = () => setShowSticky(window.scrollY > window.innerHeight * 0.4);
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   return (
-    <div className="bg-surface text-on-surface font-body-md antialiased">
+    <div className="overflow-clip bg-surface text-on-surface">
 
-      {/* ============ HERO ============ */}
-      <section className="relative overflow-hidden px-margin-mobile md:px-margin-desktop pt-28 pb-16 md:pt-36 md:pb-24">
-        {/* Background gradient */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_10%,rgba(124,53,227,0.10),transparent_40%),linear-gradient(180deg,#ffffff_0%,#faf9f9_100%)]" />
-        <Scribble variant="loop" className="absolute top-20 left-10 w-48 h-48 text-secondary-orange/15 -rotate-12 hidden md:block" />
-        <Scribble variant="sparkle" className="absolute bottom-10 right-10 w-32 h-32 text-secondary/10 hidden md:block" />
+      {/* ============================ HERO ============================ */}
+      <section className="relative px-margin-mobile pb-12 pt-32 md:px-margin-desktop md:pb-20 md:pt-40">
+        {/* backdrop */}
+        <div className="absolute inset-0 -z-10 overflow-hidden">
+          <div className="dot-grid absolute inset-0 opacity-60" />
+          <div className="blob absolute -right-24 top-10 h-[420px] w-[420px] bg-[radial-gradient(circle,rgba(124,58,237,0.22),transparent_70%)]" />
+          <div className="blob absolute -left-32 bottom-0 h-[380px] w-[380px] bg-[radial-gradient(circle,rgba(255,106,26,0.18),transparent_70%)]" style={{ animationDelay: "-6s" }} />
+        </div>
 
-        <div className="relative mx-auto max-w-max-width grid gap-12 lg:grid-cols-[1.02fr_0.98fr] lg:items-center">
-          {/* Left: Copy */}
-          <div className="relative z-10">
-            <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-outline-variant bg-surface-container-lowest px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] text-on-surface-variant shadow-sm">
-              <LockKeyhole size={14} className="text-secondary" />
-              100% Confidential · GCC Professionals · 20+ Yrs Experience
-            </div>
+        {/* floating doodles */}
+        <Scribble variant="star-fill" color="#ff6a1a" className="absolute left-[6%] top-28 hidden h-7 w-7 animate-float md:block" />
+        <Scribble variant="spiral" color="#9d5cff" className="absolute right-[8%] top-44 hidden h-16 w-16 opacity-50 md:block" />
+        <Scribble variant="arrow-curved" color="#7c3aed" className="absolute left-[44%] top-24 hidden h-14 w-16 opacity-60 lg:block" />
 
-            <h1 className="max-w-4xl font-h1-mobile text-h1-mobile md:font-h1-desktop md:text-h1-desktop text-primary relative inline-block">
-              Your HR isn't on your side.
-              <br />
-              <span className="relative inline-block">
-                We are.
-                <Scribble variant="underline" className="absolute -bottom-3 left-0 w-full h-4 text-secondary-orange" color="#FDA544" />
-              </span>
-            </h1>
+        <div className="relative mx-auto grid max-w-max-width items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
+          {/* Left */}
+          <div>
+            <Reveal>
+              <Eyebrow>
+                <LockKeyhole size={13} className="text-primary-violet" />
+                100% Confidential · GCC Professionals
+              </Eyebrow>
+            </Reveal>
 
-            <p className="mt-6 max-w-2xl font-body-lg text-body-lg text-on-surface-variant">
-              Independent, neutral, and confidential HR advisory for professionals navigating workplace challenges in the UAE and GCC.
-            </p>
+            <Reveal delay={0.05}>
+              <h1 className="mt-7 font-display text-[clamp(2.6rem,6.6vw,4.6rem)] font-extrabold leading-[0.98] tracking-tight text-primary-dark">
+                Your HR isn&apos;t{" "}
+                <span className="relative inline-block">
+                  <span className="highlighter-violet highlighter">on your side.</span>
+                </span>
+                <br />
+                <span className="relative inline-block">
+                  We are.
+                  <Scribble variant="underline-bold" color="#ff6a1a" strokeWidth={5} className="absolute -bottom-3 left-0 h-4 w-full" animate />
+                </span>
+              </h1>
+            </Reveal>
 
-            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <Link
-                href="/booking"
-                className="inline-flex items-center justify-center gap-3 rounded-full bg-secondary text-on-secondary px-8 py-4 font-label-bold text-label-bold hover:bg-primary-container transition-colors shadow-xl shadow-secondary/20"
-              >
-                <CalendarCheck size={18} />
-                Book a Confidential Session
-              </Link>
-              <Link
-                href="/services"
-                className="inline-flex items-center justify-center gap-3 rounded-full border border-outline-variant bg-surface-container-lowest px-8 py-4 font-label-bold text-label-bold text-on-surface hover:border-secondary transition-colors"
-              >
-                View Services
-                <ArrowRight size={18} />
-              </Link>
-            </div>
+            <Reveal delay={0.1}>
+              <p className="mt-7 max-w-xl text-body-lg text-neutral-500">
+                Independent, neutral, and confidential HR advisory for professionals navigating
+                workplace challenges in the UAE and GCC.
+              </p>
+            </Reveal>
 
-            {/* Trust markers */}
-            <div className="mt-10 grid max-w-2xl gap-3 sm:grid-cols-2">
-              {[
-                "No employer notification",
-                "Strictly confidential by design",
-                "UAE & GCC labour law expertise",
-                "Written action plan within 48 hours",
-              ].map((item) => (
-                <div key={item} className="flex items-start gap-3 text-sm font-medium text-on-surface-variant">
-                  <CheckCircle2 className="mt-0.5 shrink-0 text-secondary" size={18} />
-                  {item}
-                </div>
-              ))}
-            </div>
+            <Reveal delay={0.15}>
+              <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+                <Link
+                  href="/booking"
+                  className="btn-pop inline-flex items-center justify-center gap-2 rounded-full border-2 border-primary-dark bg-accent-orange px-7 py-4 text-[15px] font-bold text-primary-dark shadow-pop"
+                >
+                  <CalendarCheck size={18} strokeWidth={2.5} />
+                  Book a Confidential Session
+                </Link>
+                <Link
+                  href="/services"
+                  className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-primary-dark bg-neutral-100 px-7 py-4 text-[15px] font-bold text-primary-dark transition-colors hover:bg-violet-tint"
+                >
+                  View Services
+                  <ArrowRight size={18} strokeWidth={2.5} />
+                </Link>
+              </div>
+            </Reveal>
+
+            <Reveal delay={0.2}>
+              <div className="mt-9 grid max-w-xl gap-x-6 gap-y-3 sm:grid-cols-2">
+                {[
+                  "No employer notification",
+                  "Confidential by design",
+                  "UAE & GCC labour law expertise",
+                  "Action plan within 48 hours",
+                ].map((item) => (
+                  <div key={item} className="flex items-start gap-2.5 text-sm font-medium text-neutral-500">
+                    <CheckCircle2 className="mt-0.5 shrink-0 text-primary-violet" size={18} />
+                    {item}
+                  </div>
+                ))}
+              </div>
+            </Reveal>
           </div>
 
-          {/* Right: Floating visual */}
-          <div className="relative min-h-[480px] md:min-h-[560px]">
+          {/* Right — sticker card cluster */}
+          <div className="relative min-h-[460px] md:min-h-[540px]">
             <motion.div
-              animate={{ y: [0, -12, 0], rotateX: [0, 2, 0] }}
-              transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute inset-x-0 top-0 mx-auto max-w-[480px] rounded-[2rem] border border-outline-variant bg-surface-container-lowest p-5 shadow-2xl shadow-primary/10"
+              initial={{ opacity: 0, scale: 0.96, rotate: -3 }}
+              animate={{ opacity: 1, scale: 1, rotate: -2 }}
+              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+              className="absolute inset-x-0 top-0 mx-auto max-w-[440px] rotate-[-2deg] rounded-[2rem] border-2 border-primary-dark bg-primary-dark p-6 text-on-primary shadow-pop-orange"
             >
-              <div className="rounded-[1.4rem] bg-primary-container p-6 text-on-primary">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-on-primary/60">Private Case Room</p>
-                    <h2 className="mt-2 text-2xl font-semibold text-on-primary">Workplace Strategy Plan</h2>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-on-primary/50">Private Case Room</p>
+                  <h2 className="mt-1.5 font-display text-2xl font-bold text-on-primary">Workplace Strategy</h2>
+                </div>
+                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-400/15 px-3 py-1 text-[11px] font-bold text-emerald-300">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" /> Encrypted
+                </span>
+              </div>
+              <div className="mt-6 grid gap-3">
+                {[
+                  ["Concern", "Manager retaliation after a formal complaint"],
+                  ["Priority", "Protect record & preserve evidence"],
+                  ["Next Step", "Draft a neutral escalation email"],
+                ].map(([label, value]) => (
+                  <div key={label} className="rounded-2xl border border-on-primary/10 bg-white/5 p-4">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-on-primary/45">{label}</p>
+                    <p className="mt-1.5 text-[15px] font-medium text-on-primary/90">{value}</p>
                   </div>
-                  <span className="rounded-full bg-emerald-400/20 px-3 py-1 text-xs font-bold text-emerald-200">Encrypted</span>
-                </div>
-                <div className="mt-8 grid gap-4">
-                  {[
-                    ["Concern", "Manager retaliation after formal complaint"],
-                    ["Priority", "Protect record and preserve evidence"],
-                    ["Next Step", "Draft neutral escalation email"],
-                  ].map(([label, value]) => (
-                    <div key={label} className="rounded-2xl border border-on-primary/10 bg-on-primary/10 p-4">
-                      <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-on-primary/50">{label}</p>
-                      <p className="mt-2 font-medium text-on-primary/90">{value}</p>
-                    </div>
-                  ))}
-                </div>
+                ))}
               </div>
             </motion.div>
 
             <motion.div
-              animate={{ y: [0, 16, 0] }}
+              animate={{ y: [0, 14, 0] }}
               transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute bottom-16 left-0 w-[260px] rounded-2xl border border-outline-variant bg-surface-container-lowest p-5 shadow-xl"
+              className="absolute -left-2 bottom-20 w-[240px] rotate-[3deg] rounded-3xl border-2 border-primary-dark bg-neutral-100 p-5 shadow-pop-sm"
             >
-              <ShieldCheck className="text-secondary" size={26} />
-              <p className="mt-4 text-sm font-bold uppercase tracking-[0.14em] text-on-surface-variant">Confidentiality Promise</p>
-              <p className="mt-2 text-lg font-semibold leading-snug text-on-surface">No employer notification. No shared access. No recordings.</p>
+              <div className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-primary-dark bg-violet-tint text-primary-violet">
+                <ShieldCheck size={22} />
+              </div>
+              <p className="mt-3 text-[11px] font-bold uppercase tracking-[0.14em] text-neutral-400">Confidentiality Promise</p>
+              <p className="mt-1.5 text-[15px] font-bold leading-snug text-primary-dark">No notification. No shared access. No recordings.</p>
             </motion.div>
 
             <motion.div
-              animate={{ y: [0, -10, 0] }}
-              transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute bottom-0 right-4 w-[230px] rounded-2xl bg-primary p-5 text-on-primary shadow-xl shadow-primary/25"
+              animate={{ y: [0, -12, 0] }}
+              transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute -right-1 bottom-0 w-[210px] rotate-[-4deg] rounded-3xl border-2 border-primary-dark bg-accent-orange p-5 text-primary-dark shadow-pop-sm"
             >
-              <Users size={24} className="text-secondary-orange" />
-              <p className="mt-4 text-4xl font-extrabold">45 min</p>
-              <p className="mt-1 text-sm text-on-primary/70">Focused strategy session with written action summary.</p>
+              <Sparkles size={22} strokeWidth={2.5} />
+              <p className="mt-3 font-display text-4xl font-extrabold leading-none">45 min</p>
+              <p className="mt-2 text-[13px] font-medium leading-snug text-primary-dark/80">Focused session + written action summary.</p>
             </motion.div>
+
+            <Scribble variant="star-fill" color="#7c3aed" className="absolute right-10 top-2 h-6 w-6 animate-float-slow" />
           </div>
         </div>
       </section>
 
-      {/* ============ STATS BAR ============ */}
-      <section className="border-y border-outline-variant bg-surface-container-low px-margin-mobile md:px-margin-desktop py-10">
-        <div className="mx-auto max-w-max-width grid gap-4 sm:grid-cols-2 md:grid-cols-4">
-          {stats.map((stat) => (
-            <div key={stat.label} className="rounded-xl border border-outline-variant bg-surface-container-lowest p-5 text-center md:text-left">
-              <p className="text-4xl font-extrabold text-primary">{stat.value}</p>
-              <p className="mt-2 text-xs font-bold uppercase tracking-[0.16em] text-on-surface-variant">{stat.label}</p>
-              <p className="mt-3 text-sm leading-relaxed text-on-surface-variant">{stat.detail}</p>
+      {/* ============================ MARQUEE ============================ */}
+      <section className="border-y-2 border-primary-dark bg-primary-violet py-4 text-neutral-100">
+        <div className="marquee gap-0">
+          {[0, 1].map((dup) => (
+            <div key={dup} className="flex items-center gap-8 pr-8" aria-hidden={dup === 1}>
+              {marqueeItems.map((item) => (
+                <span key={item} className="flex items-center gap-8 text-sm font-bold uppercase tracking-[0.18em] whitespace-nowrap">
+                  {item}
+                  <Scribble variant="star-fill" color="#ff9a4d" className="h-4 w-4" />
+                </span>
+              ))}
             </div>
           ))}
         </div>
       </section>
 
-      {/* ============ THE PROBLEM — Unsafe Middle Ground ============ */}
-      <section className="px-margin-mobile md:px-margin-desktop py-20 md:py-24">
+      {/* ============================ STATS ============================ */}
+      <section className="px-margin-mobile py-16 md:px-margin-desktop md:py-20">
+        <div className="mx-auto grid max-w-max-width gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {stats.map((stat, i) => (
+            <Reveal key={stat.label} delay={i * 0.06}>
+              <div className="h-full rounded-3xl border-2 border-primary-dark bg-neutral-100 p-6 transition-transform hover:-translate-y-1">
+                <p className="font-display text-5xl font-extrabold text-gradient">{stat.value}</p>
+                <p className="mt-3 text-xs font-bold uppercase tracking-[0.16em] text-primary-violet">{stat.label}</p>
+                <p className="mt-2 text-sm leading-relaxed text-neutral-500">{stat.detail}</p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </section>
+
+      {/* ====================== THE PROBLEM ====================== */}
+      <section className="px-margin-mobile py-16 md:px-margin-desktop md:py-24">
         <div className="mx-auto max-w-max-width">
-          <div className="text-center mb-16 relative">
-            <h2 className="font-h1-mobile text-h1-mobile md:font-h1-desktop md:text-h1-desktop text-primary relative inline-block">
-              Caught in the unsafe middle ground?
-              <Scribble variant="underline" className="absolute -bottom-4 left-0 w-full h-4 text-secondary-orange" color="#FDA544" />
+          <Reveal className="relative mx-auto mb-16 max-w-2xl text-center">
+            <Eyebrow color="violet">The Gap</Eyebrow>
+            <h2 className="relative mt-6 inline-block font-display text-h1-mobile font-extrabold tracking-tight text-primary-dark md:text-h1-desktop">
+              Caught in the{" "}
+              <span className="relative inline-block">
+                unsafe middle?
+                <Scribble variant="circle-rough" color="#ff6a1a" strokeWidth={3} className="absolute -inset-x-4 -inset-y-3 h-[150%] w-[120%]" />
+              </span>
             </h2>
-            <p className="font-body-lg text-body-lg text-on-surface-variant mt-6 max-w-2xl mx-auto">
-              Navigating workplace issues often leaves employees trapped between conflicting interests. It doesn't have to be this way.
+            <p className="mt-6 text-body-lg text-neutral-500">
+              Workplace issues leave employees trapped between conflicting interests. It doesn&apos;t have to be that way.
             </p>
-          </div>
+          </Reveal>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter items-stretch">
+          <div className="grid items-stretch gap-6 md:grid-cols-3">
             {/* Internal HR */}
-            <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-8 relative flex flex-col h-full">
-              <div className="absolute -top-6 -right-6 text-error rotate-12 z-20">
-                <svg fill="none" height="48" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" viewBox="0 0 48 48" width="48">
-                  <path d="M24 4L4 40H44L24 4Z" strokeLinejoin="round" />
-                  <path d="M24 16V28" />
-                  <circle cx="24" cy="36" fill="currentColor" r="1" />
-                  <path d="M3 41 C15 42, 35 39, 45 41" strokeWidth="1.5" />
-                </svg>
-              </div>
-              <div className="mb-6">
-                <div className="w-12 h-12 bg-secondary/10 rounded-full flex items-center justify-center text-secondary mb-4">
-                  <span className="material-symbols-outlined text-[28px]">corporate_fare</span>
+            <Reveal>
+              <div className="flex h-full flex-col rounded-3xl border-2 border-primary-dark bg-neutral-100 p-8">
+                <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border-2 border-primary-dark bg-neutral-200 text-neutral-500">
+                  <span className="material-symbols-outlined text-[26px]">corporate_fare</span>
                 </div>
-                <h3 className="font-h3 text-h3 text-primary mb-2">Internal HR</h3>
-                <p className="font-label-bold text-label-bold text-on-surface-variant uppercase tracking-wider text-xs">The Company</p>
-              </div>
-              <div className="space-y-6 flex-grow border-t border-outline-variant pt-6">
-                <div>
-                  <h4 className="font-label-bold text-label-bold text-on-surface mb-1">Mandate:</h4>
-                  <p className="font-body-md text-body-md text-on-surface-variant">Protect the Business</p>
-                </div>
-                <div>
-                  <h4 className="font-label-bold text-label-bold text-on-surface mb-1">Perception:</h4>
-                  <p className="font-body-md text-body-md text-on-surface-variant">Unsafe for the employee.</p>
+                <h3 className="font-display text-h3 font-bold text-primary-dark">Internal HR</h3>
+                <p className="mt-1 text-xs font-bold uppercase tracking-wider text-neutral-400">The Company</p>
+                <div className="mt-6 space-y-5 border-t-2 border-dashed border-neutral-300 pt-6">
+                  <div>
+                    <p className="text-sm font-bold text-primary-dark">Mandate</p>
+                    <p className="text-neutral-500">Protect the business.</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-primary-dark">Perception</p>
+                    <p className="text-neutral-500">Unsafe for the employee.</p>
+                  </div>
                 </div>
               </div>
-            </div>
+            </Reveal>
 
-            {/* Humanly (highlighted) */}
-            <div className="bg-primary-container text-on-primary rounded-xl p-8 relative flex flex-col h-full transform md:-translate-y-4 shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-[#56348a] z-10">
-              <div className="absolute -top-8 -left-8 text-secondary-orange -rotate-12 z-20">
-                <svg fill="none" height="64" stroke="currentColor" strokeLinecap="round" strokeWidth="2" viewBox="0 0 64 64" width="64">
-                  <path d="M32 4V12M32 52V60M4 32H12M52 32H60M12 12L18 18M46 46L52 52M12 52L18 46M46 18L52 12" />
-                  <path d="M30 6V14M8 30H16" strokeWidth="1" />
-                </svg>
-              </div>
-              <div className="mb-6">
-                <div className="w-12 h-12 bg-secondary rounded-full flex items-center justify-center text-on-secondary mb-4">
-                  <span className="material-symbols-outlined text-[28px] fill-icon">balance</span>
+            {/* Humanly */}
+            <Reveal delay={0.08}>
+              <div className="relative flex h-full flex-col rounded-3xl border-2 border-primary-dark bg-primary-dark p-8 text-on-primary shadow-pop-orange md:-translate-y-4">
+                <Scribble variant="star-fill" color="#ff6a1a" className="absolute -right-3 -top-3 h-9 w-9 animate-wiggle" />
+                <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border-2 border-accent-orange bg-accent-orange text-primary-dark">
+                  <span className="material-symbols-outlined fill-icon text-[26px]">balance</span>
                 </div>
-                <h3 className="font-h3 text-h3 text-on-primary mb-2">Humanly</h3>
-                <p className="font-label-bold text-label-bold text-secondary-fixed uppercase tracking-wider text-xs">The Sweet Spot</p>
-              </div>
-              <div className="space-y-6 flex-grow border-t border-on-primary-fixed-variant pt-6">
-                <div>
-                  <h4 className="font-label-bold text-label-bold text-on-primary mb-1">Mandate:</h4>
-                  <p className="font-body-md text-body-md text-inverse-primary">Protect the Individual</p>
-                </div>
-                <div>
-                  <h4 className="font-label-bold text-label-bold text-on-primary mb-1">Perception:</h4>
-                  <p className="font-body-md text-body-md text-inverse-primary">Dignified & Neutral.</p>
+                <h3 className="font-display text-h3 font-bold text-on-primary">Humanly</h3>
+                <p className="mt-1 text-xs font-bold uppercase tracking-wider text-orange-light">The Sweet Spot</p>
+                <div className="mt-6 space-y-5 border-t-2 border-dashed border-white/20 pt-6">
+                  <div>
+                    <p className="text-sm font-bold text-on-primary">Mandate</p>
+                    <p className="text-inverse-primary">Protect the individual.</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-on-primary">Perception</p>
+                    <p className="text-inverse-primary">Dignified &amp; neutral.</p>
+                  </div>
                 </div>
               </div>
-            </div>
+            </Reveal>
 
-            {/* Employment Lawyers */}
-            <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-8 relative flex flex-col h-full">
-              <div className="absolute -top-6 -right-4 text-outline rotate-45 z-20">
-                <svg fill="none" height="48" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 48 48" width="48">
-                  <path d="M16 20L28 32" />
-                  <rect height="24" rx="2" transform="rotate(45 22 8)" width="16" x="22" y="8" />
-                  <path d="M8 38H40" />
-                  <path d="M15 19L29 33M23 9L39 25" strokeWidth="1" />
-                </svg>
-              </div>
-              <div className="mb-6">
-                <div className="w-12 h-12 bg-secondary/10 rounded-full flex items-center justify-center text-secondary mb-4">
-                  <span className="material-symbols-outlined text-[28px]">gavel</span>
+            {/* Lawyers */}
+            <Reveal delay={0.16}>
+              <div className="flex h-full flex-col rounded-3xl border-2 border-primary-dark bg-neutral-100 p-8">
+                <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border-2 border-primary-dark bg-neutral-200 text-neutral-500">
+                  <span className="material-symbols-outlined text-[26px]">gavel</span>
                 </div>
-                <h3 className="font-h3 text-h3 text-primary mb-2">Employment Lawyers</h3>
-                <p className="font-label-bold text-label-bold text-on-surface-variant uppercase tracking-wider text-xs">The Extreme</p>
-              </div>
-              <div className="space-y-6 flex-grow border-t border-outline-variant pt-6">
-                <div>
-                  <h4 className="font-label-bold text-label-bold text-on-surface mb-1">Mandate:</h4>
-                  <p className="font-body-md text-body-md text-on-surface-variant">Litigation</p>
-                </div>
-                <div>
-                  <h4 className="font-label-bold text-label-bold text-on-surface mb-1">Perception:</h4>
-                  <p className="font-body-md text-body-md text-on-surface-variant">Expensive & Aggressive.</p>
+                <h3 className="font-display text-h3 font-bold text-primary-dark">Employment Lawyers</h3>
+                <p className="mt-1 text-xs font-bold uppercase tracking-wider text-neutral-400">The Extreme</p>
+                <div className="mt-6 space-y-5 border-t-2 border-dashed border-neutral-300 pt-6">
+                  <div>
+                    <p className="text-sm font-bold text-primary-dark">Mandate</p>
+                    <p className="text-neutral-500">Litigation.</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-primary-dark">Perception</p>
+                    <p className="text-neutral-500">Expensive &amp; aggressive.</p>
+                  </div>
                 </div>
               </div>
-            </div>
+            </Reveal>
           </div>
         </div>
       </section>
 
-      {/* ============ WHAT HUMANLY IS — 3 Pillars ============ */}
-      <section className="bg-surface-container-low px-margin-mobile md:px-margin-desktop py-20 md:py-24">
+      {/* ====================== 3 PILLARS ====================== */}
+      <section className="relative px-margin-mobile py-16 md:px-margin-desktop md:py-24">
         <div className="mx-auto max-w-max-width">
-          <div className="text-center mb-16">
-            <h2 className="font-h2 text-h2 md:text-[40px] text-primary">What Humanly Is</h2>
-            <p className="font-body-lg text-body-lg text-on-surface-variant mt-4 max-w-xl mx-auto">
-              Practical strategy without legal complexity — built on three core principles.
-            </p>
-          </div>
+          <Reveal className="mb-14 text-center">
+            <Eyebrow>What Humanly Is</Eyebrow>
+            <h2 className="mt-6 font-display text-h2 font-extrabold tracking-tight text-primary-dark md:text-[44px]">
+              Practical strategy, zero legal jargon.
+            </h2>
+            <p className="mx-auto mt-4 max-w-xl text-body-lg text-neutral-500">Built on three core principles.</p>
+          </Reveal>
 
-          <div className="grid gap-8 md:grid-cols-3">
+          <div className="grid gap-6 md:grid-cols-3">
             {pillars.map((pillar, i) => (
-              <motion.div
-                key={pillar.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="bg-surface-container-lowest border border-outline-variant rounded-xl p-8 text-center relative group hover:bg-surface-container-low transition-colors duration-300"
-              >
-                <Scribble variant="sparkle" className="absolute top-4 right-6 w-12 h-12 text-secondary-orange/20 group-hover:text-secondary-orange/40 transition-opacity" />
-                <div className="w-14 h-14 bg-secondary rounded-full flex items-center justify-center text-on-secondary mx-auto mb-6">
-                  <pillar.icon size={26} />
+              <Reveal key={pillar.title} delay={i * 0.08}>
+                <div className={`group relative h-full overflow-hidden rounded-3xl border-2 border-primary-dark ${pillar.tint} p-8 transition-transform hover:-translate-y-1`}>
+                  <Scribble variant={pillar.doodle} color={pillar.doodleColor} className="absolute right-5 top-5 h-10 w-10 opacity-25 transition-opacity group-hover:opacity-60" />
+                  <span className="font-display text-6xl font-extrabold text-primary-dark/10">0{i + 1}</span>
+                  <div className="mt-3 flex h-14 w-14 items-center justify-center rounded-2xl border-2 border-primary-dark bg-neutral-100 text-primary-violet">
+                    <pillar.icon size={26} />
+                  </div>
+                  <h3 className="mt-5 font-display text-h3 font-bold text-primary-dark">{pillar.title}</h3>
+                  <p className="mt-3 leading-relaxed text-neutral-500">{pillar.description}</p>
                 </div>
-                <h3 className="font-h3 text-h3 text-primary mb-3">{pillar.title}</h3>
-                <p className="font-body-md text-body-md text-on-surface-variant">{pillar.description}</p>
-              </motion.div>
+              </Reveal>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ============ SERVICES + PRICING ============ */}
-      <section className="px-margin-mobile md:px-margin-desktop py-20 md:py-24" id="services">
+      {/* ====================== SERVICES / PRICING ====================== */}
+      <section id="services" className="px-margin-mobile py-16 md:px-margin-desktop md:py-24">
         <div className="mx-auto max-w-max-width">
-          <div className="text-center mb-16 relative">
-            <h2 className="font-h1-mobile text-h1-mobile md:font-h1-desktop md:text-h1-desktop text-primary relative inline-block">
-              A Confidential Reality Check
-              <Scribble variant="underline" className="absolute -bottom-4 left-0 w-full h-4 text-secondary-orange" color="#FDA544" />
+          <Reveal className="relative mx-auto mb-16 max-w-2xl text-center">
+            <Eyebrow color="violet">Pricing</Eyebrow>
+            <h2 className="relative mt-6 inline-block font-display text-h1-mobile font-extrabold tracking-tight text-primary-dark md:text-h1-desktop">
+              A confidential reality check
+              <Scribble variant="underline" color="#ff6a1a" strokeWidth={4} className="absolute -bottom-3 left-0 h-3.5 w-full" />
             </h2>
-            <p className="font-body-lg text-body-lg text-on-surface-variant mt-6 max-w-xl mx-auto">
-              Three ways to work with us — from a single session to ongoing support.
-            </p>
-          </div>
+            <p className="mt-6 text-body-lg text-neutral-500">From a single session to ongoing support — three ways to work together.</p>
+          </Reveal>
 
-          <div className="grid gap-6 md:grid-cols-3 relative z-10">
-            {services.map((service) => (
-              <div
-                key={service.name}
-                className={`rounded-xl p-8 flex flex-col gap-6 relative group transition-colors duration-300 ${
-                  service.featured
-                    ? "bg-surface-container border-2 border-secondary shadow-lg z-20"
-                    : "bg-surface-container-lowest border border-outline-variant hover:bg-surface-container-low"
-                }`}
-              >
-                {service.featured && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-secondary text-on-secondary font-label-bold text-caption px-4 py-1 rounded-full uppercase tracking-wider">
-                    Most Popular
-                  </div>
-                )}
-                {service.featured && (
-                  <Scribble variant="sparkle" className="absolute -top-6 -right-6 w-16 h-16 text-secondary-orange/40 pointer-events-none" />
-                )}
-                <div className="w-12 h-12 rounded-full bg-secondary text-on-secondary flex items-center justify-center">
-                  <service.icon size={22} />
-                </div>
-                <div>
-                  <h3 className="font-h3 text-h3 text-primary mb-2">{service.name}</h3>
-                  <p className="font-label-bold text-label-bold text-secondary mb-4">{service.duration}</p>
-                  <p className="font-body-md text-body-md text-on-surface-variant">{service.description}</p>
-                </div>
-                <p className="text-4xl font-extrabold text-primary">{service.price}</p>
-                <ul className="space-y-3 flex-grow">
-                  {service.features.map((f) => (
-                    <li key={f} className="flex gap-3">
-                      <CheckCircle2 className={service.featured ? "text-secondary-orange" : "text-secondary"} size={20} />
-                      <span className="font-medium text-on-surface">{f}</span>
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  href="/booking"
-                  className={`inline-flex items-center justify-center gap-2 rounded-full px-6 py-4 font-label-bold text-label-bold transition-colors ${
+          <div className="grid items-stretch gap-6 md:grid-cols-3">
+            {services.map((service, i) => (
+              <Reveal key={service.name} delay={i * 0.08} className="h-full">
+                <div
+                  className={`relative flex h-full flex-col gap-6 rounded-3xl border-2 border-primary-dark p-8 transition-transform ${
                     service.featured
-                      ? "bg-secondary text-on-secondary hover:bg-primary-container"
-                      : "border border-outline-variant text-on-surface hover:border-secondary"
+                      ? "bg-neutral-100 shadow-pop md:-translate-y-3 md:rotate-[-1deg] md:hover:-translate-y-4"
+                      : "bg-neutral-100 hover:-translate-y-1"
                   }`}
                 >
-                  <CalendarCheck size={18} />
-                  Book Now
-                </Link>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ============ FOUNDER ============ */}
-      <section className="bg-surface-container-low px-margin-mobile md:px-margin-desktop py-20 md:py-24">
-        <div className="mx-auto max-w-max-width">
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-gutter items-center">
-            {/* Left: Photo */}
-            <div className="md:col-span-5 md:col-start-1 relative order-2 md:order-1 mt-12 md:mt-0">
-              <div className="rounded-xl overflow-hidden border border-outline-variant bg-surface-container-lowest relative aspect-[4/5]">
-                <div className="w-full h-full bg-surface-container-high flex items-center justify-center text-on-surface-variant text-lg">
-                  <div className="text-center">
-                    <Users size={64} className="mx-auto text-secondary/40 mb-4" />
-                    <p className="font-semibold">Karma Harb</p>
-                    <p className="text-sm">Founder & Lead Advisor</p>
+                  {service.featured && (
+                    <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full border-2 border-primary-dark bg-accent-orange px-4 py-1 text-[11px] font-bold uppercase tracking-wider text-primary-dark">
+                      Most Popular
+                    </span>
+                  )}
+                  <div className={`flex h-12 w-12 items-center justify-center rounded-2xl border-2 border-primary-dark ${service.featured ? "bg-accent-orange text-primary-dark" : "bg-violet-tint text-primary-violet"}`}>
+                    <service.icon size={22} />
                   </div>
+                  <div>
+                    <h3 className="font-display text-h3 font-bold text-primary-dark">{service.name}</h3>
+                    <p className="mt-1 text-sm font-bold uppercase tracking-wider text-primary-violet">{service.duration}</p>
+                    <p className="mt-3 text-neutral-500">{service.description}</p>
+                  </div>
+                  <p className="font-display text-5xl font-extrabold text-primary-dark">{service.price}</p>
+                  <ul className="flex-grow space-y-3">
+                    {service.features.map((f) => (
+                      <li key={f} className="flex gap-2.5">
+                        <CheckCircle2 className={service.featured ? "text-accent-orange" : "text-primary-violet"} size={20} />
+                        <span className="font-medium text-primary-dark">{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <Link
+                    href="/booking"
+                    className={`btn-pop inline-flex items-center justify-center gap-2 rounded-full border-2 border-primary-dark px-6 py-3.5 text-[15px] font-bold ${
+                      service.featured ? "bg-accent-orange text-primary-dark shadow-pop-sm" : "bg-primary-dark text-on-primary"
+                    }`}
+                  >
+                    <CalendarCheck size={18} strokeWidth={2.5} />
+                    Book Now
+                  </Link>
                 </div>
-              </div>
-              <Scribble variant="loop" className="absolute -top-8 -left-8 w-24 h-24 text-secondary-orange opacity-80 pointer-events-none" color="#FDA544" />
-            </div>
-
-            {/* Right: Copy */}
-            <div className="md:col-span-6 md:col-start-7 flex flex-col gap-8 order-1 md:order-2">
-              <h2 className="font-h1-mobile text-h1-mobile md:font-h1-desktop md:text-h1-desktop text-on-surface">
-                Executive Experience.
-                <br className="hidden md:block" />
-                <span className="text-secondary">Human Approach.</span>
-              </h2>
-
-              <div className="flex flex-col gap-4 relative">
-                <div className="inline-block relative w-max">
-                  <h3 className="font-h2 text-h2 text-on-surface">Karma Harb, Founder</h3>
-                  <Scribble variant="underline" className="absolute -bottom-2 left-0 w-full h-3 text-secondary-orange" color="#FDA544" />
-                </div>
-                <p className="font-body-lg text-body-lg text-on-surface-variant max-w-prose leading-relaxed mt-4">
-                  20+ years in Human Resources across the UAE, Saudi Arabia, and international environments. Combines the strategic weight of a C-Suite executive with the empathy of a coach.
-                </p>
-              </div>
-
-              <div className="mt-4 p-6 bg-surface-container-lowest border border-outline-variant rounded-xl relative">
-                <div className="absolute -top-4 -left-4 bg-secondary text-on-secondary rounded-full w-8 h-8 flex items-center justify-center">
-                  <span className="material-symbols-outlined text-sm">format_quote</span>
-                </div>
-                <p className="font-h3 text-h3 text-primary italic">
-                  &ldquo;Everyone deserves to feel heard at work.&rdquo;
-                </p>
-              </div>
-
-              <Link
-                href="/about"
-                className="inline-flex items-center gap-3 text-secondary font-label-bold text-label-bold hover:text-primary-container transition-colors"
-              >
-                Read Karma's full story
-                <ArrowRight size={18} />
-              </Link>
-            </div>
+              </Reveal>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* ============ WHO THIS IS FOR — Trigger Grid ============ */}
-      <section className="px-margin-mobile md:px-margin-desktop py-20 md:py-24">
-        <div className="mx-auto max-w-max-width">
-          <div className="text-center mb-16 relative">
-            <h2 className="font-h2 text-h2 md:text-[40px] text-primary">Is This You?</h2>
-            <p className="font-body-lg text-body-lg text-on-surface-variant mt-4 max-w-xl mx-auto">
-              Workplace challenges shouldn't be faced alone. If any of these resonate, we can help.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-gutter">
-            {triggers.map((trigger, i) => (
-              <motion.div
-                key={trigger.icon}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.06 }}
-                className="bg-surface-container-lowest border border-outline-variant rounded-xl p-8 relative overflow-hidden group hover:bg-surface-container-low transition-colors duration-300"
-              >
-                <Scribble variant="sparkle" className="absolute top-4 right-4 w-10 h-10 text-secondary-orange/20 group-hover:text-secondary-orange/40 transition-opacity" />
-                <div className="w-14 h-14 rounded-full bg-secondary flex items-center justify-center text-on-secondary mb-6">
-                  <span className="material-symbols-outlined text-[28px] fill-icon">{trigger.icon}</span>
+      {/* ====================== FOUNDER ====================== */}
+      <section className="px-margin-mobile py-16 md:px-margin-desktop md:py-24">
+        <div className="mx-auto grid max-w-max-width items-center gap-12 md:grid-cols-12">
+          {/* photo */}
+          <Reveal className="order-2 md:order-1 md:col-span-5">
+            <div className="relative">
+              <div className="blob absolute -left-6 -top-6 -z-10 h-40 w-40 bg-accent-orange/30" />
+              <Scribble variant="loop" color="#7c3aed" className="absolute -right-6 -top-8 h-24 w-24 opacity-60" />
+              <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem] border-2 border-primary-dark bg-violet-tint shadow-pop">
+                <div className="flex h-full w-full flex-col items-center justify-center text-center">
+                  <Users size={64} className="mb-4 text-primary-violet/50" />
+                  <p className="font-display text-xl font-bold text-primary-dark">Karma Harb</p>
+                  <p className="text-sm text-neutral-500">Founder &amp; Lead Advisor</p>
                 </div>
-                <h3 className="font-h3 text-h3 text-primary mb-2 relative z-10">{trigger.label}</h3>
-              </motion.div>
+              </div>
+              <div className="absolute -bottom-5 -right-3 rotate-[4deg] rounded-2xl border-2 border-primary-dark bg-accent-orange px-5 py-3 text-primary-dark shadow-pop-sm">
+                <p className="font-display text-2xl font-extrabold leading-none">20+ yrs</p>
+                <p className="text-[11px] font-bold uppercase tracking-wider">in HR leadership</p>
+              </div>
+            </div>
+          </Reveal>
+
+          {/* copy */}
+          <Reveal delay={0.1} className="order-1 flex flex-col gap-6 md:order-2 md:col-span-7 md:pl-6">
+            <Eyebrow>The Founder</Eyebrow>
+            <h2 className="font-display text-h1-mobile font-extrabold tracking-tight text-primary-dark md:text-h1-desktop">
+              Executive experience.{" "}
+              <span className="relative inline-block text-primary-violet">
+                Human approach.
+                <Scribble variant="underline" color="#ff6a1a" strokeWidth={4} className="absolute -bottom-2 left-0 h-3 w-full" />
+              </span>
+            </h2>
+            <p className="max-w-prose text-body-lg leading-relaxed text-neutral-500">
+              20+ years in Human Resources across the UAE, Saudi Arabia, and international environments —
+              combining the strategic weight of a C-Suite executive with the empathy of a coach.
+            </p>
+            <div className="relative rounded-3xl border-2 border-primary-dark bg-violet-tint p-7">
+              <span className="material-symbols-outlined absolute -left-3 -top-3 flex h-9 w-9 items-center justify-center rounded-full border-2 border-primary-dark bg-accent-orange text-base text-primary-dark">format_quote</span>
+              <p className="font-display text-h3 font-bold italic text-primary-dark">
+                &ldquo;Everyone deserves to feel heard at work.&rdquo;
+              </p>
+            </div>
+            <Link href="/about" className="group inline-flex items-center gap-2 font-bold text-primary-violet transition-colors hover:text-accent-orange">
+              Read Karma&apos;s full story
+              <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
+            </Link>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* ====================== IS THIS YOU? ====================== */}
+      <section className="px-margin-mobile py-16 md:px-margin-desktop md:py-24">
+        <div className="mx-auto max-w-max-width">
+          <Reveal className="mb-14 text-center">
+            <Eyebrow color="violet">Who This Is For</Eyebrow>
+            <h2 className="mt-6 font-display text-h2 font-extrabold tracking-tight text-primary-dark md:text-[44px]">Is this you?</h2>
+            <p className="mx-auto mt-4 max-w-xl text-body-lg text-neutral-500">If any of these resonate, we can help.</p>
+          </Reveal>
+
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {triggers.map((trigger, i) => (
+              <Reveal key={trigger.icon} delay={i * 0.05}>
+                <div className="group flex h-full items-center gap-4 rounded-3xl border-2 border-primary-dark bg-neutral-100 p-6 transition-transform hover:-translate-y-1 hover:bg-orange-tint">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border-2 border-primary-dark bg-violet-tint text-primary-violet transition-colors group-hover:bg-accent-orange group-hover:text-primary-dark">
+                    <span className="material-symbols-outlined fill-icon text-[26px]">{trigger.icon}</span>
+                  </div>
+                  <h3 className="font-display text-[17px] font-bold leading-snug text-primary-dark">{trigger.label}</h3>
+                </div>
+              </Reveal>
             ))}
           </div>
 
-          <div className="text-center mt-12">
+          <Reveal className="mt-12 text-center">
             <Link
               href="/booking"
-              className="inline-flex items-center justify-center gap-3 rounded-full bg-secondary text-on-secondary px-8 py-4 font-label-bold text-label-bold hover:bg-primary-container transition-colors shadow-xl shadow-secondary/20"
+              className="btn-pop inline-flex items-center gap-2 rounded-full border-2 border-primary-dark bg-accent-orange px-8 py-4 text-[15px] font-bold text-primary-dark shadow-pop"
             >
-              <CalendarCheck size={18} />
+              <CalendarCheck size={18} strokeWidth={2.5} />
               Get Confidential Support
             </Link>
-          </div>
+          </Reveal>
         </div>
       </section>
 
-      {/* ============ HOW IT WORKS ============ */}
-      <section className="bg-surface-container-low px-margin-mobile md:px-margin-desktop py-20 md:py-24">
+      {/* ====================== HOW IT WORKS ====================== */}
+      <section className="relative overflow-hidden bg-primary-dark px-margin-mobile py-20 text-on-primary md:px-margin-desktop md:py-28">
+        <Scribble variant="spiral" color="#ff6a1a" className="absolute left-6 top-10 hidden h-20 w-20 opacity-30 md:block" />
+        <Scribble variant="star-fill" color="#9d5cff" className="absolute bottom-12 right-12 hidden h-8 w-8 animate-float md:block" />
+
         <div className="mx-auto max-w-max-width">
-          <div className="text-center mb-16">
-            <p className="font-label-bold text-label-bold text-secondary uppercase tracking-widest mb-4">Low Overhead. High Efficiency.</p>
-            <h2 className="font-h1-mobile text-h1-mobile md:font-h1-desktop md:text-h1-desktop text-primary relative inline-block">
-              From chaos to clarity in 48 hours.
-              <Scribble variant="underline" className="absolute -bottom-3 left-0 w-full h-4 text-secondary-orange" color="#FDA544" />
+          <Reveal className="mb-16 text-center">
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-orange-light">
+              <span className="h-2 w-2 rounded-full bg-accent-orange" /> Low overhead · High efficiency
+            </span>
+            <h2 className="mt-6 inline-block font-display text-h1-mobile font-extrabold tracking-tight text-on-primary md:text-h1-desktop">
+              From chaos to clarity in{" "}
+              <span className="relative inline-block text-accent-orange">
+                48 hours
+                <Scribble variant="underline-bold" color="#ff6a1a" strokeWidth={4} className="absolute -bottom-3 left-0 h-3.5 w-full" />
+              </span>
             </h2>
-            <p className="font-body-lg text-body-lg text-on-surface-variant mt-6 max-w-2xl mx-auto">
-              Our streamlined process cuts through corporate red tape, delivering actionable insights and emotional support when you need it most.
+            <p className="mx-auto mt-6 max-w-2xl text-body-lg text-on-primary/70">
+              A streamlined process that cuts corporate red tape — delivering actionable insight and support when you need it most.
             </p>
-          </div>
+          </Reveal>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-gutter relative">
-            {/* Connecting line (desktop) */}
-            <div className="hidden md:block absolute top-[60px] left-[15%] right-[15%] h-[4px] z-0">
-              <svg className="text-secondary-orange w-full h-full" fill="none" preserveAspectRatio="none" viewBox="0 0 1000 20" xmlns="http://www.w3.org/2000/svg">
-                <path d="M0,10 Q250,20 500,10 T1000,10" stroke="currentColor" strokeDasharray="8 8" strokeLinecap="round" strokeWidth="4" />
-              </svg>
-            </div>
-
+          <div className="relative grid gap-10 md:grid-cols-3">
+            <Scribble variant="wave" color="#ffffff" strokeWidth={2} className="absolute left-[16%] right-[16%] top-9 hidden h-6 opacity-20 md:block" />
             {steps.map((step, i) => (
-              <div key={step.title} className="flex flex-col items-center text-center group relative z-10">
-                <div className="w-24 h-24 rounded-full bg-surface-container-high flex items-center justify-center border border-outline-variant mb-6">
-                  <div className="w-16 h-16 rounded-full bg-secondary text-on-secondary flex items-center justify-center transition-transform duration-300 group-hover:scale-110">
-                    <step.icon size={28} />
+              <Reveal key={step.title} delay={i * 0.1}>
+                <div className="relative flex flex-col items-center text-center">
+                  <div className="relative z-10 mb-6 flex h-20 w-20 items-center justify-center rounded-full border-2 border-accent-orange bg-accent-orange text-primary-dark">
+                    <step.icon size={30} strokeWidth={2} />
+                    <span className="absolute -right-2 -top-2 flex h-7 w-7 items-center justify-center rounded-full border-2 border-primary-dark bg-neutral-100 font-display text-sm font-extrabold text-primary-dark">
+                      {i + 1}
+                    </span>
+                  </div>
+                  <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
+                    <h3 className="font-display text-h3 font-bold text-on-primary">{step.title}</h3>
+                    <p className="mt-3 leading-relaxed text-on-primary/70">{step.copy}</p>
                   </div>
                 </div>
-                <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-6 w-full shadow-sm relative">
-                  <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-secondary text-on-secondary font-label-bold text-caption px-3 py-1 rounded-full">
-                    Step {i + 1}
-                  </span>
-                  <h3 className="font-h3 text-h3 text-primary mb-3 mt-2">{step.title}</h3>
-                  <p className="font-body-md text-body-md text-on-surface-variant">{step.copy}</p>
-                </div>
-              </div>
+              </Reveal>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ============ TESTIMONIALS ============ */}
-      <section className="px-margin-mobile md:px-margin-desktop py-20 md:py-24">
-        <div className="mx-auto max-w-max-width">
-          <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
-            <div>
-              <p className="font-label-bold text-label-bold text-secondary uppercase tracking-widest mb-4">Trust Signals</p>
-              <h2 className="font-h2 text-h2 md:text-[40px] text-primary">No fake reviews. Trust starts cleaner than that.</h2>
-              <p className="mt-6 font-body-lg text-body-lg text-on-surface-variant">
-                Humanly is early-stage, so this section focuses on founder expertise, process transparency, and future verified testimonial slots.
-              </p>
-              <Link href="/booking" className="mt-8 inline-flex items-center gap-3 text-secondary font-label-bold text-label-bold hover:text-primary-container transition-colors">
-                Start your story
-                <ArrowRight size={18} />
-              </Link>
-            </div>
+      {/* ====================== TESTIMONIALS ====================== */}
+      <section className="px-margin-mobile py-16 md:px-margin-desktop md:py-24">
+        <div className="mx-auto grid max-w-max-width gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+          <Reveal>
+            <Eyebrow>Trust Signals</Eyebrow>
+            <h2 className="mt-6 font-display text-h2 font-extrabold tracking-tight text-primary-dark md:text-[40px]">
+              No fake reviews. Trust starts cleaner than that.
+            </h2>
+            <p className="mt-6 text-body-lg text-neutral-500">
+              Humanly is early-stage, so this focuses on founder expertise, process transparency, and future verified testimonial slots.
+            </p>
+            <Link href="/booking" className="group mt-8 inline-flex items-center gap-2 font-bold text-primary-violet transition-colors hover:text-accent-orange">
+              Start your story
+              <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
+            </Link>
+          </Reveal>
+          <Reveal delay={0.1}>
             <TestimonialsCarousel
               testimonials={trustSignals}
               title="No fake reviews. Trust starts cleaner than that."
               subtitle="Humanly is early-stage, so this section focuses on founder expertise, process transparency, and future verified testimonial slots."
             />
-          </div>
+          </Reveal>
         </div>
       </section>
 
-      {/* ============ BOOKING EMBED ============ */}
-      <section className="bg-surface-container-low px-margin-mobile md:px-margin-desktop py-20 md:py-24" id="book">
-        <div className="mx-auto max-w-3xl text-center">
-          <h2 className="font-h2 text-h2 md:text-[40px] text-primary mb-4">Book Your Confidential Session</h2>
-          <p className="font-body-lg text-body-lg text-on-surface-variant mb-10">
-            Pay securely through Stripe first. Once payment succeeds, your private scheduling page unlocks.
-          </p>
-
-          <div className="bg-surface-container-lowest border border-outline-variant rounded-xl p-8 shadow-sm min-h-[400px] flex items-center justify-center">
-            <div className="text-center">
-              <CalendarCheck size={48} className="mx-auto text-secondary mb-4" />
-              <p className="font-h3 text-h3 text-primary mb-2">Payment-first booking funnel</p>
-              <p className="text-on-surface-variant mb-6 max-w-md">
-                The funnel collects a short confidential intake, sends you to Stripe Checkout,
-                and redirects paid clients to Cal.com scheduling.
-              </p>
-              <Link
-                href="/booking"
-                className="inline-flex items-center gap-3 rounded-full bg-secondary text-on-secondary px-8 py-4 font-label-bold text-label-bold hover:bg-primary-container transition-colors"
-              >
-                Start Secure Booking
-                <ArrowRight size={18} />
-              </Link>
-            </div>
-          </div>
-
-          {/* Trust markers near booking */}
-          <div className="flex flex-wrap justify-center gap-6 mt-8 text-on-surface-variant">
-            <div className="flex items-center gap-2">
-              <LockKeyhole size={16} className="text-secondary" />
-              <span className="text-sm">No recording</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <ShieldCheck size={16} className="text-secondary" />
-              <span className="text-sm">Confidential by design</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle2 size={16} className="text-secondary" />
-              <span className="text-sm">No commitment</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ============ FAQ (schema-marked) ============ */}
-      <section className="px-margin-mobile md:px-margin-desktop py-20 md:py-24">
-        <div className="mx-auto max-w-max-width">
-          <div className="grid gap-10 lg:grid-cols-[1fr_0.9fr] lg:items-start">
-            <div>
-              <p className="font-label-bold text-label-bold text-secondary uppercase tracking-widest mb-4">FAQ</p>
-              <h2 className="font-h2 text-h2 md:text-[40px] text-primary">Designed for people who need privacy first.</h2>
-              <p className="mt-6 font-body-lg text-body-lg text-on-surface-variant">
-                Common questions about confidentiality, scope, and how the consultation works.
-              </p>
-              <Link href="/faq" className="mt-8 inline-flex items-center gap-3 text-secondary font-label-bold text-label-bold hover:text-primary-container transition-colors">
-                View all questions
-                <ArrowRight size={18} />
-              </Link>
-            </div>
-            <FAQAccordion />
-          </div>
-        </div>
-      </section>
-
-      {/* ============ FINAL CTA ============ */}
-      <section className="px-margin-mobile md:px-margin-desktop py-20 md:py-24 relative overflow-hidden border-t border-outline-variant bg-surface-container-low">
-        <Scribble variant="loop" className="absolute -top-10 -left-10 w-64 h-64 text-secondary-orange/20 hidden md:block" />
-        <Scribble variant="sparkle" className="absolute bottom-10 right-10 w-48 h-48 text-secondary/10 hidden md:block" />
-
-        <div className="mx-auto max-w-max-width flex flex-col items-center text-center relative z-10">
-          <div className="relative inline-block mb-8">
-            <h2 className="font-h1-mobile text-h1-mobile md:font-h1-desktop md:text-h1-desktop text-on-surface">
-              Ready to find your safe space?
+      {/* ====================== BOOKING CTA BAND ====================== */}
+      <section id="book" className="px-margin-mobile py-16 md:px-margin-desktop md:py-20">
+        <Reveal className="mx-auto max-w-max-width">
+          <div className="relative overflow-hidden rounded-[2.5rem] border-2 border-primary-dark bg-violet-tint p-10 text-center md:p-16">
+            <Scribble variant="star-fill" color="#ff6a1a" className="absolute left-10 top-10 hidden h-8 w-8 animate-wiggle md:block" />
+            <Scribble variant="spiral" color="#7c3aed" className="absolute bottom-8 right-10 hidden h-16 w-16 opacity-50 md:block" />
+            <h2 className="mx-auto max-w-2xl font-display text-h2 font-extrabold tracking-tight text-primary-dark md:text-[40px]">
+              Book your confidential session
             </h2>
-            <Scribble variant="underline" className="absolute -bottom-4 left-0 w-full h-4 text-secondary-orange" color="#FDA544" />
+            <p className="mx-auto mt-4 max-w-xl text-body-lg text-neutral-500">
+              Pay securely through Stripe first. Once payment succeeds, your private scheduling page unlocks.
+            </p>
+            <Link
+              href="/booking"
+              className="btn-pop mt-8 inline-flex items-center gap-2 rounded-full border-2 border-primary-dark bg-accent-orange px-8 py-4 text-[15px] font-bold text-primary-dark shadow-pop"
+            >
+              Start Secure Booking
+              <ArrowUpRight size={18} strokeWidth={2.5} />
+            </Link>
+            <div className="mt-8 flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm font-medium text-neutral-500">
+              <span className="flex items-center gap-1.5"><LockKeyhole size={15} className="text-primary-violet" /> No recording</span>
+              <span className="flex items-center gap-1.5"><ShieldCheck size={15} className="text-primary-violet" /> Confidential by design</span>
+              <span className="flex items-center gap-1.5"><CheckCircle2 size={15} className="text-primary-violet" /> No commitment</span>
+            </div>
           </div>
-          <p className="font-body-lg text-body-lg text-on-surface-variant max-w-2xl mb-12">
-            Take the first step towards resolving workplace challenges with dignity. Our triage session is confidential, supportive, and designed to map out your next move.
-          </p>
-          <Link
-            href="/booking"
-            className="inline-flex items-center gap-3 bg-secondary text-on-secondary font-label-bold text-label-bold px-10 py-5 rounded-full hover:bg-primary-container transition-colors shadow-xl shadow-secondary/20"
-          >
-            <Sparkles size={20} />
-            Book Your Triage Session
-            <ArrowRight size={20} className="fill-icon" />
-          </Link>
+        </Reveal>
+      </section>
+
+      {/* ====================== FAQ ====================== */}
+      <section className="px-margin-mobile py-16 md:px-margin-desktop md:py-24">
+        <div className="mx-auto grid max-w-max-width gap-10 lg:grid-cols-[1fr_1.1fr] lg:items-start">
+          <Reveal className="lg:sticky lg:top-28">
+            <Eyebrow color="violet">FAQ</Eyebrow>
+            <h2 className="mt-6 font-display text-h2 font-extrabold tracking-tight text-primary-dark md:text-[40px]">
+              Designed for people who need privacy first.
+            </h2>
+            <p className="mt-6 text-body-lg text-neutral-500">
+              Common questions about confidentiality, scope, and how the consultation works.
+            </p>
+            <Link href="/faq" className="group mt-8 inline-flex items-center gap-2 font-bold text-primary-violet transition-colors hover:text-accent-orange">
+              View all questions
+              <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
+            </Link>
+          </Reveal>
+          <Reveal delay={0.1}>
+            <FAQAccordion />
+          </Reveal>
         </div>
       </section>
 
-      {/* ============ STICKY MOBILE CTA ============ */}
-      {showSticky && (
-        <motion.div
-          initial={{ y: 80 }}
-          animate={{ y: 0 }}
-          className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-surface-container-lowest border-t border-outline-variant p-4 shadow-2xl"
-        >
+      {/* ====================== FINAL CTA ====================== */}
+      <section className="px-margin-mobile py-16 md:px-margin-desktop md:py-24">
+        <Reveal className="relative mx-auto flex max-w-max-width flex-col items-center overflow-hidden rounded-[2.5rem] border-2 border-primary-dark bg-primary-dark px-6 py-16 text-center text-on-primary shadow-pop-orange md:py-24">
+          <Scribble variant="loop" color="#ff6a1a" className="absolute -left-6 -top-6 h-32 w-32 opacity-25" />
+          <Scribble variant="star-fill" color="#9d5cff" className="absolute right-10 top-10 hidden h-8 w-8 animate-float md:block" />
+          <Scribble variant="heart" color="#ff6a1a" className="absolute bottom-10 left-12 hidden h-9 w-9 animate-float-slow md:block" />
+
+          <h2 className="relative max-w-3xl font-display text-[clamp(2.2rem,5.5vw,3.75rem)] font-extrabold leading-[1.02] tracking-tight">
+            Ready to find your{" "}
+            <span className="relative inline-block text-accent-orange">
+              safe space?
+              <Scribble variant="underline-bold" color="#ff6a1a" strokeWidth={5} className="absolute -bottom-3 left-0 h-4 w-full" />
+            </span>
+          </h2>
+          <p className="mt-6 max-w-2xl text-body-lg text-on-primary/70">
+            Take the first step toward resolving workplace challenges with dignity. Confidential, supportive,
+            and designed to map out your next move.
+          </p>
           <Link
             href="/booking"
-            className="flex items-center justify-center gap-3 w-full rounded-full bg-secondary text-on-secondary py-4 font-label-bold text-label-bold"
+            className="btn-pop mt-10 inline-flex items-center gap-2 rounded-full border-2 border-primary-dark bg-accent-orange px-10 py-5 text-base font-bold text-primary-dark shadow-[6px_6px_0_0_#9d5cff]"
           >
-            <CalendarCheck size={18} />
-            Book Confidential Session
+            <Sparkles size={20} strokeWidth={2.5} />
+            Book Your Triage Session
+            <ArrowRight size={20} strokeWidth={2.5} />
           </Link>
-        </motion.div>
-      )}
+        </Reveal>
+      </section>
+
+      {/* ====================== STICKY MOBILE CTA ====================== */}
+      <AnimatePresence>
+        {showSticky && (
+          <motion.div
+            initial={{ y: 90 }}
+            animate={{ y: 0 }}
+            exit={{ y: 90 }}
+            transition={{ type: "spring", stiffness: 260, damping: 30 }}
+            className="fixed inset-x-0 bottom-0 z-40 border-t-2 border-primary-dark bg-neutral-bg/95 p-3 backdrop-blur-md md:hidden"
+          >
+            <Link
+              href="/booking"
+              className="flex w-full items-center justify-center gap-2 rounded-full border-2 border-primary-dark bg-accent-orange py-3.5 text-[15px] font-bold text-primary-dark"
+            >
+              <CalendarCheck size={18} strokeWidth={2.5} />
+              Book Confidential Session
+            </Link>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
-}
-
-/* needed for Material Symbols inline */
-const globalStyles = `
-.material-symbols-outlined {
-  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-}
-.fill-icon {
-  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-}
-`;
-if (typeof document !== "undefined") {
-  const style = document.createElement("style");
-  style.textContent = globalStyles;
-  document.head.appendChild(style);
 }

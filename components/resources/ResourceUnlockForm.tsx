@@ -38,11 +38,13 @@ export function ResourceUnlockForm({
   }
 
   return (
-    <form action={submit} className="grid gap-4 rounded-lg border border-primary-violet/20 bg-primary-violet/5 p-6">
+    <form action={submit} className="grid gap-4 rounded-3xl border-2 border-primary-dark bg-violet-tint p-6 shadow-pop-sm">
       <div className="flex items-center gap-3">
-        <LockKeyhole className="text-primary-violet" size={22} />
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border-2 border-primary-dark bg-neutral-100 text-primary-violet">
+          <LockKeyhole size={20} />
+        </span>
         <div>
-          <h2 className="text-2xl font-extrabold text-primary-dark">Unlock premium PDF</h2>
+          <h2 className="font-display text-2xl font-bold text-primary-dark">Unlock premium PDF</h2>
           <p className="text-neutral-500">Stripe handles payment. Download unlocks after payment succeeds.</p>
         </div>
       </div>
@@ -51,24 +53,24 @@ export function ResourceUnlockForm({
           name="name"
           required
           placeholder="Full name"
-          className="rounded-lg border border-neutral-300 bg-white px-4 py-3 text-primary-dark"
+          className="rounded-2xl border-2 border-primary-dark/30 bg-neutral-100 px-4 py-3 text-primary-dark outline-none transition focus:border-primary-dark"
         />
         <input
           name="email"
           type="email"
           required
           placeholder="Email"
-          className="rounded-lg border border-neutral-300 bg-white px-4 py-3 text-primary-dark"
+          className="rounded-2xl border-2 border-primary-dark/30 bg-neutral-100 px-4 py-3 text-primary-dark outline-none transition focus:border-primary-dark"
         />
       </div>
-      {error && <p className="rounded-lg bg-red-50 p-3 text-sm font-semibold text-red-700">{error}</p>}
+      {error && <p className="rounded-2xl bg-coral/10 p-3 text-sm font-semibold text-coral">{error}</p>}
       <button
         type="submit"
         disabled={isPending}
-        className="inline-flex items-center justify-center gap-2 rounded-full bg-primary-violet px-6 py-4 text-sm font-bold uppercase tracking-[0.12em] text-white disabled:opacity-60"
+        className="btn-pop inline-flex items-center justify-center gap-2 rounded-full border-2 border-primary-dark bg-accent-orange px-6 py-4 text-sm font-bold uppercase tracking-[0.1em] text-primary-dark shadow-pop-sm disabled:opacity-60"
       >
         {isPending ? "Opening Stripe..." : `Pay ${formatAed(amount)} and unlock`}
-        {!isPending && <ArrowRight size={18} />}
+        {!isPending && <ArrowRight size={18} strokeWidth={2.5} />}
       </button>
     </form>
   );

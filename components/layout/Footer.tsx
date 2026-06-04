@@ -1,80 +1,116 @@
 import Link from "next/link";
+import { ArrowUpRight, MessageCircle } from "lucide-react";
+import { Scribble } from "@/components/ui/Scribble";
 
-const footerLinks = [
-  { href: "/", label: "Home" },
-  { href: "/services", label: "Services" },
-  { href: "/about", label: "About" },
-  { href: "/resources", label: "Resources" },
-  { href: "/booking", label: "Book a Session" },
-  { href: "/faq", label: "FAQ" },
-  { href: "/privacy", label: "Privacy Policy" },
-  { href: "/terms", label: "Terms of Service" },
-  { href: "/contact", label: "Contact" },
+const columns: { title: string; links: { href: string; label: string }[] }[] = [
+  {
+    title: "Explore",
+    links: [
+      { href: "/services", label: "Services" },
+      { href: "/about", label: "About" },
+      { href: "/resources", label: "Resources" },
+      { href: "/faq", label: "FAQ" },
+    ],
+  },
+  {
+    title: "Get Started",
+    links: [
+      { href: "/booking", label: "Book a Session" },
+      { href: "/contact", label: "Contact" },
+    ],
+  },
+  {
+    title: "Legal",
+    links: [
+      { href: "/privacy", label: "Privacy Policy" },
+      { href: "/terms", label: "Terms of Service" },
+    ],
+  },
 ];
 
 export function Footer() {
+  const year = new Date().getFullYear();
+
   return (
-    <footer className="w-full py-[64px] px-[20px] md:px-[64px] flex flex-col items-center text-center bg-neutral-100 border-t border-neutral-300">
-      <div className="max-w-[1200px] mx-auto w-full flex flex-col items-center">
-        {/* Brand */}
-        <Link
-          href="/"
-          className="font-extrabold text-[32px] text-primary-dark mb-8 tracking-tight hover:text-primary-violet transition-colors"
-        >
-          Humanly
-        </Link>
+    <footer className="relative mt-auto overflow-hidden bg-primary-dark text-neutral-100">
+      {/* doodles */}
+      <Scribble variant="loop" color="#ff6a1a" className="absolute -top-6 right-10 hidden h-28 w-28 opacity-30 md:block" />
+      <Scribble variant="star-fill" color="#ff9a4d" className="absolute bottom-24 left-8 hidden h-8 w-8 animate-float md:block" />
+      <Scribble variant="spiral" color="#9d5cff" className="absolute right-1/3 bottom-10 hidden h-20 w-20 opacity-40 md:block" />
 
-        {/* Footer Navigation */}
-        <nav
-          className="flex flex-wrap justify-center gap-x-8 gap-y-4 mb-12"
-          aria-label="Footer navigation"
-        >
-          {footerLinks.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="font-normal text-[16px] text-neutral-500 hover:text-primary-violet underline transition-all opacity-80 hover:opacity-100"
-            >
-              {link.label}
-            </Link>
-          ))}
-        </nav>
-
-        {/* Divider */}
-        <div className="w-full max-w-lg h-px bg-neutral-300 mb-12" />
-
-        {/* Legal Disclaimer */}
-        <p className="font-normal text-[12px] text-neutral-500 mb-6 max-w-2xl mx-auto italic">
-          Humanly provides HR guidance and coaching, not legal advice.
-        </p>
-
-        {/* Copyright */}
-        <p className="font-normal text-[12px] text-neutral-500 mb-8">
-          © {new Date().getFullYear()} Humanly HR Advisory. All rights
-          reserved. Neutral advocacy for the modern workplace.
-        </p>
-
-        {/* Bottom Stamp — hand-drawn feel */}
-        <div className="relative mt-8 group cursor-default">
-          <div className="absolute inset-0 border-2 border-neutral-400 rounded-[2px] rotate-[-2deg] opacity-40 group-hover:opacity-60 transition-opacity" />
-          <div className="relative font-semibold text-[14px] text-neutral-500 py-3 px-6 uppercase tracking-widest bg-neutral-100 rounded-[2px]">
-            Humanly — HR with dignity. {new Date().getFullYear()}.
+      <div className="relative mx-auto max-w-max-width px-margin-mobile md:px-margin-desktop">
+        {/* Top CTA row */}
+        <div className="flex flex-col items-start justify-between gap-8 border-b border-white/10 py-14 md:flex-row md:items-end md:py-20">
+          <div>
+            <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.16em] text-orange-light">
+              <span className="h-2 w-2 rounded-full bg-accent-orange" />
+              Confidential · UAE & GCC
+            </p>
+            <h2 className="max-w-2xl font-display text-[clamp(2rem,5vw,3.5rem)] font-extrabold leading-[1.02] tracking-tight">
+              Your HR isn&apos;t on your side.{" "}
+              <span className="relative inline-block text-accent-orange">
+                We are.
+                <Scribble variant="underline-bold" color="#ff6a1a" strokeWidth={4} className="absolute -bottom-3 left-0 h-3.5 w-full" />
+              </span>
+            </h2>
           </div>
+          <Link
+            href="/booking"
+            className="btn-pop inline-flex shrink-0 items-center gap-2 rounded-full border-2 border-primary-dark bg-accent-orange px-7 py-4 text-[15px] font-bold text-primary-dark shadow-[6px_6px_0_0_#9d5cff]"
+          >
+            Book a Confidential Session
+            <ArrowUpRight size={18} strokeWidth={2.5} />
+          </Link>
         </div>
 
-        {/* WhatsApp CTA — GCC audience expects this */}
-        <Link
-          href="https://wa.me/YOUR_BUSINESS_WHATSAPP?text=Hi%2C%20I%27d%20like%20to%20learn%20more%20about%20Humanly."
-          target="_blank"
-          rel="noopener noreferrer"
-          className="fixed bottom-6 right-6 z-40 w-14 h-14 rounded-full bg-green-500 text-white flex items-center justify-center shadow-lg hover:bg-green-600 transition-colors hover:scale-105"
-          aria-label="Chat on WhatsApp"
-        >
-          <span className="material-symbols-outlined text-[28px]" style={{ fontVariationSettings: "'FILL' 1" }}>
-            chat
-          </span>
-        </Link>
+        {/* Link columns */}
+        <div className="grid gap-10 py-14 sm:grid-cols-2 md:grid-cols-4">
+          <div>
+            <Link href="/" className="font-display text-2xl font-extrabold tracking-tight">
+              Humanly<span className="text-accent-orange">.</span>
+            </Link>
+            <p className="mt-4 max-w-xs text-sm leading-relaxed text-neutral-100/60">
+              Independent, neutral, confidential HR advisory for professionals navigating workplace
+              challenges in the UAE & GCC.
+            </p>
+          </div>
+          {columns.map((col) => (
+            <div key={col.title}>
+              <p className="mb-4 text-xs font-bold uppercase tracking-[0.16em] text-neutral-100/40">{col.title}</p>
+              <ul className="space-y-3">
+                {col.links.map((link) => (
+                  <li key={link.href}>
+                    <Link
+                      href={link.href}
+                      className="group inline-flex items-center gap-1.5 text-[15px] font-medium text-neutral-100/80 transition-colors hover:text-accent-orange"
+                    >
+                      {link.label}
+                      <ArrowUpRight size={14} className="opacity-0 transition-opacity group-hover:opacity-100" />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+
+        {/* Bottom bar */}
+        <div className="flex flex-col gap-4 border-t border-white/10 py-8 text-sm text-neutral-100/50 md:flex-row md:items-center md:justify-between">
+          <p>© {year} Humanly HR Advisory. Neutral advocacy for the modern workplace.</p>
+          <p className="italic">Humanly provides HR guidance & coaching, not legal advice.</p>
+        </div>
       </div>
+
+      {/* WhatsApp floating CTA */}
+      <Link
+        href="https://wa.me/YOUR_BUSINESS_WHATSAPP?text=Hi%2C%20I%27d%20like%20to%20learn%20more%20about%20Humanly."
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Chat on WhatsApp"
+        className="fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full border-2 border-primary-dark bg-[#25D366] text-white shadow-pop-sm transition-transform hover:scale-105"
+      >
+        <MessageCircle size={26} strokeWidth={2.2} className="fill-white" />
+      </Link>
     </footer>
   );
 }

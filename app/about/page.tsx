@@ -14,78 +14,74 @@ const careerTimeline = [
 ];
 
 const values = [
-  {
-    title: "Radical Empathy",
-    desc: "We listen without judgment. Your perspective is the one that matters most.",
-    icon: Heart,
-  },
-  {
-    title: "Neutral Ground",
-    desc: "We have no stake in your company's politics, no reporting to management, no conflict of interest.",
-    icon: Building2,
-  },
-  {
-    title: "Pure Clarity",
-    desc: "We cut through legalities and corporate double-speak to tell you what's actually happening and what you can do.",
-    icon: Globe,
-  },
+  { title: "Radical Empathy", desc: "We listen without judgment. Your perspective is the one that matters most.", icon: Heart, tint: "bg-violet-tint" },
+  { title: "Neutral Ground", desc: "No stake in your company's politics, no reporting to management, no conflict of interest.", icon: Building2, tint: "bg-orange-tint" },
+  { title: "Pure Clarity", desc: "We cut through legalese and corporate double-speak to tell you what's actually happening — and what you can do.", icon: Globe, tint: "bg-violet-tint" },
+];
+
+const credentials = [
+  "20+ years in HR leadership",
+  "UAE, KSA, Qatar experience",
+  "CIPD qualified",
+  "Fortune 500 background",
+  "Startup scaling expertise",
+  "Employee relations specialist",
+  "Arabic & English fluent",
+  "GCC labour law depth",
 ];
 
 export default function AboutPage() {
   return (
-    <div className="min-h-screen bg-neutral-bg pb-24 pt-28">
+    <div className="overflow-clip bg-surface pb-24 pt-32 md:pt-40">
       {/* Hero */}
-      <section className="px-5 md:px-[64px] max-w-7xl mx-auto grid md:grid-cols-12 gap-10 items-center">
-        {/* Left: Visual */}
-        <div className="md:col-span-5 relative order-2 md:order-1 mt-12 md:mt-0">
-          <div className="rounded-xl overflow-hidden border border-neutral-300 bg-white relative aspect-[4/5]">
+      <section className="relative mx-auto grid max-w-max-width items-center gap-12 px-margin-mobile md:grid-cols-12 md:px-margin-desktop">
+        <div className="dot-grid pointer-events-none absolute inset-0 -z-10 opacity-50" />
+        {/* Visual */}
+        <div className="relative order-2 md:order-1 md:col-span-5">
+          <div className="blob absolute -left-6 -top-6 -z-10 h-44 w-44 bg-accent-orange/30" />
+          <Scribble variant="loop" color="#7c3aed" className="absolute -right-6 -top-8 h-24 w-24 opacity-60" />
+          <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem] border-2 border-primary-dark shadow-pop">
             <img
               alt="Karma Harb — founder of Humanly, HR advisor"
-              className="w-full h-full object-cover"
+              className="h-full w-full object-cover"
               src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=800"
             />
           </div>
-          <Scribble variant="circle" className="absolute -top-8 -left-8 w-24 h-24 text-amber/40 pointer-events-none" />
+          <div className="absolute -bottom-5 -right-3 rotate-[4deg] rounded-2xl border-2 border-primary-dark bg-accent-orange px-5 py-3 text-primary-dark shadow-pop-sm">
+            <p className="font-display text-2xl font-extrabold leading-none">20+ yrs</p>
+            <p className="text-[11px] font-bold uppercase tracking-wider">in HR leadership</p>
+          </div>
         </div>
 
-        {/* Right: Copy */}
-        <div className="md:col-span-6 md:col-start-7 flex flex-col gap-8 order-1 md:order-2">
-          <h1 className="font-extrabold text-[32px] md:text-[48px] leading-[1.2] -tracking-[0.02em] text-primary-dark">
-            Executive Experience.
-            <br />
-            <span className="text-primary-violet">Human Approach.</span>
+        {/* Copy */}
+        <div className="order-1 flex flex-col gap-7 md:order-2 md:col-span-7 md:pl-6">
+          <span className="inline-flex w-max items-center gap-2 rounded-full border-2 border-primary-dark bg-neutral-100 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-primary-dark shadow-pop-sm">
+            <span className="h-2 w-2 rounded-full bg-accent-orange" /> The Founder
+          </span>
+          <h1 className="font-display text-h1-mobile font-extrabold leading-[1.04] tracking-tight text-primary-dark md:text-h1-desktop">
+            Executive experience.{" "}
+            <span className="relative inline-block text-primary-violet">
+              Human approach.
+              <Scribble variant="underline-bold" color="#ff6a1a" strokeWidth={5} className="absolute -bottom-3 left-0 h-4 w-full" />
+            </span>
           </h1>
-
-          <div className="flex flex-col gap-4">
-            <div className="relative inline-block w-max">
-              <h2 className="font-semibold text-[32px] leading-[1.3] text-primary-dark">Karma Harb, Founder</h2>
-              <Scribble variant="underline" className="absolute -bottom-2 left-0 w-full h-3 text-amber" />
-            </div>
-            <p className="text-lg leading-relaxed text-neutral-500 max-w-prose">
-              20+ years in Human Resources across the UAE, Saudi Arabia, and international environments. Combines the strategic weight of a C-Suite executive with the empathy of a coach.
-            </p>
-          </div>
-
-          {/* Quote block */}
-          <div className="p-6 bg-white border border-neutral-300 rounded-lg relative">
-            <div className="absolute -top-4 -left-4 bg-primary-violet text-white rounded-full w-8 h-8 flex items-center justify-center">
-              <Quote size={14} />
-            </div>
-            <p className="font-semibold text-2xl leading-relaxed text-primary-dark italic">
-              &ldquo;Everyone deserves to feel heard at work.&rdquo;
-            </p>
+          <p className="max-w-prose text-body-lg leading-relaxed text-neutral-500">
+            20+ years in Human Resources across the UAE, Saudi Arabia, and international environments — combining the strategic weight of a C-Suite executive with the empathy of a coach.
+          </p>
+          <div className="relative rounded-3xl border-2 border-primary-dark bg-violet-tint p-7">
+            <span className="absolute -left-3 -top-3 flex h-9 w-9 items-center justify-center rounded-full border-2 border-primary-dark bg-accent-orange text-primary-dark">
+              <Quote size={15} />
+            </span>
+            <p className="font-display text-h3 font-bold italic text-primary-dark">&ldquo;Everyone deserves to feel heard at work.&rdquo;</p>
           </div>
         </div>
       </section>
 
-      {/* Career Timeline + Philosophy */}
-      <section className="px-5 md:px-[64px] max-w-7xl mx-auto mt-24 grid md:grid-cols-2 gap-16">
-        {/* Timeline */}
+      {/* Timeline + philosophy */}
+      <section className="mx-auto mt-24 grid max-w-max-width gap-16 px-margin-mobile md:grid-cols-2 md:px-margin-desktop">
         <div>
-          <h2 className="font-extrabold text-[32px] leading-[1.3] text-primary-dark mb-8">
-            The Path to Humanly
-          </h2>
-          <div className="space-y-6">
+          <h2 className="mb-8 font-display text-h2 font-extrabold tracking-tight text-primary-dark">The path to Humanly</h2>
+          <div className="relative space-y-5 before:absolute before:bottom-4 before:left-7 before:top-4 before:w-0.5 before:bg-neutral-300">
             {careerTimeline.map((item, i) => (
               <motion.div
                 key={item.year}
@@ -93,56 +89,37 @@ export default function AboutPage() {
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.06 }}
-                className="flex gap-5"
+                className="relative flex gap-5"
               >
-                <div className="shrink-0 w-16 h-10 rounded-lg bg-primary-dark text-white flex items-center justify-center font-extrabold text-sm">
+                <div className="z-10 flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border-2 border-primary-dark bg-primary-dark font-display text-sm font-extrabold text-on-primary">
                   {item.year}
                 </div>
-                <p className="text-base leading-relaxed text-neutral-500 pt-1">{item.event}</p>
+                <p className="pt-3 leading-relaxed text-neutral-500">{item.event}</p>
               </motion.div>
             ))}
           </div>
         </div>
 
-        {/* Philosophy + Credentials */}
         <div className="space-y-10">
           <div>
-            <h2 className="font-extrabold text-[32px] leading-[1.3] text-primary-dark mb-4">
-              Why I Built Humanly
-            </h2>
-            <div className="space-y-4 text-base leading-relaxed text-neutral-500">
-              <p>
-                After two decades inside HR departments — Fortune 500s, scaling startups, and everything between — I saw the same pattern repeat: professionals facing workplace challenges had no one truly on their side.
-              </p>
-              <p>
-                Internal HR protects the business. Employment lawyers escalate to litigation. The space between — where most people actually need help — was empty. Humanly fills that space.
-              </p>
-              <p>
-                We provide the confidential, practical guidance that I wish every professional had access to — without fear, without judgment, and without a corporate agenda.
-              </p>
+            <h2 className="mb-4 font-display text-h2 font-extrabold tracking-tight text-primary-dark">Why I built Humanly</h2>
+            <div className="space-y-4 leading-relaxed text-neutral-500">
+              <p>After two decades inside HR departments — Fortune 500s, scaling startups, and everything between — I saw the same pattern repeat: professionals facing workplace challenges had no one truly on their side.</p>
+              <p>Internal HR protects the business. Employment lawyers escalate to litigation. The space between — where most people actually need help — was empty. Humanly fills that space.</p>
+              <p>We provide the confidential, practical guidance I wish every professional had access to — without fear, without judgment, and without a corporate agenda.</p>
             </div>
           </div>
 
-          {/* Credentials */}
           <div>
-            <h3 className="font-semibold text-xl text-primary-dark mb-4 flex items-center gap-2">
-              <Award className="text-amber" size={22} />
-              Credentials & Expertise
+            <h3 className="mb-4 flex items-center gap-2 font-display text-xl font-bold text-primary-dark">
+              <Award className="text-accent-orange" size={22} />
+              Credentials &amp; expertise
             </h3>
-            <ul className="grid grid-cols-2 gap-3 text-sm text-neutral-500">
-              {[
-                "20+ years in HR leadership",
-                "UAE, KSA, Qatar experience",
-                "CIPD qualified",
-                "Fortune 500 background",
-                "Startup scaling expertise",
-                "Employee relations specialist",
-                "Arabic & English fluent",
-                "GCC labor law depth",
-              ].map((cred) => (
-                <li key={cred} className="flex items-center gap-2 bg-white rounded-lg p-3 border border-neutral-300">
-                  <MapPin className="text-primary-violet shrink-0" size={14} />
-                  <span>{cred}</span>
+            <ul className="grid grid-cols-1 gap-3 text-sm text-neutral-500 sm:grid-cols-2">
+              {credentials.map((cred) => (
+                <li key={cred} className="flex items-center gap-2 rounded-2xl border-2 border-primary-dark bg-neutral-100 p-3.5">
+                  <MapPin className="shrink-0 text-primary-violet" size={15} />
+                  <span className="font-medium text-primary-dark">{cred}</span>
                 </li>
               ))}
             </ul>
@@ -151,12 +128,12 @@ export default function AboutPage() {
       </section>
 
       {/* Values */}
-      <section className="px-5 md:px-[64px] max-w-7xl mx-auto mt-24">
-        <div className="text-center mb-12">
-          <Scribble variant="sparkle" className="mx-auto w-16 h-16 text-amber/30 mb-4" />
-          <h2 className="font-extrabold text-[32px] leading-[1.3] text-primary-dark">The values we live by.</h2>
+      <section className="mx-auto mt-24 max-w-max-width px-margin-mobile md:px-margin-desktop">
+        <div className="mb-12 text-center">
+          <Scribble variant="star-fill" color="#ff6a1a" className="mx-auto mb-4 h-10 w-10 animate-wiggle" />
+          <h2 className="font-display text-h2 font-extrabold tracking-tight text-primary-dark">The values we live by</h2>
         </div>
-        <div className="grid md:grid-cols-3 gap-8">
+        <div className="grid gap-6 md:grid-cols-3">
           {values.map((value, i) => (
             <motion.div
               key={value.title}
@@ -164,33 +141,34 @@ export default function AboutPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: i * 0.06 }}
-              className="bg-white p-10 rounded-lg border border-neutral-300 shadow-sm hover:shadow-xl transition-shadow"
+              className={`rounded-3xl border-2 border-primary-dark ${value.tint} p-9 transition-transform hover:-translate-y-1`}
             >
-              <value.icon className="text-primary-violet mb-6" size={40} />
-              <h3 className="font-extrabold text-2xl text-primary-dark mb-3">{value.title}</h3>
-              <p className="text-base leading-relaxed text-neutral-500">{value.desc}</p>
+              <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl border-2 border-primary-dark bg-neutral-100 text-primary-violet">
+                <value.icon size={26} />
+              </div>
+              <h3 className="font-display text-h3 font-bold text-primary-dark">{value.title}</h3>
+              <p className="mt-3 leading-relaxed text-neutral-500">{value.desc}</p>
             </motion.div>
           ))}
         </div>
       </section>
 
       {/* CTA */}
-      <section className="px-5 md:px-[64px] max-w-7xl mx-auto mt-24">
-        <div className="rounded-lg bg-primary-dark p-10 md:p-14 text-white text-center relative overflow-hidden">
-          <Scribble variant="sparkle" className="absolute top-6 left-6 w-20 h-20 text-amber/20" />
+      <section className="mx-auto mt-24 max-w-max-width px-margin-mobile md:px-margin-desktop">
+        <div className="relative overflow-hidden rounded-[2.5rem] border-2 border-primary-dark bg-primary-dark p-10 text-center text-on-primary shadow-pop-orange md:p-16">
+          <Scribble variant="loop" color="#ff6a1a" className="absolute -left-6 -top-6 h-28 w-28 opacity-25" />
+          <Scribble variant="star-fill" color="#9d5cff" className="absolute right-10 top-10 hidden h-8 w-8 animate-float md:block" />
           <div className="relative z-10">
-            <h2 className="font-extrabold text-[32px] leading-[1.3] mb-4">
-              Ready to talk?
-            </h2>
-            <p className="text-lg text-white/70 max-w-xl mx-auto mb-8">
+            <h2 className="font-display text-h2 font-extrabold tracking-tight">Ready to talk?</h2>
+            <p className="mx-auto mt-4 max-w-xl text-body-lg text-on-primary/70">
               Karma reads every intake form personally. Your situation deserves a human response — not a template.
             </p>
             <Link
               href="/booking"
-              className="inline-flex items-center gap-2 bg-amber text-primary-dark px-8 py-4 rounded-full text-sm font-bold uppercase tracking-[0.12em] hover:bg-amber/90 transition-colors"
+              className="btn-pop mt-8 inline-flex items-center gap-2 rounded-full border-2 border-primary-dark bg-accent-orange px-8 py-4 text-[15px] font-bold text-primary-dark shadow-[6px_6px_0_0_#9d5cff]"
             >
               Book a Confidential Session
-              <ArrowRight size={16} />
+              <ArrowRight size={18} strokeWidth={2.5} />
             </Link>
           </div>
         </div>
