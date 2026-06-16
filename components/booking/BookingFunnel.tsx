@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { ArrowRight, Calendar, CheckCircle2, Lock, ShieldCheck } from "lucide-react";
-import { serviceProducts, formatAed } from "@/lib/products";
+import { serviceProducts, formatUsd } from "@/lib/products";
 import { cn } from "@/lib/utils";
 
 const concerns = [
@@ -86,7 +86,7 @@ export function BookingFunnel() {
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <h3 className="text-2xl font-extrabold text-primary-dark">{service.name}</h3>
                     <span className="text-2xl font-extrabold text-primary-dark">
-                      {formatAed(service.amount)}
+                      {formatUsd(service.amount)}
                     </span>
                   </div>
                   <p className="mt-1 text-sm font-semibold uppercase tracking-[0.12em] text-primary-violet">
@@ -159,7 +159,7 @@ export function BookingFunnel() {
             className="btn-pop inline-flex items-center justify-center gap-3 rounded-full border-2 border-primary-dark bg-accent-orange px-8 py-4 text-sm font-bold uppercase tracking-[0.1em] text-primary-dark shadow-pop-sm disabled:opacity-60"
           >
             <ShieldCheck size={18} strokeWidth={2.5} />
-            {isPending ? "Opening Stripe..." : `Pay ${formatAed(selectedProduct.amount)} with Stripe`}
+            {isPending ? "Opening Stripe..." : `Pay ${formatUsd(selectedProduct.amount)} with Stripe`}
             {!isPending && <ArrowRight size={18} strokeWidth={2.5} />}
           </button>
           <div className="grid gap-3 rounded-2xl border-2 border-dashed border-neutral-300 p-4 text-sm text-neutral-500 sm:grid-cols-3">
