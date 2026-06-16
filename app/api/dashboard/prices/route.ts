@@ -30,7 +30,7 @@ export async function POST(request: Request) {
     });
     const price = await stripe.prices.create({
       product: product.id,
-      currency: "aed",
+      currency: "usd",
       unit_amount: body.amount,
       ...(body.mode === "subscription" ? { recurring: { interval: "month" } } : {}),
       metadata: { slug: body.slug, kind: body.kind },
@@ -43,7 +43,7 @@ export async function POST(request: Request) {
   await sql`
     update products set active = false, updated_at = now() where slug = ${body.slug};
     insert into products (slug, kind, name, amount, currency, stripe_product_id, stripe_price_id, active)
-    values (${body.slug}, ${body.kind}, ${body.name}, ${body.amount}, 'aed', ${stripeProductId}, ${stripePriceId}, true)
+    values (${body.slug}, ${body.kind}, ${body.name}, ${body.amount}, 'usd', ${stripeProductId}, ${stripePriceId}, true)
     on conflict (slug)
     do update set
       name = excluded.name,

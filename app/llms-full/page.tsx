@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getPublishedResources } from "@/lib/db/repository";
-import { serviceProducts, formatAed } from "@/lib/products";
+import { serviceProducts, formatUsd } from "@/lib/products";
 import { resources } from "@/lib/resources";
 import { absoluteUrl, siteConfig } from "@/lib/site";
 
@@ -42,7 +42,7 @@ export default async function LlmsFullPage() {
         <ul className="mt-3 space-y-3 text-neutral-500">
           {serviceProducts.map((product) => (
             <li key={product.slug}>
-              <strong>{product.name}</strong>: {product.description} Price: {formatAed(product.amount)}.
+              <strong>{product.name}</strong>: {product.description} Price: {formatUsd(product.amount)}.
             </li>
           ))}
         </ul>

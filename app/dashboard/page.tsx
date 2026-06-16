@@ -5,7 +5,7 @@ import { DashboardClient } from "@/components/dashboard/DashboardClient";
 import { getAdminState } from "@/lib/auth/admin";
 import { hasDatabase } from "@/lib/db/client";
 import { getDashboardMetrics } from "@/lib/db/repository";
-import { formatAed } from "@/lib/products";
+import { formatUsd } from "@/lib/products";
 import { absoluteUrl } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
@@ -65,7 +65,7 @@ export default async function DashboardPage() {
       </header>
       <section className="mx-auto mt-10 grid max-w-max-width gap-4 md:grid-cols-4">
         {[
-          { icon: Wallet, label: "Revenue", value: formatAed(metrics.revenue) },
+          { icon: Wallet, label: "Revenue", value: formatUsd(metrics.revenue) },
           { icon: CalendarCheck, label: "Paid orders", value: String(metrics.paidOrders) },
           { icon: BarChart3, label: "Bookings", value: String(metrics.bookings) },
           { icon: Upload, label: "Uploaded resources", value: String(metrics.uploadedResources) },
