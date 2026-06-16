@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowLeft, Download, FileText } from "lucide-react";
 import { ResourceUnlockForm } from "@/components/resources/ResourceUnlockForm";
 import { getResourceForSlug } from "@/lib/db/repository";
-import { formatAed } from "@/lib/products";
+import { formatUsd } from "@/lib/products";
 import { getResourceUrl, resources } from "@/lib/resources";
 
 export function generateStaticParams() {
@@ -73,7 +73,7 @@ export default async function ResourceDetailPage({
           offers: {
             "@type": "Offer",
             price: resource.amount / 100,
-            priceCurrency: "AED",
+            priceCurrency: "USD",
             availability: "https://schema.org/InStock",
           },
         }
@@ -120,7 +120,12 @@ export default async function ResourceDetailPage({
         </section>
         <section className="mt-10">
           {resource.gated && resource.amount ? (
-            <ResourceUnlockForm resourceSlug={resource.slug} amount={resource.amount} />
+            <ResourceUnlockForm
+              resourceSlug={resource.slug}
+              amount={resource.amount}
+              priceNote={resource.interval ? "/mo" : undefined}
+              membership={resource.membership}
+            />
           ) : (
             <a
               href={resource.pdf}
@@ -137,8 +142,9 @@ export default async function ResourceDetailPage({
             <div className="flex items-start gap-3">
               <FileText className="mt-1 text-primary-violet" size={22} />
               <p className="text-sm leading-relaxed text-neutral-500">
-                This premium resource is {formatAed(resource.amount)}. The download link is generated after
-                Stripe confirms payment.
+                {resource.membership
+                  ? `Membership is ${formatUsd(resource.amount)}/mo. Access is emailed to you after Stripe confirms your first payment.`
+                  : `This resource is ${formatUsd(resource.amount)}. Your download is emailed to you and unlocked on screen after Stripe confirms payment.`}
               </p>
             </div>
           </aside>

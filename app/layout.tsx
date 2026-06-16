@@ -45,7 +45,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Humanly — HR with Dignity",
     description:
-      "Confidential, neutral HR advice for UAE & GCC professionals. Your HR isn't on your side. We are.",
+      "Confidential, neutral HR advice for UAE & GCC professionals. Expert HR advice, just for you.",
   },
   robots: {
     index: true,
@@ -109,7 +109,7 @@ const serviceSchema = {
   serviceType: "Confidential HR advisory for employees",
   url: "https://talkhumanly.com",
   founder: founderSchema,
-  priceRange: "AED 550-1800",
+  priceRange: "$75-$1400",
 };
 
 const websiteSchema = {

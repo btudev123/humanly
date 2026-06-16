@@ -86,7 +86,9 @@ export async function POST(request: Request) {
       kind: "consultation",
       productSlug: product.slug,
     },
-    success_url: `${absoluteUrl("/booking/schedule")}?session_id={CHECKOUT_SESSION_ID}`,
+    success_url: product.needsScheduling
+      ? `${absoluteUrl("/booking/schedule")}?session_id={CHECKOUT_SESSION_ID}`
+      : `${absoluteUrl("/booking/done")}?session_id={CHECKOUT_SESSION_ID}&kind=async`,
     cancel_url: `${absoluteUrl("/payment-failed")}?kind=consultation&product=${product.slug}`,
     ...(product.mode === "payment" ? { invoice_creation: { enabled: true } } : {}),
   });

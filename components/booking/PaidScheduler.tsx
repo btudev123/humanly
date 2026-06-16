@@ -43,6 +43,9 @@ export function PaidScheduler({
             <p className="mt-1 text-neutral-500">
               This scheduling page is unlocked for {order.customer_email}. Your booking will be linked to order {order.id}.
             </p>
+            <p className="mt-3 text-sm text-neutral-500">
+              Please note: your call may be recorded solely for the purpose of making notes.
+            </p>
           </div>
         </div>
       </div>

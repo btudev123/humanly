@@ -37,7 +37,7 @@ export default async function SchedulePage({
   }
 
   const product = getServiceProduct(order.product_slug);
-  return <PaidScheduler order={order} calLink={product ? getCalLink(product) : "talkhumanly/triage"} />;
+  return <PaidScheduler order={order} calLink={product ? getCalLink(product) : "talkhumanly/individual-advisory"} />;
 }
 
 function ScheduleBlocked({ message }: { message: string }) {

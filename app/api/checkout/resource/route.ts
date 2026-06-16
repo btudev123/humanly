@@ -28,13 +28,15 @@ export async function POST(request: Request) {
     return Response.json({ error: "This resource is not available for paid unlock." }, { status: 400 });
   }
 
+  const isSubscription = Boolean(resource.interval);
+
   const order = await createPendingOrder({
     kind: "resource",
     productSlug: resource.slug,
     customerName: body.name,
     customerEmail: body.email,
     amount: resource.amount,
-    currency: "aed",
+    currency: "usd",
     metadata: {
       resourceTitle: resource.title,
       category: resource.category,
@@ -43,18 +45,21 @@ export async function POST(request: Request) {
 
   const stripe = getStripe();
   const session = await stripe.checkout.sessions.create({
-    mode: "payment",
+    mode: isSubscription ? "subscription" : "payment",
     customer_email: body.email,
     client_reference_id: order.id,
     line_items: [
       {
         price_data: {
-          currency: "aed",
+          currency: "usd",
           unit_amount: resource.amount,
           product_data: {
             name: resource.title,
             description: resource.summary,
           },
+          ...(isSubscription && resource.interval
+            ? { recurring: { interval: resource.interval } }
+            : {}),
         },
         quantity: 1,
       },
@@ -64,7 +69,7 @@ export async function POST(request: Request) {
       kind: "resource",
       productSlug: resource.slug,
     },
-    invoice_creation: { enabled: true },
+    ...(isSubscription ? {} : { invoice_creation: { enabled: true } }),
     success_url: `${absoluteUrl("/resources/unlocked")}?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${absoluteUrl(`/resources/${resource.slug}`)}?payment=cancelled`,
   });

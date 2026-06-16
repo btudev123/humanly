@@ -48,11 +48,17 @@ function metadataStringArray(metadata: Record<string, unknown> | null, key: stri
 function toPublicResource(row: ResourceRow): Resource {
   const updatedAt = row.updated_at ? new Date(row.updated_at).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10);
 
+  const tierValue = Number(row.metadata?.tier);
+  const tier = ([1, 2, 3, 4].includes(tierValue) ? tierValue : 2) as Resource["tier"];
+
   return {
     slug: row.slug,
     title: row.title,
     category: row.category,
+    tier,
     minutes: Number(row.metadata?.minutes) || 8,
+    format: metadataString(row.metadata, "format", "PDF download"),
+    audience: metadataString(row.metadata, "audience", "Global employees"),
     summary: row.summary,
     pdf: row.blob_url || row.public_path || `/resources/${row.slug}.pdf`,
     gated: row.gated,
@@ -95,7 +101,7 @@ export async function createPendingOrder(input: {
       ${input.customerEmail},
       ${input.phone || null},
       ${input.amount},
-      ${input.currency || "aed"},
+      ${input.currency || "usd"},
       ${JSON.stringify(input.metadata || {})}::jsonb
     )
     returning *

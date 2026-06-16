@@ -2,14 +2,18 @@
 
 import { useState, useTransition } from "react";
 import { ArrowRight, LockKeyhole } from "lucide-react";
-import { formatAed } from "@/lib/products";
+import { formatUsd } from "@/lib/products";
 
 export function ResourceUnlockForm({
   resourceSlug,
   amount,
+  priceNote,
+  membership,
 }: {
   resourceSlug: string;
   amount: number;
+  priceNote?: string;
+  membership?: boolean;
 }) {
   const [error, setError] = useState("");
   const [isPending, startTransition] = useTransition();
@@ -44,8 +48,14 @@ export function ResourceUnlockForm({
           <LockKeyhole size={20} />
         </span>
         <div>
-          <h2 className="font-display text-2xl font-bold text-primary-dark">Unlock premium PDF</h2>
-          <p className="text-neutral-500">Stripe handles payment. Download unlocks after payment succeeds.</p>
+          <h2 className="font-display text-2xl font-bold text-primary-dark">
+            {membership ? "Join the membership" : "Unlock this resource"}
+          </h2>
+          <p className="text-neutral-500">
+            {membership
+              ? "Stripe handles your subscription. Access is emailed once payment succeeds."
+              : "Stripe handles payment. Your download is emailed and unlocks on screen once payment succeeds."}
+          </p>
         </div>
       </div>
       <div className="grid gap-3 sm:grid-cols-2">
@@ -69,7 +79,9 @@ export function ResourceUnlockForm({
         disabled={isPending}
         className="btn-pop inline-flex items-center justify-center gap-2 rounded-full border-2 border-primary-dark bg-accent-orange px-6 py-4 text-sm font-bold uppercase tracking-[0.1em] text-primary-dark shadow-pop-sm disabled:opacity-60"
       >
-        {isPending ? "Opening Stripe..." : `Pay ${formatAed(amount)} and unlock`}
+        {isPending
+          ? "Opening Stripe..."
+          : `Pay ${formatUsd(amount)}${priceNote ?? ""} ${membership ? "and join" : "and unlock"}`}
         {!isPending && <ArrowRight size={18} strokeWidth={2.5} />}
       </button>
     </form>

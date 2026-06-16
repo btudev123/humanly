@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowUpRight, MessageCircle } from "lucide-react";
+import { BrandLogo } from "@/components/layout/BrandLogo";
 import { Scribble } from "@/components/ui/Scribble";
 
 const columns: { title: string; links: { href: string; label: string }[] }[] = [
@@ -47,9 +48,9 @@ export function Footer() {
               Confidential · UAE & GCC
             </p>
             <h2 className="max-w-2xl font-display text-[clamp(2rem,5vw,3.5rem)] font-extrabold leading-[1.02] tracking-tight">
-              Your HR isn&apos;t on your side.{" "}
+              Expert HR advice,{" "}
               <span className="relative inline-block text-accent-orange">
-                We are.
+                just for you.
                 <Scribble variant="underline-bold" color="#ff6a1a" strokeWidth={4} className="absolute -bottom-3 left-0 h-3.5 w-full" />
               </span>
             </h2>
@@ -66,8 +67,8 @@ export function Footer() {
         {/* Link columns */}
         <div className="grid gap-10 py-14 sm:grid-cols-2 md:grid-cols-4">
           <div>
-            <Link href="/" className="font-display text-2xl font-extrabold tracking-tight">
-              Humanly<span className="text-accent-orange">.</span>
+            <Link href="/" aria-label="Humanly home" className="inline-flex rounded-2xl bg-surface px-4 py-3">
+              <BrandLogo className="h-11 w-auto" />
             </Link>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-neutral-100/60">
               Independent, neutral, confidential HR advisory for professionals navigating workplace

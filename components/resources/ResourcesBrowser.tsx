@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, BookOpen, Download, FileText, Search } from "lucide-react";
-import { formatAed } from "@/lib/products";
+import { formatUsd } from "@/lib/products";
 import type { Resource } from "@/lib/resources";
 
 export function ResourcesBrowser({ resources }: { resources: Resource[] }) {
@@ -81,11 +81,12 @@ export function ResourcesBrowser({ resources }: { resources: Resource[] }) {
                 <div className="flex items-center gap-2">
                   {resource.gated && (
                     <span className="rounded-full border-2 border-primary-dark bg-accent-orange px-3 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-primary-dark">
-                      {resource.amount ? formatAed(resource.amount) : "Premium"}
+                      {resource.amount ? formatUsd(resource.amount) : "Premium"}
+                      {resource.interval ? "/mo" : ""}
                     </span>
                   )}
                   <span className="rounded-full border border-neutral-300 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.12em] text-neutral-500">
-                    {resource.minutes} min
+                    {resource.membership ? "Membership" : `${resource.minutes} min`}
                   </span>
                 </div>
               </div>

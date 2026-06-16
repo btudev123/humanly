@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useTransition } from "react";
 import { Upload, DollarSign, MessageSquarePlus } from "lucide-react";
-import { serviceProducts, formatAed } from "@/lib/products";
+import { serviceProducts, formatUsd } from "@/lib/products";
 
 type UploadedResource = {
   slug: string;
@@ -99,7 +99,7 @@ export function DashboardClient() {
                   className="rounded-xl border-2 border-primary-dark/30 bg-neutral-100 px-3 py-2 text-base text-primary-dark outline-none transition focus:border-primary-dark"
                 />
               </label>
-              <p className="mt-2 text-xs text-neutral-500">Current seed: {formatAed(product.amount)}</p>
+              <p className="mt-2 text-xs text-neutral-500">Current seed: {formatUsd(product.amount)}</p>
               <button className="btn-pop mt-3 rounded-full border-2 border-primary-dark bg-accent-orange px-4 py-2 text-xs font-bold uppercase tracking-[0.1em] text-primary-dark shadow-pop-sm">
                 Save
               </button>
@@ -118,7 +118,7 @@ export function DashboardClient() {
           <input name="slug" required placeholder="resource-slug" className="rounded-2xl border-2 border-primary-dark/30 px-4 py-3 outline-none transition focus:border-primary-dark" />
           <input name="category" required placeholder="Category" className="rounded-2xl border-2 border-primary-dark/30 px-4 py-3 outline-none transition focus:border-primary-dark" />
           <textarea name="summary" required placeholder="Short summary" className="rounded-2xl border-2 border-primary-dark/30 px-4 py-3 outline-none transition focus:border-primary-dark" />
-          <input name="amount" type="number" min="1" required placeholder="Price in AED" className="rounded-2xl border-2 border-primary-dark/30 px-4 py-3 outline-none transition focus:border-primary-dark" />
+          <input name="amount" type="number" min="1" required placeholder="Price in USD cents (e.g. 1500 = $15)" className="rounded-2xl border-2 border-primary-dark/30 px-4 py-3 outline-none transition focus:border-primary-dark" />
           <input name="file" type="file" accept="application/pdf" required className="rounded-2xl border-2 border-primary-dark/30 px-4 py-3 outline-none transition focus:border-primary-dark" />
           <label className="flex items-center gap-2 text-sm font-semibold text-primary-dark">
             <input name="published" type="checkbox" />
@@ -137,7 +137,7 @@ export function DashboardClient() {
             uploadedResources.map((resource) => (
               <div key={resource.slug} className="rounded-2xl border-2 border-primary-dark/15 bg-surface-container-low p-4">
                 <p className="font-bold text-primary-dark">{resource.title}</p>
-                <p className="text-xs text-neutral-500">{resource.slug} · {resource.amount ? formatAed(resource.amount) : "No price"}</p>
+                <p className="text-xs text-neutral-500">{resource.slug} · {resource.amount ? formatUsd(resource.amount) : "No price"}</p>
                 <button
                   type="button"
                   disabled={isPending}

@@ -65,29 +65,29 @@ const pillars = [
 
 const services = [
   {
-    name: "The Triage",
-    price: "550 AED",
-    duration: "60-Minute Advisory",
-    description: "A private consultation for verbal guidance and clarity on immediate next steps.",
-    features: ["60-minute confidential session", "Situation mapping", "Verbal action plan"],
+    name: "Document Review",
+    price: "$75",
+    duration: "Async · No Call Needed",
+    description: "A written review of one document — a letter, contract, or termination notice — emailed back to you.",
+    features: ["Written expert review", "Letter, contract, or notice", "No call required"],
     featured: false,
-    icon: MessageSquare,
-  },
-  {
-    name: "The Strategy",
-    price: "950 AED",
-    duration: "Written Follow-Up Report",
-    description: "A structured document: situation summary, risk view, recommended actions, and suggested scripts.",
-    features: ["Confidential session", "Document review checklist", "Written report", "Email & meeting scripts", "48-hour turnaround"],
-    featured: true,
     icon: FileText,
   },
   {
-    name: "The Retainer",
-    price: "Custom",
+    name: "Individual Advisory Session",
+    price: "$327",
+    duration: "60-Minute Expert Advisory",
+    description: "A full advisory session on your specific situation, plus a written follow-up summary.",
+    features: ["Confidential 60-minute session", "Advice on your exact situation", "Written follow-up summary", "Recommended next steps"],
+    featured: true,
+    icon: MessageSquare,
+  },
+  {
+    name: "Career Transition Retainer",
+    price: "$900/mo",
     duration: "Ongoing Monthly Support",
-    description: "For complex situations needing message review, strategy check-ins, and ongoing containment.",
-    features: ["Monthly strategy sessions", "Message & email review", "Real-time guidance", "Priority access"],
+    description: "Three monthly sessions, async WhatsApp support, and document reviews for exits, PIPs, and job searches.",
+    features: ["3 sessions per month", "Async WhatsApp support", "Document reviews included", "Most common retainer"],
     featured: false,
     icon: Users,
   },
@@ -300,13 +300,13 @@ export default function Home() {
 
             <Reveal delay={0.05}>
               <h1 className="mt-7 font-display text-[clamp(2.6rem,6.6vw,4.6rem)] font-extrabold leading-[0.98] tracking-tight text-primary-dark">
-                Your HR isn&apos;t{" "}
+                Expert HR advice,{" "}
                 <span className="relative inline-block">
-                  <span className="highlighter-violet highlighter">on your side.</span>
+                  <span className="highlighter-violet highlighter">just for you.</span>
                 </span>
                 <br />
                 <span className="relative inline-block">
-                  We are.
+                  Always confidential.
                   <Scribble variant="underline-bold" color="#ff6a1a" strokeWidth={5} className="absolute -bottom-3 left-0 h-4 w-full" animate />
                 </span>
               </h1>
@@ -567,7 +567,7 @@ export default function Home() {
               A confidential reality check
               <Scribble variant="underline" color="#ff6a1a" strokeWidth={4} className="absolute -bottom-3 left-0 h-3.5 w-full" />
             </h2>
-            <p className="mt-6 text-body-lg text-neutral-500">From a single session to ongoing support — three ways to work together.</p>
+            <p className="mt-6 text-body-lg text-neutral-500">From a quick document review to ongoing retainers — see the full range of advisory options.</p>
           </Reveal>
 
           <div className="grid items-stretch gap-6 md:grid-cols-3">

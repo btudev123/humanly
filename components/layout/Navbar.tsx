@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import { ArrowUpRight, Menu, X } from "lucide-react";
-import { Scribble } from "@/components/ui/Scribble";
+import { BrandLogo } from "@/components/layout/BrandLogo";
 
 const navLinks = [
   { href: "/", label: "Home" },
@@ -16,15 +16,8 @@ const navLinks = [
 
 function Wordmark() {
   return (
-    <span className="relative inline-flex items-end font-display text-[26px] md:text-[30px] font-extrabold tracking-tight text-primary-dark leading-none">
-      Humanly
-      <span className="ml-0.5 h-2.5 w-2.5 rounded-full bg-accent-orange translate-y-[-2px]" />
-      <Scribble
-        variant="underline"
-        strokeWidth={4}
-        color="#ff6a1a"
-        className="absolute -bottom-2 left-0 h-3 w-[88%] opacity-0 transition-opacity duration-300 group-hover/logo:opacity-100"
-      />
+    <span className="relative inline-flex items-center leading-none">
+      <BrandLogo className="h-10 w-auto md:h-11" />
     </span>
   );
 }

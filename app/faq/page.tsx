@@ -21,7 +21,7 @@ const faqData = [
     items: [
       { q: "What kind of expertise does Karma have?", a: "Karma Harb has 20+ years of senior HR leadership experience across the UAE, Saudi Arabia, and international markets. She's led HR functions inside major corporate structures and knows exactly how internal systems operate — which is what makes her external advice so precise." },
       { q: "Can you help me with a legal case?", a: "We provide strategic advocacy and education to help you navigate workplace issues or prepare for legal processes. However, Humanly is not a law firm. If your situation requires formal litigation, we'll help you understand what to ask an attorney and what evidence to gather." },
-      { q: "What's the difference between The Triage and The Strategy?", a: "The Triage (60 min, AED 550) is a live conversation where you receive immediate verbal guidance, clarity, and next-step direction. The Strategy (AED 950) includes everything in The Triage plus a structured written report with situation summary, risk assessment, recommended actions, and suggested scripts you can use immediately." },
+      { q: "Which session should I book?", a: "Most people start with the Individual Advisory Session ($327, 60 minutes) — a full advisory call on your situation plus a written follow-up summary. If you only need a single document reviewed, the async Document Review ($75) is emailed back to you with no call required. For complex, multi-issue situations, the Extended Advisory Session ($490, 90 minutes) includes an action-plan document, and ongoing situations are best served by a monthly retainer." },
     ],
   },
   {
@@ -29,8 +29,8 @@ const faqData = [
     icon: Calendar,
     items: [
       { q: "What if I need to reschedule?", a: "We understand workplace crises aren't always predictable. You can reschedule any consultation up to 24 hours before the session start time via your confirmation email with no penalty." },
-      { q: "Are there any hidden fees?", a: "No. The price you see on the service page is the total price. This includes your consultation, any templates provided by your advisor during the session, and — if you book The Strategy — your written follow-up report." },
-      { q: "What payment methods do you accept?", a: "We accept all major credit and debit cards via Stripe, including Visa and Mastercard. Payment is processed securely in AED. No card details are stored on our servers." },
+      { q: "Are there any hidden fees?", a: "No. The price you see on the service page is the total price. This includes your consultation, any templates provided by your advisor during the session, and — where the service includes one — your written follow-up summary or report." },
+      { q: "What payment methods do you accept?", a: "We accept all major credit and debit cards via Stripe, including Visa and Mastercard. Payment is processed securely in USD. No card details are stored on our servers." },
       { q: "Can I cancel and get a refund?", a: "Yes. Cancellations made at least 24 hours before your session receive a full refund. Cancellations within 24 hours receive a 50% refund. No-shows are non-refundable, but you can reschedule once at no cost." },
     ],
   },

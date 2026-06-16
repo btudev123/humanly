@@ -1,5 +1,6 @@
 import { Resend } from "resend";
 import { BookingConfirmationEmail } from "@/emails/BookingConfirmationEmail";
+import { ResourceDeliveryEmail } from "@/emails/ResourceDeliveryEmail";
 import { recordEmailEvent } from "@/lib/db/repository";
 import { siteConfig } from "@/lib/site";
 
@@ -51,6 +52,46 @@ export async function sendBookingConfirmation(input: {
 
   await recordEmailEvent({
     kind: "booking_confirmation",
+    recipient: input.to,
+    status: result.error ? "error" : "sent",
+    providerId: result.data?.id,
+    metadata: result.error ? { error: result.error.message } : input,
+  });
+
+  return result;
+}
+
+export async function sendResourceDelivery(input: {
+  to: string;
+  name: string;
+  title: string;
+  accessUrl: string;
+  membership?: boolean;
+  priceFormatted?: string | null;
+  invoiceUrl?: string | null;
+}) {
+  if (!process.env.RESEND_API_KEY) {
+    await recordEmailEvent({
+      kind: "resource_delivery",
+      recipient: input.to,
+      status: "skipped_missing_resend_key",
+      metadata: input,
+    });
+    return null;
+  }
+
+  const from = process.env.RESEND_FROM || `${siteConfig.name} <hello@talkhumanly.com>`;
+  const result = await getResend().emails.send({
+    from,
+    to: [input.to],
+    subject: input.membership
+      ? `Welcome to Humanly: ${input.title}`
+      : `Your Humanly resource: ${input.title}`,
+    react: <ResourceDeliveryEmail {...input} />,
+  });
+
+  await recordEmailEvent({
+    kind: "resource_delivery",
     recipient: input.to,
     status: result.error ? "error" : "sent",
     providerId: result.data?.id,
