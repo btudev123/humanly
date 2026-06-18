@@ -16,36 +16,42 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://talkhumanly.com"),
   title: {
     template: "%s | Humanly — HR with Dignity",
-    default: "Humanly — Independent HR Advisory | UAE & GCC Workplace Support",
+    default: "Humanly — Independent, Confidential HR Advisory for Professionals",
   },
   description:
-    "Confidential, neutral HR advice for professionals in the UAE and GCC. Navigate toxic workplaces, PIPs, burnout, and labour law — without your employer knowing.",
+    "Your HR manages the workplace. We manage your career. Independent, confidential HR advice for professionals worldwide — toxic workplaces, PIPs, burnout, exits, and your rights, without your employer knowing. Regional guides for the UAE, GCC & North America.",
   keywords: [
-    "HR advisor UAE",
-    "independent HR consultant Dubai",
-    "toxic workplace advice UAE",
-    "performance improvement plan Dubai",
+    "independent HR advisor",
     "confidential HR consultation",
-    "UAE labour law expat rights",
     "HR advice without telling employer",
-    "wrongful termination UAE",
-    "gratuity rights UAE",
+    "performance improvement plan help",
+    "toxic workplace advice",
+    "exit negotiation support",
+    "employee rights advisor",
+    "career advisory",
+    "UAE labour law rights",
     "GCC employee rights",
+    "North America workplace rights",
   ],
   openGraph: {
     type: "website",
     siteName: "Humanly",
-    title: "Humanly — Independent HR Advisory | UAE & GCC Workplace Support",
+    title: "Humanly — Independent, Confidential HR Advisory for Professionals",
     description:
-      "Confidential, neutral HR advice for professionals navigating workplace challenges. Talk to a real expert — not your employer's HR.",
+      "Your HR manages the workplace. We manage your career. Talk to a real expert — not your employer's HR.",
     url: "https://talkhumanly.com",
-    locale: "en_AE",
+    locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
     title: "Humanly — HR with Dignity",
     description:
-      "Confidential, neutral HR advice for UAE & GCC professionals. Expert HR advice, just for you.",
+      "Your HR manages the workplace. We manage your career. Independent, confidential HR advisory for professionals.",
+  },
+  icons: {
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    shortcut: "/icon.svg",
+    apple: "/logo-mark.svg",
   },
   robots: {
     index: true,
@@ -65,10 +71,10 @@ const organizationSchema = {
   "@type": "Organization",
   name: "Humanly HR Advisory",
   url: "https://talkhumanly.com",
-  logo: "https://talkhumanly.com/logo.png",
+  logo: "https://talkhumanly.com/logo-mark.svg",
   description:
-    "Independent, confidential HR advisory for UAE and GCC professionals.",
-  email: "karma@talkhumanly.com",
+    "Independent, confidential HR advisory for professionals worldwide, with dedicated guidance for the UAE, GCC and North America.",
+  email: "hello@talkhumanly.com",
   contactPoint: {
     "@type": "ContactPoint",
     contactType: "Confidential Consultation",
@@ -105,7 +111,7 @@ const serviceSchema = {
   "@context": "https://schema.org",
   "@type": "ProfessionalService",
   name: "Humanly HR Advisory",
-  areaServed: ["United Arab Emirates", "Gulf Cooperation Council"],
+  areaServed: ["Worldwide", "United Arab Emirates", "Gulf Cooperation Council", "North America"],
   serviceType: "Confidential HR advisory for employees",
   url: "https://talkhumanly.com",
   founder: founderSchema,
@@ -146,9 +152,9 @@ export default function RootLayout({
             crossOrigin="anonymous"
           />
 
-          {/* Body: Poppins (400/500/600/800) + Display: Bricolage Grotesque (600/700/800) */}
+          {/* Brand typeface: Poppins everywhere — 400 body / 500 buttons / 600 sub-head / 700 / 800 headers */}
           <link
-            href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Poppins:wght@400;500;600;800&display=swap"
+            href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
             rel="stylesheet"
           />
 

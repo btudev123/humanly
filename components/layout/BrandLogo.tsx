@@ -1,24 +1,34 @@
-import Image from "next/image";
+import { cn } from "@/lib/utils";
 
 /**
- * Brand logo. Replace /public/humanly-logo.png with updated artwork to change
- * the logo everywhere it is used. (A transparent-background SVG/PNG is ideal —
- * the current file has a solid cream background, so it is shown on matching
- * light/cream surfaces.)
+ * Brand lockup: transparent SVG H-mark (`/public/logo-mark.svg`) + "Humanly"
+ * wordmark rendered as live text in Poppins ExtraBold so the brand font is used
+ * (an SVG referenced via <img> cannot load the page's web fonts).
+ *
+ * Sizing is driven by the height utility passed in `className` (e.g. `h-11`);
+ * the mark fills that height and the wordmark is scaled to pair with it.
  */
 export function BrandLogo({
   className = "",
+  wordmark = true,
 }: {
   className?: string;
+  wordmark?: boolean;
 }) {
   return (
-    <Image
-      src="/humanly-logo.png"
-      alt="Humanly"
-      width={268}
-      height={158}
-      priority
-      className={className}
-    />
+    <span className={cn("inline-flex items-center gap-2 text-primary-dark", className)}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/logo-mark.svg"
+        alt="Humanly"
+        className="h-full w-auto"
+        style={{ aspectRatio: "1 / 1" }}
+      />
+      {wordmark && (
+        <span className="font-display text-[1.55rem] font-extrabold leading-none tracking-[-0.02em]">
+          Humanly
+        </span>
+      )}
+    </span>
   );
 }

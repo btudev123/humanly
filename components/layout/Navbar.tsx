@@ -10,8 +10,10 @@ import { BrandLogo } from "@/components/layout/BrandLogo";
 const navLinks = [
   { href: "/", label: "Home" },
   { href: "/services", label: "Services" },
-  { href: "/about", label: "About" },
   { href: "/resources", label: "Resources" },
+  { href: "/tools", label: "Tools" },
+  { href: "/about", label: "About" },
+  { href: "/contact", label: "Contact" },
 ];
 
 function Wordmark() {

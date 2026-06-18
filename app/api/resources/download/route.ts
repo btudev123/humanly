@@ -29,6 +29,9 @@ export async function GET(request: Request) {
     return Response.json({ error: "Payment is required to download this resource." }, { status: 402 });
   }
 
+  // Protected content MUST be served from private Vercel Blob and only after the
+  // entitlement check above. Stream it through this endpoint so the blob URL is
+  // never exposed to the client.
   if (resource.pdf.startsWith("https://")) {
     const blob = await get(resource.pdf, { access: "private" });
     if (blob?.stream) {
@@ -36,9 +39,21 @@ export async function GET(request: Request) {
         headers: {
           "Content-Type": "application/pdf",
           "Content-Disposition": `attachment; filename="${slug}.pdf"`,
+          // Private, authenticated download — never cache at the edge or in shared caches.
+          "Cache-Control": "private, no-store, max-age=0",
         },
       });
     }
+    return Response.json({ error: "This resource is not available yet. Please contact support." }, { status: 503 });
+  }
+
+  // SECURITY: a gated resource must never be redirected to a world-readable
+  // /public path (that would bypass payment). Only free resources may do that.
+  if (resource.gated) {
+    return Response.json(
+      { error: "This resource is not available yet. Our team has been notified." },
+      { status: 503 }
+    );
   }
 
   return NextResponse.redirect(absoluteUrl(resource.pdf));

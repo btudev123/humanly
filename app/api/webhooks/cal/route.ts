@@ -1,7 +1,15 @@
+import crypto from "node:crypto";
 import { getOrderById, recordBooking } from "@/lib/db/repository";
 import { sendBookingConfirmation } from "@/lib/email/resend";
 
 export const runtime = "nodejs";
+
+function timingSafeEqualStr(a: string, b: string) {
+  const ab = Buffer.from(a);
+  const bb = Buffer.from(b);
+  if (ab.length !== bb.length) return false;
+  return crypto.timingSafeEqual(ab, bb);
+}
 
 function stringValue(value: unknown) {
   return typeof value === "string" ? value : null;
@@ -17,18 +25,34 @@ function nestedString(source: Record<string, unknown>, keys: string[]) {
 }
 
 export async function POST(request: Request) {
+  const rawBody = await request.text();
   const secret = process.env.CAL_WEBHOOK_SECRET;
   if (secret) {
-    const provided =
+    // Cal.com signs the raw payload: X-Cal-Signature-256 = HMAC-SHA256(body, secret).
+    // Also accept a plaintext secret header as a fallback.
+    const signature = request.headers.get("x-cal-signature-256");
+    const plaintext =
       request.headers.get("x-cal-secret") ||
       request.headers.get("x-webhook-secret") ||
       request.headers.get("authorization")?.replace(/^Bearer\s+/i, "");
-    if (provided !== secret) {
-      return Response.json({ error: "Invalid Cal.com webhook secret." }, { status: 401 });
+    let authorized = false;
+    if (signature) {
+      const expected = crypto.createHmac("sha256", secret).update(rawBody).digest("hex");
+      authorized = timingSafeEqualStr(signature, expected);
+    } else if (plaintext) {
+      authorized = timingSafeEqualStr(plaintext, secret);
+    }
+    if (!authorized) {
+      return Response.json({ error: "Invalid Cal.com webhook signature." }, { status: 401 });
     }
   }
 
-  const body = (await request.json()) as Record<string, unknown>;
+  let body: Record<string, unknown>;
+  try {
+    body = JSON.parse(rawBody) as Record<string, unknown>;
+  } catch {
+    return Response.json({ error: "Invalid JSON body." }, { status: 400 });
+  }
   const payload = ((body.payload || body.data || body) ?? {}) as Record<string, unknown>;
   const metadata = ((payload.metadata || body.metadata || {}) ?? {}) as Record<string, unknown>;
   const attendees = Array.isArray(payload.attendees) ? (payload.attendees as Record<string, unknown>[]) : [];

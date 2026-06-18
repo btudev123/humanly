@@ -7,3 +7,12 @@ coverage/
 *.log
 .env*
 !.env.example
+agents/
+
+# iCloud / sync conflict copies and the no-sync git object store
+*\ [0-9]
+.git.nosync
+.git.corrupt-bak
+.node_modules.broken.*
+*.tsbuildinfo
+.vercel

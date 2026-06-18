@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" fill="none" role="img" aria-label="Humanly">
+  <defs>
+    <linearGradient id="hl-bar" x1="120" y1="36" x2="120" y2="176" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#8b44e8"/>
+      <stop offset="1" stop-color="#3f1b73"/>
+    </linearGradient>
+    <linearGradient id="hl-orange" x1="90" y1="150" x2="150" y2="78" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f37325"/>
+      <stop offset="1" stop-color="#fdb44a"/>
+    </linearGradient>
+    <radialGradient id="hl-dot" cx="0.38" cy="0.34" r="0.75">
+      <stop offset="0" stop-color="#fdb44a"/>
+      <stop offset="1" stop-color="#f26a1b"/>
+    </radialGradient>
+    <linearGradient id="hl-swoosh" x1="44" y1="206" x2="196" y2="206" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#5a2a9e"/>
+      <stop offset="0.5" stop-color="#8b44e8"/>
+      <stop offset="1" stop-color="#5a2a9e"/>
+    </linearGradient>
+    <clipPath id="hl-clip-left"><rect x="70" y="36" width="36" height="140" rx="17"/></clipPath>
+    <clipPath id="hl-clip-right"><rect x="134" y="36" width="36" height="140" rx="17"/></clipPath>
+  </defs>
+
+  <!-- H stems -->
+  <rect x="70" y="36" width="36" height="140" rx="17" fill="url(#hl-bar)"/>
+  <rect x="134" y="36" width="36" height="140" rx="17" fill="url(#hl-bar)"/>
+
+  <!-- orange flame accents inside the stems -->
+  <g clip-path="url(#hl-clip-left)">
+    <path d="M70 176 H106 V120 C106 150 86 152 70 132 Z" fill="url(#hl-orange)"/>
+    <path d="M106 120 C106 150 86 152 70 132" stroke="#fbf7f1" stroke-width="3" fill="none" stroke-linecap="round"/>
+  </g>
+  <g clip-path="url(#hl-clip-right)">
+    <path d="M170 36 H134 V92 C134 62 154 60 170 80 Z" fill="url(#hl-orange)"/>
+    <path d="M134 92 C134 62 154 60 170 80" stroke="#fbf7f1" stroke-width="3" fill="none" stroke-linecap="round"/>
+  </g>
+
+  <!-- crossbar tick stubs -->
+  <rect x="100" y="103" width="16" height="6" rx="3" fill="#fbf7f1"/>
+  <rect x="124" y="103" width="16" height="6" rx="3" fill="#fbf7f1"/>
+
+  <!-- center dot -->
+  <circle cx="120" cy="106" r="23" fill="url(#hl-dot)"/>
+
+  <!-- swoosh smile -->
+  <path d="M44 198 C92 224 148 224 196 198 C150 214 90 214 44 198 Z" fill="url(#hl-swoosh)"/>
+</svg>

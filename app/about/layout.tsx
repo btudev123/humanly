@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "About Humanly | Our Radical Mission",
-  description: "Learn about Humanly's mission to protect employee dignity through neutral advocacy and AI-enhanced support.",
+  title: "About Karma Harb & Humanly",
+  description:
+    "Karma Harb founded Humanly after ~20 years in HR across regulated industries, government, media and investment management — to give every professional honest, confidential, expert HR guidance.",
 };
 
 export default function AboutLayout({

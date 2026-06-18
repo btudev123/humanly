@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowUpRight, MessageCircle } from "lucide-react";
+import { ArrowUpRight, Mail } from "lucide-react";
 import { BrandLogo } from "@/components/layout/BrandLogo";
 import { Scribble } from "@/components/ui/Scribble";
 
@@ -8,8 +8,9 @@ const columns: { title: string; links: { href: string; label: string }[] }[] = [
     title: "Explore",
     links: [
       { href: "/services", label: "Services" },
-      { href: "/about", label: "About" },
       { href: "/resources", label: "Resources" },
+      { href: "/tools", label: "Free Tools" },
+      { href: "/about", label: "About" },
       { href: "/faq", label: "FAQ" },
     ],
   },
@@ -45,13 +46,13 @@ export function Footer() {
           <div>
             <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.16em] text-orange-light">
               <span className="h-2 w-2 rounded-full bg-accent-orange" />
-              Confidential · UAE & GCC
+              Confidential · Global advisory
             </p>
             <h2 className="max-w-2xl font-display text-[clamp(2rem,5vw,3.5rem)] font-extrabold leading-[1.02] tracking-tight">
-              Expert HR advice,{" "}
+              Your HR manages the workplace.{" "}
               <span className="relative inline-block text-accent-orange">
-                just for you.
-                <Scribble variant="underline-bold" color="#ff6a1a" strokeWidth={4} className="absolute -bottom-3 left-0 h-3.5 w-full" />
+                We manage your career.
+                <Scribble variant="underline-bold" color="#fda544" strokeWidth={4} className="absolute -bottom-3 left-0 h-3.5 w-full" />
               </span>
             </h2>
           </div>
@@ -71,8 +72,8 @@ export function Footer() {
               <BrandLogo className="h-11 w-auto" />
             </Link>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-neutral-100/60">
-              Independent, neutral, confidential HR advisory for professionals navigating workplace
-              challenges in the UAE & GCC.
+              Independent, neutral, and confidential HR advisory for professionals worldwide
+              navigating workplace challenges — with dedicated guides for the UAE, GCC &amp; North America.
             </p>
           </div>
           {columns.map((col) => (
@@ -102,15 +103,13 @@ export function Footer() {
         </div>
       </div>
 
-      {/* WhatsApp floating CTA */}
+      {/* Floating contact CTA → contact page */}
       <Link
-        href="https://wa.me/YOUR_BUSINESS_WHATSAPP?text=Hi%2C%20I%27d%20like%20to%20learn%20more%20about%20Humanly."
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="Chat on WhatsApp"
-        className="fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full border-2 border-primary-dark bg-[#25D366] text-white shadow-pop-sm transition-transform hover:scale-105"
+        href="/contact"
+        aria-label="Contact Humanly"
+        className="fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full border-2 border-primary-dark bg-accent-orange text-primary-dark shadow-pop-sm transition-transform hover:scale-105"
       >
-        <MessageCircle size={26} strokeWidth={2.2} className="fill-white" />
+        <Mail size={24} strokeWidth={2.4} />
       </Link>
     </footer>
   );

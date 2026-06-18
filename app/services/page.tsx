@@ -6,15 +6,28 @@ import { ArrowRight, ArrowUpRight, CheckCircle2, ShieldCheck, Sparkles } from "l
 import { Scribble } from "@/components/ui/Scribble";
 import {
   formatUsd,
+  formatAed,
   serviceProducts,
   serviceCategoryLabels,
   type ServiceCategory,
 } from "@/lib/products";
 
-const categoryOrder: { key: ServiceCategory; blurb: string }[] = [
-  { key: "session", blurb: "One-off, pay-as-you-go advisory — book exactly what your situation needs." },
-  { key: "retainer", blurb: "Ongoing monthly support for live, evolving situations." },
-  { key: "corporate", blurb: "Employer-side guidance and team workshops for SMEs." },
+const categoryOrder: { key: ServiceCategory; blurb: string; accent: string }[] = [
+  {
+    key: "session",
+    blurb: "One-off, pay-as-you-go advisory — book exactly what your situation needs. No commitment required.",
+    accent: "bg-violet-tint border-primary-violet/20",
+  },
+  {
+    key: "retainer",
+    blurb: "Ongoing monthly support for live, evolving situations — the most comprehensive way to work with Humanly.",
+    accent: "bg-accent-orange/8 border-accent-orange/20",
+  },
+  {
+    key: "corporate",
+    blurb: "Employer-side guidance and team workshops for SMEs.",
+    accent: "bg-neutral-200/60 border-neutral-300",
+  },
 ];
 
 const comparison = [
@@ -52,17 +65,17 @@ export default function ServicesPage() {
       </section>
 
       {/* Catalog grouped by category */}
-      {categoryOrder.map(({ key, blurb }) => {
+      {categoryOrder.map(({ key, blurb, accent }) => {
         const items = serviceProducts.filter((product) => product.category === key);
         if (items.length === 0) return null;
 
         return (
           <section key={key} className="mx-auto mt-20 max-w-max-width px-margin-mobile md:px-margin-desktop">
-            <div className="mb-8 max-w-2xl">
+            <div className={`mb-8 rounded-2xl border-2 border-primary-dark p-6 ${accent}`}>
               <h2 className="font-display text-h2 font-extrabold tracking-tight text-primary-dark">
                 {serviceCategoryLabels[key]}
               </h2>
-              <p className="mt-3 text-body-lg text-neutral-500">{blurb}</p>
+              <p className="mt-2 text-body-lg text-neutral-500">{blurb}</p>
             </div>
 
             <div className="grid items-stretch gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -111,10 +124,13 @@ export default function ServicesPage() {
                   <div className={`mt-auto border-t-2 border-dashed pt-5 ${service.featured ? "border-white/15" : "border-neutral-300"}`}>
                     <p className={`text-xs font-bold uppercase tracking-[0.14em] ${service.featured ? "text-on-primary/60" : "text-neutral-400"}`}>{service.duration}</p>
                     <p className={`mt-1 font-display text-4xl font-extrabold ${service.featured ? "text-on-primary" : "text-primary-dark"}`}>
-                      {formatUsd(service.amount)}
+                      {formatAed(service.amountAed)}
                       {service.priceNote && (
                         <span className={`text-xl font-bold ${service.featured ? "text-on-primary/60" : "text-neutral-400"}`}>{service.priceNote}</span>
                       )}
+                    </p>
+                    <p className={`mt-1 text-xs font-semibold ${service.featured ? "text-on-primary/55" : "text-neutral-400"}`}>
+                      ≈ {formatUsd(service.amount)}{service.priceNote ?? ""} · charged in USD
                     </p>
                     <Link
                       href="/booking"

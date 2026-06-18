@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { ArrowRight, Calendar, CheckCircle2, Lock, ShieldCheck } from "lucide-react";
-import { serviceProducts, formatUsd } from "@/lib/products";
+import { serviceProducts, formatUsd, formatAed } from "@/lib/products";
 import { cn } from "@/lib/utils";
 
 const concerns = [
@@ -85,8 +85,13 @@ export function BookingFunnel() {
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center justify-between gap-3">
                     <h3 className="text-2xl font-extrabold text-primary-dark">{service.name}</h3>
-                    <span className="text-2xl font-extrabold text-primary-dark">
-                      {formatUsd(service.amount)}
+                    <span className="text-right">
+                      <span className="block text-2xl font-extrabold text-primary-dark">
+                        {formatAed(service.amountAed)}{service.priceNote ?? ""}
+                      </span>
+                      <span className="block text-xs font-semibold text-neutral-400">
+                        ≈ {formatUsd(service.amount)}{service.priceNote ?? ""}
+                      </span>
                     </span>
                   </div>
                   <p className="mt-1 text-sm font-semibold uppercase tracking-[0.12em] text-primary-violet">

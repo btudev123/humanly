@@ -7,9 +7,11 @@ export type ServiceProduct = {
   name: string;
   subtitle: string;
   description: string;
-  /** Amount in minor units (USD cents). */
+  /** Amount in minor units (USD cents) — this is what Stripe charges. */
   amount: number;
   currency: "usd";
+  /** Display price in AED (whole dirhams). Shown as the primary price; USD remains the charge currency. */
+  amountAed: number;
   duration: string;
   /** Optional price suffix, e.g. "/mo" or "/hr". */
   priceNote?: string;
@@ -35,6 +37,7 @@ export const serviceProducts: ServiceProduct[] = [
       "A full advisory session on your specific situation — workplace issues, PIPs, exits, or rights — plus a written follow-up summary.",
     amount: 32700,
     currency: "usd",
+    amountAed: 1200,
     duration: "60 minutes",
     category: "session",
     features: [
@@ -59,6 +62,7 @@ export const serviceProducts: ServiceProduct[] = [
       "UAE job-market orientation, CV positioning, and outreach strategy — the entry point for career movers.",
     amount: 8200,
     currency: "usd",
+    amountAed: 300,
     duration: "30 minutes",
     category: "session",
     features: [
@@ -80,6 +84,7 @@ export const serviceProducts: ServiceProduct[] = [
       "A rights overview plus your top five questions answered for new arrivals to the UAE.",
     amount: 8200,
     currency: "usd",
+    amountAed: 300,
     duration: "30 minutes",
     category: "session",
     features: [
@@ -101,6 +106,7 @@ export const serviceProducts: ServiceProduct[] = [
       "An extended session for complex or multi-issue situations, with a written action-plan document.",
     amount: 49000,
     currency: "usd",
+    amountAed: 1800,
     duration: "90 minutes",
     category: "session",
     features: [
@@ -122,6 +128,7 @@ export const serviceProducts: ServiceProduct[] = [
       "A written review of one document: a letter, contract, termination notice, or similar. Delivered by email.",
     amount: 7500,
     currency: "usd",
+    amountAed: 275,
     duration: "Async — emailed back",
     category: "session",
     features: [
@@ -145,6 +152,7 @@ export const serviceProducts: ServiceProduct[] = [
       "Two 60-minute sessions per month plus async WhatsApp support, for clients navigating one or two active situations.",
     amount: 60000,
     currency: "usd",
+    amountAed: 2200,
     duration: "Monthly",
     priceNote: "/mo",
     category: "retainer",
@@ -168,6 +176,7 @@ export const serviceProducts: ServiceProduct[] = [
       "Three 60-minute sessions per month, async WhatsApp support, and document reviews — the most common retainer profile.",
     amount: 90000,
     currency: "usd",
+    amountAed: 3300,
     duration: "Monthly",
     priceNote: "/mo",
     category: "retainer",
@@ -191,6 +200,7 @@ export const serviceProducts: ServiceProduct[] = [
       "Four 60-minute sessions per month, priority async access, and full document reviews for senior, high-complexity situations.",
     amount: 140000,
     currency: "usd",
+    amountAed: 5140,
     duration: "Monthly",
     priceNote: "/mo",
     category: "retainer",
@@ -216,6 +226,7 @@ export const serviceProducts: ServiceProduct[] = [
       "UAE labour-law essentials for SME teams of up to 20 people, delivered as a practical 90-minute workshop.",
     amount: 75000,
     currency: "usd",
+    amountAed: 2750,
     duration: "90 minutes · up to 20 pax",
     category: "corporate",
     features: [
@@ -237,6 +248,7 @@ export const serviceProducts: ServiceProduct[] = [
       "Per-hour employer-side guidance across freezone and mainland UAE — kept distinct from employee advisory.",
     amount: 30000,
     currency: "usd",
+    amountAed: 1100,
     duration: "Per hour",
     priceNote: "/hr",
     category: "corporate",
@@ -267,6 +279,15 @@ export function formatUsd(amount: number) {
   }).format(amount / 100);
 }
 
+/** Format a whole-dirham amount, e.g. 1200 -> "AED 1,200". */
+export function formatAed(amountAed: number) {
+  return new Intl.NumberFormat("en-AE", {
+    style: "currency",
+    currency: "AED",
+    maximumFractionDigits: 0,
+  }).format(amountAed);
+}
+
 export function getServiceProduct(slug: string | null | undefined) {
   return serviceProducts.find((product) => product.slug === slug);
 }
@@ -283,6 +304,6 @@ export function getCalLink(product: ServiceProduct) {
   return (
     process.env[product.calLinkEnv] ||
     process.env.NEXT_PUBLIC_CAL_LINK_INDIVIDUAL_ADVISORY ||
-    "talkhumanly/individual-advisory"
+    "talk-humanly/individual-advisory"
   );
 }

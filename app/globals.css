@@ -1,24 +1,24 @@
 @import "tailwindcss";
 
 @theme {
-  /* === Brand Typefaces === */
+  /* === Brand Typefaces (Poppins everywhere, per brand guide) === */
   --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Bricolage Grotesque", "Poppins", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Poppins", ui-sans-serif, system-ui, sans-serif;
 
-  /* === Primary Palette — Purple === */
-  --color-primary-dark: #2e1065;     /* ink purple */
-  --color-primary-violet: #7c3aed;   /* signature violet */
-  --color-primary-purple: #2e1065;   /* alias used across pages */
+  /* === Primary Palette — Purple (brand guide) === */
+  --color-primary-dark: #3f1b73;     /* ink purple — brand primary */
+  --color-primary-violet: #7c35e3;   /* signature violet — brand primary */
+  --color-primary-purple: #3f1b73;   /* alias used across pages */
   --color-violet-bright: #9d5cff;
   --color-violet-soft: #c9acff;
   --color-violet-tint: #efe7ff;
 
-  /* === Accent Palette — Firefox Orange === */
-  --color-accent-orange: #ff6a1a;    /* the hero accent */
-  --color-secondary-orange: #ff6a1a; /* alias used across pages */
-  --color-orange-deep: #e8500e;
-  --color-orange-light: #ff9a4d;
-  --color-orange-tint: #fff0e6;
+  /* === Accent Palette — Brand Orange === */
+  --color-accent-orange: #fda544;    /* brand secondary orange */
+  --color-secondary-orange: #fda544; /* alias used across pages */
+  --color-orange-deep: #f26a1b;
+  --color-orange-light: #ffc078;
+  --color-orange-tint: #fff3e3;
 
   /* === Secondary / decorative === */
   --color-secondary-pink: #ff5fb0;
@@ -56,8 +56,8 @@
   --color-on-background: #1b1130;
   --color-on-tertiary-container: #e8500e;
   --color-inverse-primary: #d5baff;
-  --color-primary-container: #2e1065;
-  --color-secondary: #7c3aed;
+  --color-primary-container: #3f1b73;
+  --color-secondary: #7c35e3;
   --color-secondary-container: #9d5cff;
   --color-error: #ff4f5e;
 
@@ -184,7 +184,7 @@
 
 /* === Gradient text (purple → orange) === */
 .text-gradient {
-  background: linear-gradient(100deg, #7c3aed 0%, #9d5cff 35%, #ff6a1a 100%);
+  background: linear-gradient(100deg, #7c35e3 0%, #9d5cff 35%, #fda544 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -221,7 +221,7 @@
 .highlighter {
   position: relative;
   display: inline;
-  background-image: linear-gradient(120deg, rgba(255,106,26,0.32), rgba(255,106,26,0.32));
+  background-image: linear-gradient(120deg, rgba(253,165,68,0.34), rgba(253,165,68,0.34));
   background-repeat: no-repeat;
   background-size: 100% 42%;
   background-position: 0 78%;

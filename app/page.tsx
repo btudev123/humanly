@@ -28,8 +28,8 @@ import {
 
 const stats = [
   { value: "100%", label: "Confidential", detail: "No employer notification or shared access." },
-  { value: "45 min", label: "Strategy Sessions", detail: "Focused guidance with written next steps." },
-  { value: "UAE", label: "Regional Focus", detail: "Built for GCC workplace rights and concerns." },
+  { value: "60 min", label: "Strategy Sessions", detail: "Focused guidance with written next steps." },
+  { value: "Global", label: "Worldwide Reach", detail: "Plus deep UAE, GCC & North America guides." },
   { value: "20+", label: "Years In HR", detail: "Executive experience now in your corner." },
 ];
 
@@ -294,28 +294,24 @@ export default function Home() {
             <Reveal>
               <Eyebrow>
                 <LockKeyhole size={13} className="text-primary-violet" />
-                100% Confidential · GCC Professionals
+                100% Confidential · Global Advisory
               </Eyebrow>
             </Reveal>
 
             <Reveal delay={0.05}>
               <h1 className="mt-7 font-display text-[clamp(2.6rem,6.6vw,4.6rem)] font-extrabold leading-[0.98] tracking-tight text-primary-dark">
-                Expert HR advice,{" "}
+                Your HR manages the workplace.{" "}
                 <span className="relative inline-block">
-                  <span className="highlighter-violet highlighter">just for you.</span>
-                </span>
-                <br />
-                <span className="relative inline-block">
-                  Always confidential.
-                  <Scribble variant="underline-bold" color="#ff6a1a" strokeWidth={5} className="absolute -bottom-3 left-0 h-4 w-full" animate />
+                  <span className="highlighter-violet highlighter">We manage your career.</span>
+                  <Scribble variant="underline-bold" color="#fda544" strokeWidth={5} className="absolute -bottom-3 left-0 h-4 w-full" animate />
                 </span>
               </h1>
             </Reveal>
 
             <Reveal delay={0.1}>
               <p className="mt-7 max-w-xl text-body-lg text-neutral-500">
-                Independent, neutral, and confidential HR advisory for professionals navigating
-                workplace challenges in the UAE and GCC.
+                Independent, neutral, and confidential HR advisory for professionals worldwide
+                navigating workplace challenges — wherever you work.
               </p>
             </Reveal>
 
@@ -343,7 +339,7 @@ export default function Home() {
                 {[
                   "No employer notification",
                   "Confidential by design",
-                  "UAE & GCC labour law expertise",
+                  "Global & regional labour-law expertise",
                   "Action plan within 48 hours",
                 ].map((item) => (
                   <div key={item} className="flex items-start gap-2.5 text-sm font-medium text-neutral-500">
@@ -404,7 +400,7 @@ export default function Home() {
               className="absolute -right-1 bottom-0 w-[210px] rotate-[-4deg] rounded-3xl border-2 border-primary-dark bg-accent-orange p-5 text-primary-dark shadow-pop-sm"
             >
               <Sparkles size={22} strokeWidth={2.5} />
-              <p className="mt-3 font-display text-4xl font-extrabold leading-none">45 min</p>
+              <p className="mt-3 font-display text-4xl font-extrabold leading-none">60 min</p>
               <p className="mt-2 text-[13px] font-medium leading-snug text-primary-dark/80">Focused session + written action summary.</p>
             </motion.div>
 
