@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { motion, AnimatePresence } from "motion/react";
+import { serviceProducts, formatAed } from "@/lib/products";
 import { useState, useEffect } from "react";
 import { Scribble } from "@/components/ui/Scribble";
 import { TestimonialsCarousel, type Testimonial } from "@/components/reviews/TestimonialsCarousel";
@@ -63,35 +64,6 @@ const pillars = [
   },
 ];
 
-const services = [
-  {
-    name: "Document Review",
-    price: "$75",
-    duration: "Async · No Call Needed",
-    description: "A written review of one document — a letter, contract, or termination notice — emailed back to you.",
-    features: ["Written expert review", "Letter, contract, or notice", "No call required"],
-    featured: false,
-    icon: FileText,
-  },
-  {
-    name: "Individual Advisory Session",
-    price: "$327",
-    duration: "60-Minute Expert Advisory",
-    description: "A full advisory session on your specific situation, plus a written follow-up summary.",
-    features: ["Confidential 60-minute session", "Advice on your exact situation", "Written follow-up summary", "Recommended next steps"],
-    featured: true,
-    icon: MessageSquare,
-  },
-  {
-    name: "Career Transition Retainer",
-    price: "$900/mo",
-    duration: "Ongoing Monthly Support",
-    description: "Three monthly sessions, async WhatsApp support, and document reviews for exits, PIPs, and job searches.",
-    features: ["3 sessions per month", "Async WhatsApp support", "Document reviews included", "Most common retainer"],
-    featured: false,
-    icon: Users,
-  },
-];
 
 const triggers = [
   { icon: "trending_down", label: "Delayed promotions or blocked career growth" },
@@ -300,9 +272,9 @@ export default function Home() {
 
             <Reveal delay={0.05}>
               <h1 className="mt-7 font-display text-[clamp(2.6rem,6.6vw,4.6rem)] font-extrabold leading-[0.98] tracking-tight text-primary-dark">
-                Your HR manages the workplace.{" "}
+                Is your internal HR really on your side?{" "}
                 <span className="relative inline-block">
-                  <span className="highlighter-violet highlighter">We manage your career.</span>
+                  <span className="highlighter-violet highlighter">Well we are.</span>
                   <Scribble variant="underline-bold" color="#fda544" strokeWidth={5} className="absolute -bottom-3 left-0 h-4 w-full" animate />
                 </span>
               </h1>
@@ -566,51 +538,130 @@ export default function Home() {
             <p className="mt-6 text-body-lg text-neutral-500">From a quick document review to ongoing retainers — see the full range of advisory options.</p>
           </Reveal>
 
-          <div className="grid items-stretch gap-6 md:grid-cols-3">
-            {services.map((service, i) => (
-              <Reveal key={service.name} delay={i * 0.08} className="h-full">
-                <div
-                  className={`relative flex h-full flex-col gap-6 rounded-3xl border-2 border-primary-dark p-8 transition-transform ${
-                    service.featured
-                      ? "bg-neutral-100 shadow-pop md:-translate-y-3 md:rotate-[-1deg] md:hover:-translate-y-4"
-                      : "bg-neutral-100 hover:-translate-y-1"
-                  }`}
-                >
-                  {service.featured && (
-                    <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full border-2 border-primary-dark bg-accent-orange px-4 py-1 text-[11px] font-bold uppercase tracking-wider text-primary-dark">
-                      Most Popular
-                    </span>
-                  )}
-                  <div className={`flex h-12 w-12 items-center justify-center rounded-2xl border-2 border-primary-dark ${service.featured ? "bg-accent-orange text-primary-dark" : "bg-violet-tint text-primary-violet"}`}>
-                    <service.icon size={22} />
-                  </div>
-                  <div>
-                    <h3 className="font-display text-h3 font-bold text-primary-dark">{service.name}</h3>
-                    <p className="mt-1 text-sm font-bold uppercase tracking-wider text-primary-violet">{service.duration}</p>
-                    <p className="mt-3 text-neutral-500">{service.description}</p>
-                  </div>
-                  <p className="font-display text-5xl font-extrabold text-primary-dark">{service.price}</p>
-                  <ul className="flex-grow space-y-3">
-                    {service.features.map((f) => (
-                      <li key={f} className="flex gap-2.5">
-                        <CheckCircle2 className={service.featured ? "text-accent-orange" : "text-primary-violet"} size={20} />
-                        <span className="font-medium text-primary-dark">{f}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <Link
-                    href="/booking"
-                    className={`btn-pop inline-flex items-center justify-center gap-2 rounded-full border-2 border-primary-dark px-6 py-3.5 text-[15px] font-bold ${
-                      service.featured ? "bg-accent-orange text-primary-dark shadow-pop-sm" : "bg-primary-dark text-on-primary"
+          {/* ONE-OFF ADVISORY SESSIONS */}
+          <div className="mb-16">
+            <Reveal>
+              <p className="mb-2 text-xs font-bold uppercase tracking-[0.16em] text-primary-violet">One-Off Advisory Sessions</p>
+              <div className="mb-8 h-0.5 w-16 bg-accent-orange" />
+            </Reveal>
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {serviceProducts.filter((s) => s.category === "session").map((service, i) => (
+                <Reveal key={service.slug} delay={i * 0.06} className="h-full">
+                  <div
+                    className={`relative flex h-full flex-col gap-4 rounded-3xl border-2 border-primary-dark p-7 transition-transform hover:-translate-y-1 ${
+                      service.featured ? "bg-primary-dark text-on-primary shadow-pop-orange" : "bg-neutral-100"
                     }`}
                   >
-                    <CalendarCheck size={18} strokeWidth={2.5} />
-                    Book Now
-                  </Link>
-                </div>
-              </Reveal>
-            ))}
+                    {service.featured && (
+                      <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full border-2 border-primary-dark bg-accent-orange px-4 py-1 text-[11px] font-bold uppercase tracking-wider text-primary-dark">
+                        Most Popular
+                      </span>
+                    )}
+                    <div>
+                      <h3 className={`font-display text-lg font-bold leading-snug ${service.featured ? "text-on-primary" : "text-primary-dark"}`}>{service.name}</h3>
+                      <p className={`mt-1 text-sm ${service.featured ? "text-on-primary/60" : "text-neutral-500"}`}>{service.duration}</p>
+                    </div>
+                    <p className={`font-display text-4xl font-extrabold ${service.featured ? "text-accent-orange" : "text-primary-dark"}`}>
+                      {formatAed(service.amountAed)}
+                    </p>
+                    <p className={`flex-grow text-sm leading-relaxed ${service.featured ? "text-on-primary/70" : "text-neutral-500"}`}>{service.description}</p>
+                    <Link
+                      href={`/booking?service=${service.slug}`}
+                      className={`btn-pop inline-flex items-center justify-center gap-2 rounded-full border-2 border-primary-dark px-5 py-3 text-sm font-bold ${
+                        service.featured ? "bg-accent-orange text-primary-dark" : "bg-primary-dark text-on-primary"
+                      }`}
+                    >
+                      <CalendarCheck size={16} strokeWidth={2.5} />
+                      {service.needsScheduling ? "Book Now" : "Get Started"}
+                    </Link>
+                  </div>
+                </Reveal>
+              ))}
+            </div>
           </div>
+
+          {/* MONTHLY RETAINERS */}
+          <div className="mb-16">
+            <Reveal>
+              <p className="mb-2 text-xs font-bold uppercase tracking-[0.16em] text-primary-violet">Monthly Retainers</p>
+              <div className="mb-8 h-0.5 w-16 bg-accent-orange" />
+            </Reveal>
+            <div className="grid gap-5 md:grid-cols-3">
+              {serviceProducts.filter((s) => s.category === "retainer").map((service, i) => (
+                <Reveal key={service.slug} delay={i * 0.06} className="h-full">
+                  <div className="flex h-full flex-col gap-4 rounded-3xl border-2 border-primary-dark bg-violet-tint p-7 transition-transform hover:-translate-y-1">
+                    <div>
+                      <h3 className="font-display text-lg font-bold leading-snug text-primary-dark">{service.name}</h3>
+                      <p className="mt-1 text-sm text-neutral-500">{service.subtitle}</p>
+                    </div>
+                    <p className="font-display text-4xl font-extrabold text-primary-dark">
+                      {formatAed(service.amountAed)}<span className="text-2xl">/mo</span>
+                    </p>
+                    <ul className="flex-grow space-y-2">
+                      {service.features.map((f) => (
+                        <li key={f} className="flex gap-2 text-sm">
+                          <CheckCircle2 className="mt-0.5 shrink-0 text-primary-violet" size={16} />
+                          <span className="text-neutral-600">{f}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <Link
+                      href={`/booking?service=${service.slug}`}
+                      className="btn-pop inline-flex items-center justify-center gap-2 rounded-full border-2 border-primary-dark bg-primary-dark px-5 py-3 text-sm font-bold text-on-primary"
+                    >
+                      <CalendarCheck size={16} strokeWidth={2.5} />
+                      Get Started
+                    </Link>
+                  </div>
+                </Reveal>
+              ))}
+            </div>
+          </div>
+
+          {/* CORPORATE & SME ADD-ONS */}
+          <div className="mb-12">
+            <Reveal>
+              <p className="mb-2 text-xs font-bold uppercase tracking-[0.16em] text-primary-violet">Corporate & SME Add-Ons</p>
+              <div className="mb-8 h-0.5 w-16 bg-accent-orange" />
+            </Reveal>
+            <div className="grid gap-5 sm:grid-cols-2">
+              {serviceProducts.filter((s) => s.category === "corporate").map((service, i) => (
+                <Reveal key={service.slug} delay={i * 0.06} className="h-full">
+                  <div className="flex h-full flex-col gap-4 rounded-3xl border-2 border-primary-dark bg-orange-tint p-7 transition-transform hover:-translate-y-1">
+                    <div>
+                      <h3 className="font-display text-lg font-bold leading-snug text-primary-dark">{service.name}</h3>
+                      <p className="mt-1 text-sm text-neutral-500">{service.subtitle}</p>
+                    </div>
+                    <p className="font-display text-4xl font-extrabold text-primary-dark">
+                      {formatAed(service.amountAed)}{service.priceNote && <span className="text-2xl">{service.priceNote}</span>}
+                    </p>
+                    <ul className="flex-grow space-y-2">
+                      {service.features.map((f) => (
+                        <li key={f} className="flex gap-2 text-sm">
+                          <CheckCircle2 className="mt-0.5 shrink-0 text-accent-orange" size={16} />
+                          <span className="text-neutral-600">{f}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <Link
+                      href={`/booking?service=${service.slug}`}
+                      className="btn-pop inline-flex items-center justify-center gap-2 rounded-full border-2 border-primary-dark bg-accent-orange px-5 py-3 text-sm font-bold text-primary-dark"
+                    >
+                      <CalendarCheck size={16} strokeWidth={2.5} />
+                      Book Now
+                    </Link>
+                  </div>
+                </Reveal>
+              ))}
+            </div>
+          </div>
+
+          <Reveal className="text-center">
+            <Link href="/services" className="group inline-flex items-center gap-2 font-bold text-primary-violet transition-colors hover:text-accent-orange">
+              View full pricing details
+              <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
+            </Link>
+          </Reveal>
         </div>
       </section>
 
@@ -622,12 +673,12 @@ export default function Home() {
             <div className="relative">
               <div className="blob absolute -left-6 -top-6 -z-10 h-40 w-40 bg-accent-orange/30" />
               <Scribble variant="loop" color="#7c3aed" className="absolute -right-6 -top-8 h-24 w-24 opacity-60" />
-              <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem] border-2 border-primary-dark bg-violet-tint shadow-pop">
-                <div className="flex h-full w-full flex-col items-center justify-center text-center">
-                  <Users size={64} className="mb-4 text-primary-violet/50" />
-                  <p className="font-display text-xl font-bold text-primary-dark">Karma Harb</p>
-                  <p className="text-sm text-neutral-500">Founder &amp; Lead Advisor</p>
-                </div>
+              <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem] border-2 border-primary-dark shadow-pop">
+                <img
+                  src="/karma-harb.png"
+                  alt="Karma Harb — Founder & Lead Advisor at Humanly"
+                  className="h-full w-full object-cover object-top"
+                />
               </div>
               <div className="absolute -bottom-5 -right-3 rotate-[4deg] rounded-2xl border-2 border-primary-dark bg-accent-orange px-5 py-3 text-primary-dark shadow-pop-sm">
                 <p className="font-display text-2xl font-extrabold leading-none">20+ yrs</p>
