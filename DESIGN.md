@@ -1,7 +1,7 @@
 # Humanly — Design System
 
 The single source of truth for Humanly's brand on the web. Brand tokens live in
-`app/globals.css` (`@theme`); the logo lives in `public/logo-mark.svg` + `app/icon.svg`.
+`app/globals.css` (`@theme`); the logo lives in `public/logo.svg` + `app/icon.svg`.
 
 ---
 
@@ -9,18 +9,16 @@ The single source of truth for Humanly's brand on the web. Brand tokens live in
 
 | Asset | File | Use |
 | --- | --- | --- |
-| H-mark (icon) | `public/logo-mark.svg` | Square mark — app, social avatar, lockup glyph |
-| Favicon | `app/icon.svg` | Browser tab (Next.js auto-serves as favicon; simplified for legibility at 16px) |
-| Lockup | `components/layout/BrandLogo.tsx` | Mark + "Humanly" wordmark rendered as live Poppins text |
+| Full lockup | `public/logo.svg` | The official Humanly logo (H-mark + "Humanly" wordmark). Used everywhere via `<BrandLogo />` |
+| Favicon / square mark | `app/icon.svg` | Browser tab + Apple touch icon. Square crop of the H-mark from the same artwork |
+| Component | `components/layout/BrandLogo.tsx` | Renders `public/logo.svg` at the height passed in `className` |
 
 **Rules**
-- The mark is **transparent** (no cream/grey background). This fixes the prior `humanly-logo.png`
-  which shipped a solid cream background.
-- The wordmark is **never** flattened into the SVG — it is live Poppins ExtraBold text so the brand
-  font renders crisply and recolours with context (`<BrandLogo />`).
+- Both assets are **transparent** (no cream/grey background) — the official logo PNG was background-keyed,
+  trimmed, and embedded into `logo.svg` so the one file is the single source of truth.
 - Mark anatomy: two purple→indigo gradient stems (the H), an orange radial-gradient dot at the
   crossbar, cream tick stubs, and the purple "smile" swoosh beneath.
-- Minimum clear space ≈ the width of one stem. Don't recolour the mark; don't add effects.
+- Minimum clear space ≈ the width of one stem. Don't recolour or redraw the logo; don't add effects.
 
 ## Color
 

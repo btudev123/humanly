@@ -51,7 +51,7 @@ export const metadata: Metadata = {
   icons: {
     icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
     shortcut: "/icon.svg",
-    apple: "/logo-mark.svg",
+    apple: "/icon.svg",
   },
   robots: {
     index: true,
@@ -71,7 +71,7 @@ const organizationSchema = {
   "@type": "Organization",
   name: "Humanly HR Advisory",
   url: "https://talkhumanly.com",
-  logo: "https://talkhumanly.com/logo-mark.svg",
+  logo: "https://talkhumanly.com/logo.svg",
   description:
     "Independent, confidential HR advisory for professionals worldwide, with dedicated guidance for the UAE, GCC and North America.",
   email: "hello@talkhumanly.com",
