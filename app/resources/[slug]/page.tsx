@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowLeft, Download, FileText } from "lucide-react";
 import { ResourceUnlockForm } from "@/components/resources/ResourceUnlockForm";
 import { getResourceForSlug } from "@/lib/db/repository";
-import { aedFromUsdCents, formatAed, formatUsd } from "@/lib/products";
+import { aedFromUsdCents, formatAed } from "@/lib/products";
 import { getResourceUrl, resources } from "@/lib/resources";
 
 export function generateStaticParams() {
@@ -143,8 +143,8 @@ export default async function ResourceDetailPage({
               <FileText className="mt-1 text-primary-violet" size={22} />
               <p className="text-sm leading-relaxed text-neutral-500">
                 {resource.membership
-                  ? `Membership is ${formatAed(aedFromUsdCents(resource.amount))}/mo (≈ ${formatUsd(resource.amount)}/mo, charged in USD). Access is emailed to you after Stripe confirms your first payment.`
-                  : `This resource is ${formatAed(aedFromUsdCents(resource.amount))} (≈ ${formatUsd(resource.amount)}, charged in USD). Your download is emailed to you and unlocked on screen after Stripe confirms payment.`}
+                  ? `Membership is ${formatAed(aedFromUsdCents(resource.amount))}/mo. Access is emailed to you after Stripe confirms your first payment.`
+                  : `This resource is ${formatAed(aedFromUsdCents(resource.amount))}. Your download is emailed to you and unlocked on screen after Stripe confirms payment.`}
               </p>
             </div>
           </aside>
