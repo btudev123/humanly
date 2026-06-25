@@ -19,7 +19,7 @@ const navLinks = [
 function Wordmark() {
   return (
     <span className="relative inline-flex items-center leading-none">
-      <BrandLogo className="h-11 w-auto md:h-12" />
+      <BrandLogo className="h-14 w-auto md:h-16" />
     </span>
   );
 }

@@ -288,6 +288,15 @@ export function formatAed(amountAed: number) {
   }).format(amountAed);
 }
 
+/** Reference rate used to show an AED display price for USD-charged items (e.g. resources). */
+export const AED_PER_USD = 3.6725;
+
+/** Convert USD cents to a display AED amount, rounded to the nearest 5 dirhams. */
+export function aedFromUsdCents(amountUsdCents: number) {
+  const aed = (amountUsdCents / 100) * AED_PER_USD;
+  return Math.round(aed / 5) * 5;
+}
+
 export function getServiceProduct(slug: string | null | undefined) {
   return serviceProducts.find((product) => product.slug === slug);
 }

@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { ArrowRight, LockKeyhole } from "lucide-react";
-import { formatUsd } from "@/lib/products";
+import { aedFromUsdCents, formatAed, formatUsd } from "@/lib/products";
 
 export function ResourceUnlockForm({
   resourceSlug,
@@ -81,9 +81,12 @@ export function ResourceUnlockForm({
       >
         {isPending
           ? "Opening Stripe..."
-          : `Pay ${formatUsd(amount)}${priceNote ?? ""} ${membership ? "and join" : "and unlock"}`}
+          : `Pay ${formatAed(aedFromUsdCents(amount))}${priceNote ?? ""} ${membership ? "and join" : "and unlock"}`}
         {!isPending && <ArrowRight size={18} strokeWidth={2.5} />}
       </button>
+      <p className="text-center text-xs font-semibold text-neutral-400">
+        ≈ {formatUsd(amount)}{priceNote ?? ""} · charged securely in USD via Stripe
+      </p>
     </form>
   );
 }

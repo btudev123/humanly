@@ -69,7 +69,7 @@ export function Footer() {
         <div className="grid gap-10 py-14 sm:grid-cols-2 md:grid-cols-4">
           <div>
             <Link href="/" aria-label="Humanly home" className="inline-flex rounded-2xl bg-surface px-4 py-3">
-              <BrandLogo className="h-12 w-auto" />
+              <BrandLogo className="h-16 w-auto" />
             </Link>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-neutral-100/60">
               Independent, neutral, and confidential HR advisory for professionals worldwide

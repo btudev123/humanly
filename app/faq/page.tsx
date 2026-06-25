@@ -12,7 +12,7 @@ const faqData = [
     items: [
       { q: "Is my employer notified when I book a call?", a: "Absolutely not. Humanly is a third-party platform. We have no direct connection to your company's systems, HR departments, or management. Your identity and the contents of your session are strictly between you and your advisor." },
       { q: "How secure is my data?", a: "We use AES-256 encryption for all data at rest and TLS for all data in transit. We follow UAE data protection standards and treat your personal story with the same security we treat bank data." },
-      { q: "Will this session be recorded?", a: "No. Sessions are never recorded. Your advisor may take handwritten notes to prepare your written follow-up, but these notes are destroyed after the report is delivered unless you request otherwise." },
+      { q: "Will this session be recorded?", a: "Your call may be recorded solely so your advisor can take accurate notes and prepare your written follow-up. Recordings and notes are kept private and confidential, used only for your file, and are never shared with your employer or any third party." },
     ],
   },
   {

@@ -140,7 +140,7 @@ const faqs = [
   },
   {
     q: "Will the session be recorded?",
-    a: "No. Sessions are never recorded. You receive a written summary of key points and recommended next steps within 48 hours.",
+    a: "Your call may be recorded solely so your advisor can take accurate notes — it stays private and confidential, and is never shared with your employer or any third party. You receive a written summary of key points and recommended next steps within 48 hours.",
   },
   {
     q: "Can I cancel or reschedule?",
@@ -363,7 +363,7 @@ export default function Home() {
                 <ShieldCheck size={22} />
               </div>
               <p className="mt-3 text-[11px] font-bold uppercase tracking-[0.14em] text-neutral-400">Confidentiality Promise</p>
-              <p className="mt-1.5 text-[15px] font-bold leading-snug text-primary-dark">No notification. No shared access. No recordings.</p>
+              <p className="mt-1.5 text-[15px] font-bold leading-snug text-primary-dark">No notification. No shared access. Strictly confidential.</p>
             </motion.div>
 
             <motion.div

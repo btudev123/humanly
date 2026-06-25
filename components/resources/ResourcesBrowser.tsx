@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import { ArrowRight, LockKeyhole, Search } from "lucide-react";
-import { formatUsd } from "@/lib/products";
+import { aedFromUsdCents, formatAed, formatUsd } from "@/lib/products";
 import type { Resource } from "@/lib/resources";
 
 const categoryGradients: Record<string, string> = {
@@ -65,12 +65,16 @@ function ResourceCard({ resource }: { resource: Resource }) {
         <div className="mt-auto flex items-end justify-between gap-4 border-t border-neutral-200 pt-4">
           <div>
             <p className="font-display text-2xl font-extrabold text-primary-dark">
-              {resource.amount ? formatUsd(resource.amount) : "—"}
+              {resource.amount ? formatAed(aedFromUsdCents(resource.amount)) : "—"}
               {resource.interval && (
                 <span className="text-base font-bold text-neutral-400">/mo</span>
               )}
             </p>
-            <p className="mt-0.5 text-[10px] text-neutral-400">Charged in USD</p>
+            {resource.amount && (
+              <p className="mt-0.5 text-[10px] text-neutral-400">
+                ≈ {formatUsd(resource.amount)}{resource.interval ? "/mo" : ""} · charged in USD
+              </p>
+            )}
           </div>
           <Link
             href={`/resources/${resource.slug}`}
