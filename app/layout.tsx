@@ -145,6 +145,11 @@ export default function RootLayout({
     <MaybeClerkProvider>
       <html lang="en">
         <head>
+          <meta
+            name="google-site-verification"
+            content="aqes15l-sKDJFnhJO3sk6HJ0HcmDajXGKi22TK9NMsQ"
+          />
+
           {/* Preconnect for fonts */}
           <link rel="preconnect" href="https://fonts.googleapis.com" />
           <link
