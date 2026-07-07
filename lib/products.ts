@@ -143,6 +143,56 @@ export const serviceProducts: ServiceProduct[] = [
     calLinkEnv: "NEXT_PUBLIC_CAL_LINK_INDIVIDUAL_ADVISORY",
   },
 
+  // ── Interview prep ───────────────────────────────────────────────────────
+  {
+    slug: "interview-prep",
+    name: "Interview Prep Session",
+    subtitle: "JD review + mock interview",
+    description:
+      "An insider-informed analysis of your job posting or JD, followed by a mock interview with real-time pointers to sharpen your delivery and confidence.",
+    amount: 21800,
+    currency: "usd",
+    amountAed: 800,
+    duration: "60 minutes",
+    category: "session",
+    features: [
+      "JD / job posting analysis",
+      "Insider-informed mock interview",
+      "Real-time coaching on delivery & confidence",
+      "Pointers to carry into the real interview",
+    ],
+    forWho:
+      "Candidates preparing for a specific interview who want an insider read on likely questions and honest, real-time feedback.",
+    needsScheduling: true,
+    stripePriceEnv: "STRIPE_PRICE_INTERVIEW_PREP",
+    mode: "payment",
+    calLinkEnv: "NEXT_PUBLIC_CAL_LINK_INTERVIEW_PREP",
+  },
+  {
+    slug: "interview-prep-package",
+    name: "Interview Prep Package (3 Sessions)",
+    subtitle: "For multiple interview processes",
+    description:
+      "Three interview-prep sessions — JD analysis and a mock interview each time — for candidates juggling more than one interview process at once.",
+    amount: 54500,
+    currency: "usd",
+    amountAed: 2000,
+    duration: "3 × 60-minute sessions",
+    category: "session",
+    features: [
+      "3 JD/job posting analyses + mock interviews",
+      "For candidates managing multiple interview processes",
+      "Insider-informed prep tailored to each role",
+      "Pointers after every session",
+    ],
+    forWho:
+      "Candidates running several interview processes at once who want repeated, insider-informed mock-interview reps.",
+    needsScheduling: true,
+    stripePriceEnv: "STRIPE_PRICE_INTERVIEW_PREP_PACKAGE",
+    mode: "payment",
+    calLinkEnv: "NEXT_PUBLIC_CAL_LINK_INTERVIEW_PREP_PACKAGE",
+  },
+
   // ── Retainers (monthly) ─────────────────────────────────────────────────
   {
     slug: "essential-retainer",
