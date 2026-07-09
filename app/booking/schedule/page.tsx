@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PaidScheduler } from "@/components/booking/PaidScheduler";
-import { getPaidOrderBySession } from "@/lib/db/repository";
+import { getPaidOrderBySession, markOrderPaidFromSession } from "@/lib/db/repository";
 import { getCalLink, getServiceProduct } from "@/lib/products";
+import { getStripe, hasStripe, getInvoiceForSession } from "@/lib/stripe";
 import { absoluteUrl } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
@@ -28,6 +29,17 @@ export default async function SchedulePage({
   let order = null;
   try {
     order = await getPaidOrderBySession(sessionId);
+
+    // The Stripe webhook is asynchronous and may not have marked the order paid
+    // by the time Stripe redirects here. Verify the session directly with Stripe
+    // and promote the order so scheduling isn't blocked by that race.
+    if (!order && hasStripe()) {
+      const session = await getStripe().checkout.sessions.retrieve(sessionId);
+      if (session && (session.payment_status === "paid" || session.mode === "subscription")) {
+        const invoice = await getInvoiceForSession(session);
+        order = await markOrderPaidFromSession(session, invoice);
+      }
+    }
   } catch (error) {
     return <ScheduleBlocked message="Scheduling is waiting for payment infrastructure to be configured." />;
   }

@@ -53,6 +53,8 @@ export async function sendBookingConfirmation(input: {
   const result = await getResend().emails.send({
     from,
     to: [input.to],
+    // Copy the Humanly inbox on every client confirmation.
+    bcc: input.to === LEAD_INBOX ? undefined : [LEAD_INBOX],
     subject: `Your Humanly session is confirmed: ${input.service}`,
     react: <BookingConfirmationEmail {...input} />,
   });
@@ -91,6 +93,8 @@ export async function sendResourceDelivery(input: {
   const result = await getResend().emails.send({
     from,
     to: [input.to],
+    // Copy the Humanly inbox on every client delivery.
+    bcc: input.to === LEAD_INBOX ? undefined : [LEAD_INBOX],
     subject: input.membership
       ? `Welcome to Humanly: ${input.title}`
       : `Your Humanly resource: ${input.title}`,
