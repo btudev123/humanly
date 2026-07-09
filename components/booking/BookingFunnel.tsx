@@ -90,10 +90,10 @@ export function BookingFunnel() {
   }
 
   return (
-    <div className="mx-auto grid max-w-5xl gap-6 lg:gap-8">
+    <div className="mx-auto flex w-full max-w-5xl flex-col gap-6 lg:gap-8">
       {/* ── Step 1 — choose a service ─────────────────────────────── */}
-      <section className="rounded-3xl border-2 border-primary-dark bg-neutral-100 p-5 shadow-pop-sm sm:p-6 md:p-8">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <section className="min-w-0 rounded-3xl border-2 border-primary-dark bg-neutral-100 p-5 shadow-pop-sm sm:p-6 md:p-8">
+        <div className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 border-primary-dark bg-violet-tint text-primary-dark">
               <Calendar size={18} strokeWidth={2.5} />
@@ -104,7 +104,7 @@ export function BookingFunnel() {
           </div>
 
           {/* Category filter — horizontally scrollable on small screens */}
-          <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1 sm:mx-0 sm:px-0 sm:pb-0">
+          <div className="-mx-1 flex min-w-0 max-w-full gap-2 overflow-x-auto px-1 pb-1 sm:mx-0 sm:px-0 sm:pb-0">
             {categoryFilters.map((filter) => (
               <button
                 key={filter.value}
@@ -177,7 +177,7 @@ export function BookingFunnel() {
       </section>
 
       {/* ── Step 2 — private intake ───────────────────────────────── */}
-      <section className="rounded-3xl border-2 border-primary-dark bg-neutral-100 p-5 shadow-pop-sm sm:p-6 md:p-8">
+      <section className="min-w-0 rounded-3xl border-2 border-primary-dark bg-neutral-100 p-5 shadow-pop-sm sm:p-6 md:p-8">
         <div className="flex items-start gap-3">
           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 border-primary-dark bg-violet-tint text-primary-dark">
             <Lock size={18} strokeWidth={2.5} />

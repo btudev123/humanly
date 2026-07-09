@@ -42,14 +42,16 @@ export function Navbar() {
   }, [pathname]);
 
   return (
-    <header className="fixed inset-x-0 top-0 z-50 px-margin-mobile md:px-margin-desktop pt-3 md:pt-4">
+    <header
+      className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
+        scrolled || mobileOpen
+          ? "border-b border-primary-dark/10 bg-neutral-bg/90 shadow-soft backdrop-blur-xl"
+          : "border-b border-transparent bg-transparent"
+      }`}
+    >
       <nav
         aria-label="Main navigation"
-        className={`mx-auto flex max-w-max-width items-center justify-between rounded-full px-4 py-2.5 transition-all duration-300 md:px-5 ${
-          scrolled || mobileOpen
-            ? "border border-primary-dark/10 bg-neutral-bg/85 shadow-soft backdrop-blur-xl"
-            : "border border-transparent bg-transparent"
-        }`}
+        className="mx-auto flex max-w-max-width items-center justify-between px-margin-mobile py-2.5 md:px-margin-desktop md:py-3"
       >
         {/* Brand */}
         <Link href="/" aria-label="Humanly home" className="group/logo relative shrink-0">
@@ -124,7 +126,8 @@ export function Navbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -12 }}
             transition={{ duration: 0.22 }}
-            className="mx-auto mt-2 max-w-max-width overflow-hidden rounded-3xl border border-primary-dark/10 bg-neutral-100 p-3 shadow-soft md:hidden"
+            className="mt-2 overflow-hidden rounded-3xl border border-primary-dark/10 bg-neutral-100 p-3 shadow-soft md:hidden"
+            style={{ marginLeft: "var(--spacing-margin-mobile)", marginRight: "var(--spacing-margin-mobile)" }}
           >
             <div className="flex flex-col gap-1">
               {navLinks.map((link) => {
