@@ -5,10 +5,39 @@ import {
   type OrderRecord,
 } from "@/lib/db/repository";
 import { getResourceForSlug } from "@/lib/db/repository";
-import { sendResourceDelivery } from "@/lib/email/resend";
+import { sendResourceDelivery, sendLeadNotification } from "@/lib/email/resend";
 import { getInvoiceForSession, getStripe } from "@/lib/stripe";
-import { formatUsd } from "@/lib/products";
+import { formatUsd, formatAed, getServiceProduct } from "@/lib/products";
 import { absoluteUrl } from "@/lib/site";
+
+function metaStr(meta: Record<string, unknown> | null | undefined, key: string) {
+  const value = meta?.[key];
+  return typeof value === "string" && value ? value : null;
+}
+
+async function notifyPaidConsultationLead(order: OrderRecord | undefined | null) {
+  if (!order || order.kind !== "consultation") return;
+  const product = getServiceProduct(order.product_slug);
+  const priceFormatted = product
+    ? formatAed(product.amountAed) + (product.priceNote ?? "")
+    : formatAed(Math.round(order.amount / 100));
+  try {
+    await sendLeadNotification({
+      service: metaStr(order.metadata, "service") || product?.name || order.product_slug,
+      priceFormatted,
+      name: order.customer_name,
+      email: order.customer_email,
+      phone: order.phone,
+      urgency: metaStr(order.metadata, "urgency"),
+      concern: metaStr(order.metadata, "concern"),
+      message: metaStr(order.metadata, "message"),
+      paid: true,
+      orderId: order.id,
+    });
+  } catch {
+    // Best-effort; payment is already recorded.
+  }
+}
 
 export const runtime = "nodejs";
 
@@ -69,6 +98,7 @@ export async function POST(request: Request) {
         const invoice = await getInvoiceForSession(session);
         const order = await markOrderPaidFromSession(session, invoice);
         await deliverResourceIfNeeded(order, session, invoice);
+        await notifyPaidConsultationLead(order);
       }
       break;
     }
@@ -77,6 +107,7 @@ export async function POST(request: Request) {
       const invoice = await getInvoiceForSession(session);
       const order = await markOrderPaidFromSession(session, invoice);
       await deliverResourceIfNeeded(order, session, invoice);
+      await notifyPaidConsultationLead(order);
       break;
     }
     case "checkout.session.async_payment_failed":

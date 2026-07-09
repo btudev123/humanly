@@ -1,10 +1,9 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { ArrowRight, Calendar, CheckCircle2, Clock, Lock, ShieldCheck } from "lucide-react";
 import {
   serviceProducts,
-  formatUsd,
   formatAed,
   type ServiceCategory,
 } from "@/lib/products";
@@ -28,24 +27,35 @@ export function BookingFunnel() {
   const [category, setCategory] = useState<ServiceCategory | "all">("all");
   const [selected, setSelected] = useState("individual-advisory");
   const [error, setError] = useState("");
+  const [showHidden, setShowHidden] = useState(false);
   const [isPending, startTransition] = useTransition();
+
+  // Reveal hidden products (e.g. the internal test service) with ?test=1.
+  useEffect(() => {
+    setShowHidden(new URLSearchParams(window.location.search).get("test") === "1");
+  }, []);
+
+  const availableProducts = useMemo(
+    () => serviceProducts.filter((product) => showHidden || !product.hidden),
+    [showHidden]
+  );
 
   const visibleServices = useMemo(
     () =>
       category === "all"
-        ? serviceProducts
-        : serviceProducts.filter((product) => product.category === category),
-    [category]
+        ? availableProducts
+        : availableProducts.filter((product) => product.category === category),
+    [category, availableProducts]
   );
 
   const selectedProduct =
-    serviceProducts.find((product) => product.slug === selected) || serviceProducts[0];
+    availableProducts.find((product) => product.slug === selected) || availableProducts[0];
 
   function changeCategory(next: ServiceCategory | "all") {
     setCategory(next);
     // Keep the selection valid for the visible set so the summary stays in sync.
     if (next !== "all" && selectedProduct.category !== next) {
-      const firstInCategory = serviceProducts.find((product) => product.category === next);
+      const firstInCategory = availableProducts.find((product) => product.category === next);
       if (firstInCategory) setSelected(firstInCategory.slug);
     }
   }
@@ -193,10 +203,7 @@ export function BookingFunnel() {
               {formatAed(selectedProduct.amountAed)}
               {selectedProduct.priceNote ?? ""}
             </p>
-            <p className="text-xs font-semibold text-neutral-400">
-              charged in USD · {formatUsd(selectedProduct.amount)}
-              {selectedProduct.priceNote ?? ""}
-            </p>
+            <p className="text-xs font-semibold text-neutral-400">Secured by Stripe</p>
           </div>
         </div>
 

@@ -1,8 +1,15 @@
 import { Resend } from "resend";
 import { BookingConfirmationEmail } from "@/emails/BookingConfirmationEmail";
 import { ResourceDeliveryEmail } from "@/emails/ResourceDeliveryEmail";
+import {
+  LeadNotificationEmail,
+  type LeadNotificationEmailProps,
+} from "@/emails/LeadNotificationEmail";
 import { recordEmailEvent } from "@/lib/db/repository";
 import { siteConfig } from "@/lib/site";
+
+/** Where internal lead notifications are sent. */
+const LEAD_INBOX = process.env.LEAD_NOTIFICATION_EMAIL || "hello@talkhumanly.com";
 
 let resend: Resend | null = null;
 
@@ -93,6 +100,44 @@ export async function sendResourceDelivery(input: {
   await recordEmailEvent({
     kind: "resource_delivery",
     recipient: input.to,
+    status: result.error ? "error" : "sent",
+    providerId: result.data?.id,
+    metadata: result.error ? { error: result.error.message } : input,
+  });
+
+  return result;
+}
+
+/**
+ * Internal lead notification with all intake-form fields, sent to the Humanly
+ * inbox (hello@talkhumanly.com). Fires once on form submit (paid:false) and
+ * again once payment succeeds (paid:true).
+ */
+export async function sendLeadNotification(input: LeadNotificationEmailProps) {
+  if (!process.env.RESEND_API_KEY) {
+    await recordEmailEvent({
+      kind: "lead_notification",
+      recipient: LEAD_INBOX,
+      status: "skipped_missing_resend_key",
+      metadata: input,
+    });
+    return null;
+  }
+
+  const from = process.env.RESEND_FROM || `${siteConfig.name} <hello@talkhumanly.com>`;
+  const subject = `${input.paid ? "💳 Paid lead" : "📥 New lead"}: ${input.name} — ${input.service}`;
+
+  const result = await getResend().emails.send({
+    from,
+    to: [LEAD_INBOX],
+    replyTo: input.email,
+    subject,
+    react: <LeadNotificationEmail {...input} />,
+  });
+
+  await recordEmailEvent({
+    kind: "lead_notification",
+    recipient: LEAD_INBOX,
     status: result.error ? "error" : "sent",
     providerId: result.data?.id,
     metadata: result.error ? { error: result.error.message } : input,

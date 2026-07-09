@@ -7,10 +7,10 @@ export type ServiceProduct = {
   name: string;
   subtitle: string;
   description: string;
-  /** Amount in minor units (USD cents) — this is what Stripe charges. */
+  /** Reference amount in USD cents. Kept for reporting; consultations are charged in AED (amountAed). */
   amount: number;
-  currency: "usd";
-  /** Display price in AED (whole dirhams). Shown as the primary price; USD remains the charge currency. */
+  currency: "usd" | "aed";
+  /** Price in AED (whole dirhams). This is the primary price AND the charge currency for consultations. */
   amountAed: number;
   duration: string;
   /** Optional price suffix, e.g. "/mo" or "/hr". */
@@ -25,6 +25,8 @@ export type ServiceProduct = {
   interval?: "month";
   calLinkEnv: string;
   featured?: boolean;
+  /** Hidden from the public booking list; only revealed with `?test=1` (used for the $1 test service). */
+  hidden?: boolean;
 };
 
 export const serviceProducts: ServiceProduct[] = [
@@ -312,6 +314,27 @@ export const serviceProducts: ServiceProduct[] = [
     stripePriceEnv: "STRIPE_PRICE_HR_COMPLIANCE_ADVISORY",
     mode: "payment",
     calLinkEnv: "NEXT_PUBLIC_CAL_LINK_HR_COMPLIANCE_ADVISORY",
+  },
+
+  // ── Internal test product (hidden; append ?test=1 to /booking to reveal) ──
+  {
+    slug: "test-service",
+    name: "Test Service",
+    subtitle: "Internal payment test",
+    description:
+      "A low-value test product for verifying the end-to-end payment and lead-email flow. Not for customers.",
+    amount: 100,
+    currency: "aed",
+    amountAed: 5,
+    duration: "Async — test only",
+    category: "session",
+    features: ["Payment flow test", "Lead-email test"],
+    forWho: "Internal testing only.",
+    needsScheduling: false,
+    stripePriceEnv: "STRIPE_PRICE_TEST_SERVICE",
+    mode: "payment",
+    calLinkEnv: "NEXT_PUBLIC_CAL_LINK_INDIVIDUAL_ADVISORY",
+    hidden: true,
   },
 ];
 
