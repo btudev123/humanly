@@ -2,7 +2,12 @@ import { Resend } from "resend";
 import { BookingConfirmationEmail } from "@/emails/BookingConfirmationEmail";
 import { ResourceDeliveryEmail } from "@/emails/ResourceDeliveryEmail";
 import {
+  PaymentReceiptEmail,
+  type PaymentReceiptEmailProps,
+} from "@/emails/PaymentReceiptEmail";
+import {
   LeadNotificationEmail,
+  isBookedLead,
   type LeadNotificationEmailProps,
 } from "@/emails/LeadNotificationEmail";
 import { recordEmailEvent } from "@/lib/db/repository";
@@ -53,8 +58,8 @@ export async function sendBookingConfirmation(input: {
   const result = await getResend().emails.send({
     from,
     to: [input.to],
-    // Copy the Humanly inbox on every client confirmation.
-    bcc: input.to === LEAD_INBOX ? undefined : [LEAD_INBOX],
+    // No BCC: the Humanly inbox gets its own richer "Meeting booked" notification
+    // (sendLeadNotification with booking fields), which carries the intake form too.
     subject: `Your Humanly session is confirmed: ${input.service}`,
     react: <BookingConfirmationEmail {...input} />,
   });
@@ -113,9 +118,48 @@ export async function sendResourceDelivery(input: {
 }
 
 /**
+ * Client-facing payment + invoice email, sent the moment Stripe confirms payment.
+ * Deliberately independent of scheduling: a client who pays and never picks a time
+ * still gets their invoice, and the CTA pulls them back to the Cal.com scheduler.
+ */
+export async function sendPaymentReceipt(
+  input: PaymentReceiptEmailProps & { to: string }
+) {
+  if (!process.env.RESEND_API_KEY) {
+    await recordEmailEvent({
+      kind: "payment_receipt",
+      recipient: input.to,
+      status: "skipped_missing_resend_key",
+      metadata: input,
+    });
+    return null;
+  }
+
+  const from = process.env.RESEND_FROM || `${siteConfig.name} <hello@talkhumanly.com>`;
+  const result = await getResend().emails.send({
+    from,
+    to: [input.to],
+    subject: `Payment confirmed: ${input.service} — choose your time`,
+    react: <PaymentReceiptEmail {...input} />,
+  });
+
+  await recordEmailEvent({
+    kind: "payment_receipt",
+    recipient: input.to,
+    status: result.error ? "error" : "sent",
+    providerId: result.data?.id,
+    metadata: result.error ? { error: result.error.message } : input,
+  });
+
+  return result;
+}
+
+/**
  * Internal lead notification with all intake-form fields, sent to the Humanly
- * inbox (hello@talkhumanly.com). Fires once on form submit (paid:false) and
- * again once payment succeeds (paid:true).
+ * inbox (hello@talkhumanly.com). Fires at each funnel stage: form submit
+ * (paid:false), payment (paid:true), and — with booking fields attached — once
+ * the client picks a Cal.com slot, which is the only email carrying both the
+ * intake form and the meeting details.
  */
 export async function sendLeadNotification(input: LeadNotificationEmailProps) {
   if (!process.env.RESEND_API_KEY) {
@@ -129,7 +173,12 @@ export async function sendLeadNotification(input: LeadNotificationEmailProps) {
   }
 
   const from = process.env.RESEND_FROM || `${siteConfig.name} <hello@talkhumanly.com>`;
-  const subject = `${input.paid ? "💳 Paid lead" : "📥 New lead"}: ${input.name} — ${input.service}`;
+  const stage = isBookedLead(input)
+    ? "✅ Booked"
+    : input.paid
+      ? "💳 Paid lead"
+      : "📥 New lead";
+  const subject = `${stage}: ${input.name} — ${input.service}`;
 
   const result = await getResend().emails.send({
     from,

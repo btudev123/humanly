@@ -1,8 +1,13 @@
 import crypto from "node:crypto";
 import { getOrderById, recordBooking } from "@/lib/db/repository";
-import { sendBookingConfirmation } from "@/lib/email/resend";
+import { sendBookingConfirmation, sendLeadNotification } from "@/lib/email/resend";
 
 export const runtime = "nodejs";
+
+function metaStr(meta: Record<string, unknown> | null | undefined, key: string) {
+  const value = meta?.[key];
+  return typeof value === "string" && value ? value : null;
+}
 
 function timingSafeEqualStr(a: string, b: string) {
   const ab = Buffer.from(a);
@@ -142,6 +147,30 @@ export async function POST(request: Request) {
       bookingUid: uid,
       priceFormatted,
     });
+  }
+
+  // Internal notification: the only email carrying the intake form *and* the booked
+  // meeting together. Degrades to Cal-only data when the booking has no linked order
+  // (e.g. someone booked a raw Cal link outside the paid funnel).
+  try {
+    await sendLeadNotification({
+      service,
+      priceFormatted,
+      name: order?.customer_name || attendeeName,
+      email: order?.customer_email || attendeeEmail,
+      phone: order?.phone,
+      urgency: metaStr(order?.metadata, "urgency"),
+      concern: metaStr(order?.metadata, "concern"),
+      message: metaStr(order?.metadata, "message"),
+      paid: Boolean(order),
+      orderId: order?.id,
+      startTime,
+      endTime,
+      meetingUrl,
+      bookingUid: uid,
+    });
+  } catch {
+    // Best-effort; the booking is already recorded.
   }
 
   return Response.json({ ok: true, booking });

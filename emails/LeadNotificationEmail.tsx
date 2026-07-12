@@ -24,7 +24,20 @@ export type LeadNotificationEmailProps = {
   message?: string | null;
   paid: boolean;
   orderId?: string | null;
+  /** Present only once the client has picked a time in Cal.com. */
+  startTime?: string | null;
+  endTime?: string | null;
+  meetingUrl?: string | null;
+  bookingUid?: string | null;
 };
+
+/** True once Cal.com has confirmed a slot — the final stage of the funnel. */
+export function isBookedLead(input: {
+  startTime?: string | null;
+  bookingUid?: string | null;
+}) {
+  return Boolean(input.startTime || input.bookingUid);
+}
 
 export function LeadNotificationEmail({
   service,
@@ -37,13 +50,28 @@ export function LeadNotificationEmail({
   message,
   paid,
   orderId,
+  startTime,
+  endTime,
+  meetingUrl,
+  bookingUid,
 }: LeadNotificationEmailProps) {
-  const statusLabel = paid ? "PAID — payment confirmed" : "NEW — form submitted (not yet paid)";
+  const booked = isBookedLead({ startTime, bookingUid });
+
+  const statusLabel = booked
+    ? "BOOKED — paid and scheduled"
+    : paid
+      ? "PAID — payment confirmed (no time picked yet)"
+      : "NEW — form submitted (not yet paid)";
+
+  const when = startTime && endTime ? `${startTime} → ${endTime}` : startTime;
 
   const rows: { label: string; value?: string | null }[] = [
     { label: "Status", value: statusLabel },
     { label: "Service", value: service },
     { label: "Price", value: priceFormatted },
+    { label: "When", value: when },
+    { label: "Meeting", value: meetingUrl },
+    { label: "Booking ID", value: bookingUid },
     { label: "Name", value: name },
     { label: "Email", value: email },
     { label: "Phone", value: phone },
@@ -52,15 +80,17 @@ export function LeadNotificationEmail({
     { label: "Order ID", value: orderId },
   ];
 
+  const headerColor = booked ? "#1f7a44" : paid ? "#7c35e3" : "#3f1b73";
+
   return (
     <Html>
       <Head />
       <Preview>
-        {paid ? "Paid lead" : "New lead"}: {name} — {service}
+        {booked ? "Booked" : paid ? "Paid lead" : "New lead"}: {name} — {service}
       </Preview>
       <Body style={main}>
         <Container style={container}>
-          <Section style={{ ...headerSection, background: paid ? "#1f7a44" : "#3f1b73" }}>
+          <Section style={{ ...headerSection, background: headerColor }}>
             <Row>
               <Column align="center">
                 <Text style={logo}>humanly · lead</Text>
@@ -68,11 +98,15 @@ export function LeadNotificationEmail({
             </Row>
           </Section>
 
-          <Heading style={heading}>{paid ? "Paid booking" : "New booking lead"}</Heading>
+          <Heading style={heading}>
+            {booked ? "Meeting booked" : paid ? "Paid — awaiting scheduling" : "New booking lead"}
+          </Heading>
           <Text style={paragraph}>
-            {paid
-              ? "A payment just completed. Full intake details below."
-              : "Someone submitted the booking intake form. They have been sent to Stripe to pay."}
+            {booked
+              ? "The client paid and has now picked a time. Full intake details and meeting details below."
+              : paid
+                ? "A payment just completed. The client has not picked a time yet."
+                : "Someone submitted the booking intake form. They have been sent to Stripe to pay."}
           </Text>
 
           <Section style={card}>

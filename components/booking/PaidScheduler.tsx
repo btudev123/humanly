@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Cal, { getCalApi } from "@calcom/embed-react";
 import { CheckCircle2, Lock } from "lucide-react";
 import { serviceProducts } from "@/lib/products";
@@ -18,6 +19,7 @@ export function PaidScheduler({
   calLink: string;
 }) {
   const product = serviceProducts.find((item) => item.slug === order.product_slug) || serviceProducts[0];
+  const router = useRouter();
 
   useEffect(() => {
     void (async () => {
@@ -30,8 +32,28 @@ export function PaidScheduler({
           },
         },
       });
+
+      // Final hop of the funnel: form → Stripe → Cal → /booking/done.
+      // `bookingSuccessfulV2` is the supported event (`bookingSuccessful` is deprecated);
+      // its payload is exactly what /booking/done renders.
+      cal("on", {
+        action: "bookingSuccessfulV2",
+        callback: (event) => {
+          const booking = event?.detail?.data;
+          const params = new URLSearchParams();
+          if (booking?.title) params.set("title", booking.title);
+          if (booking?.startTime) params.set("startTime", booking.startTime);
+          if (booking?.endTime) params.set("endTime", booking.endTime);
+          if (booking?.uid) params.set("uid", booking.uid);
+          params.set("attendeeName", order.customer_name);
+          params.set("email", order.customer_email);
+
+          const query = params.toString();
+          router.push(query ? `/booking/done?${query}` : "/booking/done");
+        },
+      });
     })();
-  }, []);
+  }, [order.customer_name, order.customer_email, router]);
 
   return (
     <div className="mx-auto max-w-6xl px-margin-mobile py-32 md:px-margin-desktop md:pt-40">
