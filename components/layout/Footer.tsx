@@ -99,7 +99,21 @@ export function Footer() {
         {/* Bottom bar */}
         <div className="flex flex-col gap-4 border-t border-white/10 py-8 text-sm text-neutral-100/50 md:flex-row md:items-center md:justify-between">
           <p>© {year} Humanly HR Advisory. Neutral advocacy for the modern workplace.</p>
-          <p className="italic">Humanly provides HR guidance & coaching, not legal advice.</p>
+          <div className="flex flex-col gap-2 md:items-end">
+            <p className="italic">Humanly provides HR guidance & coaching, not legal advice.</p>
+            <p>
+              Designed &amp; built by{" "}
+              <a
+                href="https://qognitionagency.com"
+                target="_blank"
+                rel="noopener"
+                title="Qognition Agency — AI-driven web design & development"
+                className="font-semibold text-neutral-100/80 underline decoration-accent-orange/60 underline-offset-4 transition-colors hover:text-accent-orange"
+              >
+                Qognition Agency
+              </a>
+            </p>
+          </div>
         </div>
       </div>
 
