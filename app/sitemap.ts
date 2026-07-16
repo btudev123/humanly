@@ -1,6 +1,7 @@
 import { MetadataRoute } from "next";
 import { getPublishedResources } from "@/lib/db/repository";
 import { resources } from "@/lib/resources";
+import { blogPosts } from "@/lib/blog";
 
 export const revalidate = 3600;
 
@@ -22,6 +23,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${baseUrl}/services`, lastModified, changeFrequency: "weekly" as const, priority: 0.9 },
     { url: `${baseUrl}/about`, lastModified, changeFrequency: "monthly" as const, priority: 0.8 },
     { url: `${baseUrl}/resources`, lastModified, changeFrequency: "weekly" as const, priority: 0.8 },
+    { url: `${baseUrl}/blog`, lastModified, changeFrequency: "weekly" as const, priority: 0.75 },
     { url: `${baseUrl}/tools`, lastModified, changeFrequency: "weekly" as const, priority: 0.75 },
     { url: `${baseUrl}/resources/managed-out`, lastModified, changeFrequency: "monthly" as const, priority: 0.7 },
     { url: `${baseUrl}/resources/resign-or-stay`, lastModified, changeFrequency: "monthly" as const, priority: 0.7 },
@@ -40,5 +42,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: resource.gated ? 0.55 : 0.65,
   }));
 
-  return [...staticPages, ...resourcePages];
+  const blogPages = blogPosts.map((post) => ({
+    url: `${baseUrl}/blog/${post.slug}`,
+    lastModified: new Date(post.publishedAt),
+    changeFrequency: "monthly" as const,
+    priority: 0.7,
+  }));
+
+  return [...staticPages, ...resourcePages, ...blogPages];
 }

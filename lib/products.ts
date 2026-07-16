@@ -315,27 +315,6 @@ export const serviceProducts: ServiceProduct[] = [
     mode: "payment",
     calLinkEnv: "NEXT_PUBLIC_CAL_LINK_HR_COMPLIANCE_ADVISORY",
   },
-
-  // ── Internal test product (hidden; append ?test=1 to /booking to reveal) ──
-  {
-    slug: "test-service",
-    name: "Test Service",
-    subtitle: "Internal payment test",
-    description:
-      "A low-value test product for verifying the end-to-end payment and lead-email flow. Not for customers.",
-    amount: 100,
-    currency: "aed",
-    amountAed: 5,
-    duration: "Test — payment + scheduling",
-    category: "session",
-    features: ["Payment flow test", "Cal.com scheduling test", "Lead-email test"],
-    forWho: "Internal testing only.",
-    needsScheduling: true,
-    stripePriceEnv: "STRIPE_PRICE_TEST_SERVICE",
-    mode: "payment",
-    calLinkEnv: "NEXT_PUBLIC_CAL_LINK_INDIVIDUAL_ADVISORY",
-    hidden: true,
-  },
 ];
 
 export const serviceCategoryLabels: Record<ServiceCategory, string> = {
