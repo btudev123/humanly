@@ -48,7 +48,7 @@ export function ResourceUnlockForm({
           <LockKeyhole size={20} />
         </span>
         <div>
-          <h2 className="font-display text-2xl font-bold text-primary-dark">
+          <h2 className="text-h3 font-display font-bold text-primary-dark">
             {membership ? "Join the membership" : "Unlock this resource"}
           </h2>
           <p className="text-neutral-500">

@@ -4,24 +4,19 @@ import { ArrowRight, ShieldCheck, Wrench } from "lucide-react";
 import { ResourcesBrowser } from "@/components/resources/ResourcesBrowser";
 import { Scribble } from "@/components/ui/Scribble";
 import { getPublishedResources } from "@/lib/db/repository";
-import { resources } from "@/lib/resources";
-import { absoluteUrl } from "@/lib/site";
+import { getResourceCopy } from "@/lib/sanity/queries";
+import { pageMetadata } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "HR Resource Hub | Guides, Kits & Courses | Humanly",
-  description:
-    "Practical HR guides, toolkits, scripts, and courses for professionals worldwide — covering PIPs, exits, harassment, UAE/GCC rights, and more. Pay once, own it forever.",
-  alternates: { canonical: absoluteUrl("/resources") },
-  openGraph: {
-    title: "HR Resource Hub | Humanly",
-    description: "Practical HR guides and toolkits — pay once, own it forever.",
-    url: absoluteUrl("/resources"),
-  },
-};
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("/resources");
+}
 
 export default async function ResourcesPage() {
+  // Sanity marketing copy merged over the in-code catalogue (falls back to in-code
+  // when Studio is empty). Pricing/gating still come from lib/resources.ts.
+  const resources = await getResourceCopy();
   let publicResources = resources;
 
   try {
@@ -45,7 +40,7 @@ export default async function ResourcesPage() {
         <span className="inline-flex items-center gap-2 rounded-full border-2 border-primary-dark bg-neutral-100 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-primary-dark shadow-pop-sm">
           <span className="h-2 w-2 rounded-full bg-accent-orange" /> Resource Hub
         </span>
-        <h1 className="mx-auto mt-6 max-w-3xl font-display text-h1-mobile font-extrabold tracking-tight text-primary-dark md:text-h1-desktop">
+        <h1 className="text-h1 mx-auto mt-6 max-w-3xl font-display font-extrabold tracking-tight text-primary-dark">
           Practical guides for moments HR makes complicated.
         </h1>
         <p className="mx-auto mt-5 max-w-xl text-body-lg text-neutral-500">
@@ -72,7 +67,7 @@ export default async function ResourcesPage() {
           <Scribble variant="star-fill" color="#9d5cff" className="absolute bottom-8 left-10 hidden h-8 w-8 animate-float md:block" />
           <div className="relative z-10">
             <ShieldCheck className="mx-auto mb-6 text-accent-orange" size={40} />
-            <h2 className="font-display text-h2 font-extrabold tracking-tight">Need something more specific?</h2>
+            <h2 className="text-h2 font-display font-extrabold tracking-tight">Need something more specific?</h2>
             <p className="mx-auto mb-8 mt-4 max-w-xl text-body-lg text-on-primary/70">
               Book a confidential consultation for private, situation-specific guidance tailored to your exact workplace issue.
             </p>

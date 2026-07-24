@@ -74,7 +74,7 @@ export default function FAQ() {
           <span className="inline-flex items-center gap-2 rounded-full border-2 border-primary-dark bg-neutral-100 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-primary-dark shadow-pop-sm">
             <MessageCircle size={13} className="text-accent-orange" /> We have answers
           </span>
-          <h1 className="mt-6 font-display text-h1-mobile font-extrabold tracking-tight text-primary-dark md:text-h1-desktop">
+          <h1 className="text-h1 mt-6 font-display font-extrabold tracking-tight text-primary-dark">
             Frequently asked{" "}
             <span className="relative inline-block">
               questions
@@ -110,7 +110,7 @@ export default function FAQ() {
                 <div className="flex h-12 w-12 items-center justify-center rounded-2xl border-2 border-primary-dark bg-violet-tint text-primary-violet">
                   <section.icon size={24} />
                 </div>
-                <h2 className="font-display text-2xl font-bold tracking-tight text-primary-dark">{section.category}</h2>
+                <h2 className="text-h3 font-display font-bold tracking-tight text-primary-dark">{section.category}</h2>
               </div>
               <div>
                 {section.items.map((item, ii) => (
@@ -131,7 +131,7 @@ export default function FAQ() {
         <div className="relative mt-16 overflow-hidden rounded-[2.5rem] border-2 border-primary-dark bg-primary-dark p-12 text-center text-on-primary shadow-pop-orange md:p-16">
           <Scribble variant="spiral" color="#ff6a1a" className="absolute right-8 top-8 hidden h-20 w-20 opacity-30 md:block" />
           <div className="relative z-10">
-            <h3 className="font-display text-2xl font-extrabold md:text-3xl">Still have a unique question?</h3>
+            <h3 className="text-h2 font-display font-extrabold">Still have a unique question?</h3>
             <p className="mx-auto mt-4 max-w-md leading-relaxed text-on-primary/70">
               Our support team is here to help you discreetly. No question is too sensitive.
             </p>

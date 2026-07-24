@@ -70,7 +70,7 @@ export default function ResignOrStay() {
           <p className="inline-flex items-center gap-2 rounded-full border-2 border-primary-dark bg-violet-tint px-3.5 py-1 text-xs font-bold uppercase tracking-[0.14em] text-primary-dark">
             Free framework · no sign-up
           </p>
-          <h1 className="mt-5 font-display text-[clamp(2rem,5vw,3rem)] font-extrabold leading-tight tracking-tight text-primary-dark">
+          <h1 className="text-h1 mt-5 font-display font-extrabold leading-tight tracking-tight text-primary-dark">
             Resign or Stay?
           </h1>
           <p className="mt-3 text-lg text-neutral-500">
@@ -98,7 +98,7 @@ export default function ResignOrStay() {
 
         {/* Scoring */}
         <div className="mt-6 rounded-[2rem] border-2 border-primary-dark bg-neutral-100 p-7 sm:p-9">
-          <h2 className="font-display text-2xl font-extrabold tracking-tight text-primary-dark">Score your situation</h2>
+          <h2 className="text-h3 font-display font-extrabold tracking-tight text-primary-dark">Score your situation</h2>
           <p className="mt-2 text-sm text-neutral-500">Rate each factor from 1 (strongly favours leaving) to 5 (strongly favours staying). Honest answers only — this is for you.</p>
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
             {factors.map((f, i) => (
@@ -128,7 +128,7 @@ export default function ResignOrStay() {
 
         {/* Middle paths */}
         <div className="mt-6 rounded-[2rem] border-2 border-primary-dark bg-neutral-100 p-7 sm:p-9">
-          <h2 className="font-display text-2xl font-extrabold tracking-tight text-primary-dark">The options in between</h2>
+          <h2 className="text-h3 font-display font-extrabold tracking-tight text-primary-dark">The options in between</h2>
           <p className="mt-2 text-sm text-neutral-500">Resign or stay isn&apos;t always the only binary. Before you commit, consider whether any of these are available to you.</p>
           <div className="mt-5 flex flex-wrap gap-2.5">
             {middlePaths.map((p) => (

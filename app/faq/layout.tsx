@@ -1,12 +1,9 @@
 import type { Metadata } from "next";
-import { absoluteUrl } from "@/lib/site";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "FAQ | Confidential HR Advice UAE & GCC",
-  description:
-    "Answers about Humanly confidentiality, Stripe payments, booking, refunds, HR advisory scope, and UAE workplace support.",
-  alternates: { canonical: absoluteUrl("/faq") },
-};
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("/faq");
+}
 
 const faqSchema = {
   "@context": "https://schema.org",

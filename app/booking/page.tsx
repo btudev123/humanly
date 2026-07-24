@@ -1,20 +1,11 @@
 import type { Metadata } from "next";
 import { BookingFunnel } from "@/components/booking/BookingFunnel";
 import { Scribble } from "@/components/ui/Scribble";
-import { absoluteUrl } from "@/lib/site";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Book a Confidential HR Consultation",
-  description:
-    "Book a private Humanly consultation. Pay securely through Stripe first, then choose a confidential Cal.com session time.",
-  alternates: { canonical: absoluteUrl("/booking") },
-  openGraph: {
-    title: "Book a Confidential HR Consultation | Humanly",
-    description:
-      "Private HR guidance for UAE and GCC professionals. Stripe handles payment, then scheduling unlocks.",
-    url: absoluteUrl("/booking"),
-  },
-};
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("/booking");
+}
 
 export default function BookingPage() {
   return (
@@ -25,7 +16,7 @@ export default function BookingPage() {
           <span className="h-2 w-2 rounded-full bg-accent-orange" />
           Confidential · Stripe secured · UAE &amp; GCC
         </span>
-        <h1 className="mx-auto mt-6 max-w-3xl font-display text-h1-mobile font-extrabold tracking-tight text-primary-dark md:text-h1-desktop">
+        <h1 className="text-h1 mx-auto mt-6 max-w-3xl font-display font-extrabold tracking-tight text-primary-dark">
           Pay securely, then book your{" "}
           <span className="relative inline-block">
             private session

@@ -49,7 +49,7 @@ export function Footer() {
               <span className="h-2 w-2 rounded-full bg-accent-orange" />
               Confidential · Global advisory
             </p>
-            <h2 className="max-w-2xl font-display text-[clamp(2rem,5vw,3.5rem)] font-extrabold leading-[1.02] tracking-tight">
+            <h2 className="text-h2 max-w-2xl font-display font-extrabold leading-[1.02] tracking-tight">
               Your HR manages the workplace.{" "}
               <span className="relative inline-block text-accent-orange">
                 We manage your career.

@@ -11,7 +11,7 @@ export default function Terms() {
         {/* Header */}
         <header className="relative mb-14 text-center">
           <div className="dot-grid pointer-events-none absolute inset-0 -z-10 opacity-50" />
-          <h1 className="inline-block font-display text-h1-mobile font-extrabold tracking-tight text-primary-dark md:text-h1-desktop">
+          <h1 className="text-h1 inline-block font-display font-extrabold tracking-tight text-primary-dark">
             Terms of{" "}
             <span className="relative inline-block">
               Service
@@ -30,7 +30,7 @@ export default function Terms() {
         >
           <div className="relative z-10 space-y-12 leading-relaxed text-neutral-500">
             <section className="space-y-4">
-              <h2 className="flex items-center gap-3 font-display text-2xl font-bold text-primary-dark">
+              <h2 className="text-h3 flex items-center gap-3 font-display font-bold text-primary-dark">
                 <span className="flex h-10 w-10 items-center justify-center rounded-xl border-2 border-primary-dark bg-orange-tint text-accent-orange"><Scale size={20} /></span>
                 1. Acceptance of Terms
               </h2>
@@ -40,7 +40,7 @@ export default function Terms() {
             </section>
 
             <section className="space-y-4">
-              <h2 className="flex items-center gap-3 font-display text-2xl font-bold text-primary-dark">
+              <h2 className="text-h3 flex items-center gap-3 font-display font-bold text-primary-dark">
                 <span className="flex h-10 w-10 items-center justify-center rounded-xl border-2 border-primary-dark bg-coral/15 text-coral"><AlertCircle size={20} /></span>
                 2. Nature of Service
               </h2>
@@ -51,7 +51,7 @@ export default function Terms() {
             </section>
 
             <section className="space-y-6">
-              <h2 className="flex items-center gap-3 font-display text-2xl font-bold text-primary-dark">
+              <h2 className="text-h3 flex items-center gap-3 font-display font-bold text-primary-dark">
                 <span className="flex h-10 w-10 items-center justify-center rounded-xl border-2 border-primary-dark bg-violet-tint text-primary-violet"><CheckCircle2 size={20} /></span>
                 3. User Responsibilities
               </h2>
@@ -71,7 +71,7 @@ export default function Terms() {
             </section>
 
             <section className="space-y-4">
-              <h2 className="flex items-center gap-3 font-display text-2xl font-bold text-primary-dark">
+              <h2 className="text-h3 flex items-center gap-3 font-display font-bold text-primary-dark">
                 <span className="flex h-10 w-10 items-center justify-center rounded-xl border-2 border-primary-dark bg-violet-tint text-primary-dark"><Gavel size={20} /></span>
                 4. Liability Disclaimer
               </h2>
@@ -86,7 +86,7 @@ export default function Terms() {
 
         {/* Contact CTA */}
         <div className="mt-14 rounded-[2rem] border-2 border-primary-dark bg-violet-tint p-10 text-center md:p-12">
-          <h3 className="font-display text-xl font-bold text-primary-dark">Questions about our legal terms?</h3>
+          <h3 className="text-h3 font-display font-bold text-primary-dark">Questions about our legal terms?</h3>
           <p className="mb-8 mt-3 text-neutral-500">We&apos;re happy to explain them in plain human language.</p>
           <a
             href="/contact"

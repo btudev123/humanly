@@ -61,7 +61,7 @@ export function PaidScheduler({
         <div className="flex items-start gap-3">
           <CheckCircle2 className="mt-1 shrink-0 text-[#1da851]" size={22} />
           <div>
-            <h1 className="font-display text-2xl font-bold">Payment confirmed. Choose your time.</h1>
+            <h1 className="text-h1 font-display font-bold">Payment confirmed. Choose your time.</h1>
             <p className="mt-1 text-neutral-500">
               This scheduling page is unlocked for {order.customer_email}. Your booking will be linked to order {order.id}.
             </p>

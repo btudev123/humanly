@@ -81,7 +81,7 @@ export default function AboutPage() {
           <span className="inline-flex w-max items-center gap-2 rounded-full border-2 border-primary-dark bg-neutral-100 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-primary-dark shadow-pop-sm">
             <span className="h-2 w-2 rounded-full bg-accent-orange" /> About Karma Harb
           </span>
-          <h1 className="font-display text-h1-mobile font-extrabold leading-[1.04] tracking-tight text-primary-dark md:text-h1-desktop">
+          <h1 className="text-h1 font-display font-extrabold leading-[1.04] tracking-tight text-primary-dark">
             HR expertise that{" "}
             <span className="relative inline-block text-primary-violet">
               puts people first.
@@ -110,7 +110,7 @@ export default function AboutPage() {
       {/* Career path + why */}
       <section className="mx-auto mt-24 grid max-w-max-width gap-16 px-margin-mobile md:grid-cols-2 md:px-margin-desktop">
         <div>
-          <h2 className="mb-8 font-display text-h2 font-extrabold tracking-tight text-primary-dark">The path to Humanly</h2>
+          <h2 className="text-h2 mb-8 font-display font-extrabold tracking-tight text-primary-dark">The path to Humanly</h2>
           <div className="relative space-y-5 before:absolute before:bottom-4 before:left-7 before:top-4 before:w-0.5 before:bg-neutral-300">
             {careerPath.map((item, i) => (
               <motion.div
@@ -135,7 +135,7 @@ export default function AboutPage() {
 
         <div className="space-y-10">
           <div>
-            <h2 className="mb-4 font-display text-h2 font-extrabold tracking-tight text-primary-dark">Why I created Humanly</h2>
+            <h2 className="text-h2 mb-4 font-display font-extrabold tracking-tight text-primary-dark">Why I created Humanly</h2>
             <div className="space-y-4 leading-relaxed text-neutral-500">
               <p>For years, people have been finding their way to me. Former colleagues. Friends of friends. People who had just walked out of a difficult meeting with HR and didn&apos;t know what had happened to them. People who&apos;d received a performance improvement plan and had no idea what it meant for their future.</p>
               <p>The calls kept coming, and the questions were always serious — terminations, investigations, what they were actually entitled to, whether what was happening to them was even legal. The more time I spent in senior HR roles, the more clearly I saw the gap between what employees experience and the support available to them.</p>
@@ -144,7 +144,7 @@ export default function AboutPage() {
           </div>
 
           <div>
-            <h3 className="mb-4 flex items-center gap-2 font-display text-xl font-bold text-primary-dark">
+            <h3 className="text-h3 mb-4 flex items-center gap-2 font-display font-bold text-primary-dark">
               <Award className="text-accent-orange" size={22} />
               Credentials &amp; expertise
             </h3>
@@ -163,7 +163,7 @@ export default function AboutPage() {
       {/* What I bring to the table */}
       <section className="mx-auto mt-24 max-w-max-width px-margin-mobile md:px-margin-desktop">
         <div className="mb-12 max-w-2xl">
-          <h2 className="font-display text-h2 font-extrabold tracking-tight text-primary-dark">What I bring to the table</h2>
+          <h2 className="text-h2 font-display font-extrabold tracking-tight text-primary-dark">What I bring to the table</h2>
           <p className="mt-3 leading-relaxed text-neutral-500">
             My experience is not theoretical. It was built across real organisations, real situations,
             and real people — and it&apos;s exactly what I bring to your corner.
@@ -182,7 +182,7 @@ export default function AboutPage() {
               <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border-2 border-primary-dark bg-violet-tint text-primary-violet">
                 <item.icon size={22} />
               </div>
-              <h3 className="font-display text-lg font-bold text-primary-dark">{item.title}</h3>
+              <h3 className="text-h4 font-display font-bold text-primary-dark">{item.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-neutral-500">{item.desc}</p>
             </motion.div>
           ))}
@@ -193,7 +193,7 @@ export default function AboutPage() {
       <section className="mx-auto mt-24 max-w-max-width px-margin-mobile md:px-margin-desktop">
         <div className="mb-12 text-center">
           <Scribble variant="star-fill" color="#fda544" className="mx-auto mb-4 h-10 w-10 animate-wiggle" />
-          <h2 className="font-display text-h2 font-extrabold tracking-tight text-primary-dark">The values we live by</h2>
+          <h2 className="text-h2 font-display font-extrabold tracking-tight text-primary-dark">The values we live by</h2>
         </div>
         <div className="grid gap-6 md:grid-cols-3">
           {values.map((value, i) => (
@@ -208,7 +208,7 @@ export default function AboutPage() {
               <div className="mb-6 flex h-14 w-14 items-center justify-center rounded-2xl border-2 border-primary-dark bg-neutral-100 text-primary-violet">
                 <value.icon size={26} />
               </div>
-              <h3 className="font-display text-h3 font-bold text-primary-dark">{value.title}</h3>
+              <h3 className="text-h3 font-display font-bold text-primary-dark">{value.title}</h3>
               <p className="mt-3 leading-relaxed text-neutral-500">{value.desc}</p>
             </motion.div>
           ))}
@@ -221,7 +221,7 @@ export default function AboutPage() {
           <Scribble variant="loop" color="#fda544" className="absolute -left-6 -top-6 h-28 w-28 opacity-25" />
           <Scribble variant="star-fill" color="#9d5cff" className="absolute right-10 top-10 hidden h-8 w-8 animate-float md:block" />
           <div className="relative z-10">
-            <h2 className="font-display text-h2 font-extrabold tracking-tight">Ready to talk to someone who actually knows this?</h2>
+            <h2 className="text-h2 font-display font-extrabold tracking-tight">Ready to talk to someone who actually knows this?</h2>
             <p className="mx-auto mt-4 max-w-xl text-body-lg text-on-primary/70">
               Karma reads every intake personally. Whether you&apos;re dealing with a situation right now
               or simply want to understand your options, it&apos;s a confidential, no-pressure conversation.

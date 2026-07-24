@@ -72,7 +72,7 @@ export function DashboardClient() {
       <section className="rounded-3xl border-2 border-primary-dark bg-neutral-100 p-6 shadow-pop-sm">
         <div className="mb-5 flex items-center gap-3">
           <span className="flex h-10 w-10 items-center justify-center rounded-xl border-2 border-primary-dark bg-violet-tint text-primary-violet"><DollarSign size={20} /></span>
-          <h2 className="font-display text-xl font-bold text-primary-dark">Set prices</h2>
+          <h2 className="text-h3 font-display font-bold text-primary-dark">Set prices</h2>
         </div>
         <div className="space-y-4">
           {serviceProducts.map((product) => (
@@ -111,7 +111,7 @@ export function DashboardClient() {
       <section className="rounded-3xl border-2 border-primary-dark bg-neutral-100 p-6 shadow-pop-sm">
         <div className="mb-5 flex items-center gap-3">
           <span className="flex h-10 w-10 items-center justify-center rounded-xl border-2 border-primary-dark bg-orange-tint text-accent-orange"><Upload size={20} /></span>
-          <h2 className="font-display text-xl font-bold text-primary-dark">Upload resource</h2>
+          <h2 className="text-h3 font-display font-bold text-primary-dark">Upload resource</h2>
         </div>
         <form action={uploadResource} className="grid gap-4">
           <input name="title" required placeholder="Resource title" className="rounded-2xl border-2 border-primary-dark/30 px-4 py-3 outline-none transition focus:border-primary-dark" />
@@ -132,7 +132,7 @@ export function DashboardClient() {
           </button>
         </form>
         <div className="mt-6 space-y-3">
-          <h3 className="text-sm font-extrabold uppercase tracking-[0.14em] text-neutral-500">Uploaded PDFs</h3>
+          <h3 className="text-h4 font-extrabold uppercase tracking-[0.14em] text-neutral-500">Uploaded PDFs</h3>
           {uploadedResources.length ? (
             uploadedResources.map((resource) => (
               <div key={resource.slug} className="rounded-2xl border-2 border-primary-dark/15 bg-surface-container-low p-4">
@@ -157,7 +157,7 @@ export function DashboardClient() {
       <section className="rounded-3xl border-2 border-primary-dark bg-neutral-100 p-6 shadow-pop-sm">
         <div className="mb-5 flex items-center gap-3">
           <span className="flex h-10 w-10 items-center justify-center rounded-xl border-2 border-primary-dark bg-violet-tint text-primary-violet"><MessageSquarePlus size={20} /></span>
-          <h2 className="font-display text-xl font-bold text-primary-dark">Future testimonials</h2>
+          <h2 className="text-h3 font-display font-bold text-primary-dark">Future testimonials</h2>
         </div>
         <form
           action={(formData) =>

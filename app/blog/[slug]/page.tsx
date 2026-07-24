@@ -2,11 +2,17 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight, ArrowUpRight, Clock } from "lucide-react";
-import { blogPosts, getBlogPost, getBlogUrl, formatBlogDate } from "@/lib/blog";
-import { siteConfig } from "@/lib/site";
+import { getArticle, getArticles } from "@/lib/sanity/queries";
+import { formatBlogDate } from "@/lib/blog";
+import { buildMetadata } from "@/lib/seo";
+import { siteConfig, absoluteUrl } from "@/lib/site";
+import { Prose } from "@/components/ui/Prose";
 
-export function generateStaticParams() {
-  return blogPosts.map((post) => ({ slug: post.slug }));
+export const revalidate = 3600;
+
+export async function generateStaticParams() {
+  const articles = await getArticles();
+  return articles.map((article) => ({ slug: article.slug }));
 }
 
 export async function generateMetadata({
@@ -15,30 +21,26 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const post = getBlogPost(slug);
+  const article = await getArticle(slug);
 
-  if (!post) {
-    return { title: "Post Not Found" };
+  if (!article) {
+    return { title: "Post Not Found", robots: { index: false, follow: false } };
   }
 
-  return {
-    title: `${post.title} | Humanly Blog`,
-    description: post.excerpt,
-    keywords: post.keywords,
-    alternates: { canonical: getBlogUrl(post) },
-    openGraph: {
-      title: post.title,
-      description: post.excerpt,
-      url: getBlogUrl(post),
-      type: "article",
-      publishedTime: post.publishedAt,
-      modifiedTime: post.publishedAt,
-      authors: [post.author],
-    },
-  };
+  return buildMetadata({
+    title: `${article.title} | Humanly Blog`,
+    description: article.excerpt,
+    path: `/blog/${article.slug}`,
+    seo: article.seo,
+    keywords: article.keywords,
+    type: "article",
+    publishedTime: article.publishedAt,
+    modifiedTime: article.updatedAt,
+    authors: [article.author?.name].filter(Boolean) as string[],
+  });
 }
 
-// Related internal links surfaced at the foot of every post.
+// Fallback internal links, used when a post has no related links set in Sanity.
 const relatedLinks = [
   {
     href: "/resources/managed-out",
@@ -63,23 +65,52 @@ export default async function BlogPostPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const post = getBlogPost(slug);
+  const article = await getArticle(slug);
 
-  if (!post) {
+  if (!article) {
     notFound();
   }
+
+  const url = absoluteUrl(`/blog/${article.slug}`);
+  const author = article.author;
+  const authorLinkedIn =
+    author?.linkedinUrl ||
+    (author?.name === siteConfig.founder ? siteConfig.founderLinkedIn : undefined);
 
   const articleSchema = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
-    headline: post.title,
-    description: post.excerpt,
-    url: getBlogUrl(post),
-    datePublished: post.publishedAt,
-    dateModified: post.publishedAt,
-    author: { "@type": "Person", name: post.author, jobTitle: post.authorRole },
-    publisher: { "@type": "Organization", name: siteConfig.legalName },
-    keywords: post.keywords.join(", "),
+    headline: article.title,
+    description: article.excerpt,
+    url,
+    mainEntityOfPage: { "@type": "WebPage", "@id": url },
+    datePublished: article.publishedAt,
+    dateModified: article.updatedAt || article.publishedAt,
+    author: {
+      "@type": "Person",
+      name: author?.name,
+      jobTitle: author?.role,
+      ...(authorLinkedIn ? { sameAs: [authorLinkedIn] } : {}),
+    },
+    publisher: {
+      "@type": "Organization",
+      name: siteConfig.legalName,
+      url: siteConfig.url,
+      logo: { "@type": "ImageObject", url: absoluteUrl("/logo.svg") },
+    },
+    keywords: article.keywords.join(", "),
+  };
+
+  // Breadcrumbs give Google an explicit path back to /blog and the homepage,
+  // which is what surfaces the breadcrumb trail in place of a raw URL in results.
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: siteConfig.url },
+      { "@type": "ListItem", position: 2, name: "Blog", item: absoluteUrl("/blog") },
+      { "@type": "ListItem", position: 3, name: article.title, item: url },
+    ],
   };
 
   return (
@@ -88,96 +119,94 @@ export default async function BlogPostPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
       <article className="mx-auto max-w-3xl">
+        <nav aria-label="Breadcrumb" className="mb-8">
+          <ol className="flex flex-wrap items-center gap-2 text-body-sm text-neutral-500">
+            <li>
+              <Link href="/" className="hover:text-primary-violet">
+                Home
+              </Link>
+            </li>
+            <li aria-hidden="true" className="text-neutral-300">
+              /
+            </li>
+            <li>
+              <Link href="/blog" className="hover:text-primary-violet">
+                Blog
+              </Link>
+            </li>
+            <li aria-hidden="true" className="text-neutral-300">
+              /
+            </li>
+            <li className="font-semibold text-primary-dark" aria-current="page">
+              {article.category}
+            </li>
+          </ol>
+        </nav>
+
         <Link
           href="/blog"
-          className="mb-8 inline-flex items-center gap-2 rounded-full border-2 border-primary-dark bg-neutral-100 px-4 py-2 text-sm font-bold text-primary-dark transition-colors hover:bg-violet-tint"
+          className="mb-8 inline-flex items-center gap-2 rounded-full border-2 border-primary-dark bg-neutral-100 px-4 py-2 text-body-sm font-bold text-primary-dark transition-colors hover:bg-violet-tint"
         >
           <ArrowLeft size={16} strokeWidth={2.5} />
           Back to blog
         </Link>
 
-        <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary-violet">
-          {post.category}
+        <p className="text-caption font-bold uppercase tracking-[0.2em] text-primary-violet">
+          {article.category}
         </p>
-        <h1 className="mt-4 font-display text-[clamp(2.25rem,5vw,3.5rem)] font-extrabold leading-[1.04] tracking-tight text-primary-dark">
-          {post.title}
+        <h1 className="text-h1 mt-4 font-display font-extrabold tracking-tight text-primary-dark">
+          {article.title}
         </h1>
 
-        <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-neutral-500">
+        <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2 text-body-sm text-neutral-500">
           <span>
-            By <span className="font-bold text-primary-dark">{post.author}</span>, {post.authorRole}
+            By{" "}
+            {authorLinkedIn ? (
+              <a
+                href={authorLinkedIn}
+                target="_blank"
+                rel="me noopener"
+                title={`${author?.name} on LinkedIn`}
+                className="font-bold text-primary-dark underline decoration-primary-violet/50 underline-offset-4 transition-colors hover:text-primary-violet"
+              >
+                {author?.name}
+              </a>
+            ) : (
+              <span className="font-bold text-primary-dark">{author?.name}</span>
+            )}
+            , {author?.role}
           </span>
           <span className="text-neutral-300">·</span>
-          <span>{formatBlogDate(post.publishedAt)}</span>
+          <span>{formatBlogDate(article.publishedAt)}</span>
           <span className="text-neutral-300">·</span>
           <span className="inline-flex items-center gap-1.5">
-            <Clock size={14} /> {post.readingMinutes} min read
+            <Clock size={14} /> {article.readingMinutes} min read
           </span>
         </div>
 
-        <p className="mt-8 text-xl font-medium leading-relaxed text-primary-dark">{post.lead}</p>
+        {/* Front-loaded answer: the lead resolves the question before the body starts. */}
+        <p className="mt-8 text-body-lg font-medium leading-relaxed text-primary-dark">
+          {article.lead}
+        </p>
 
-        <div className="mt-10 space-y-6">
-          {post.blocks.map((block, i) => {
-            if (block.type === "h2") {
-              return (
-                <h2
-                  key={i}
-                  className="pt-4 font-display text-[1.7rem] font-extrabold leading-tight tracking-tight text-primary-dark"
-                >
-                  {block.text}
-                </h2>
-              );
-            }
-            if (block.type === "list") {
-              return (
-                <ul key={i} className="space-y-3 pl-1">
-                  {block.items.map((item, j) => (
-                    <li key={j} className="flex gap-3 leading-relaxed text-neutral-600">
-                      <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary-violet" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              );
-            }
-            if (block.type === "callout") {
-              return (
-                <div
-                  key={i}
-                  className="rounded-3xl border-2 border-primary-dark bg-violet-tint p-6 sm:p-8"
-                >
-                  <p className="text-lg font-semibold leading-relaxed text-primary-dark">
-                    {block.text}
-                  </p>
-                  <Link
-                    href="/booking"
-                    className="btn-pop mt-6 inline-flex items-center gap-2 rounded-full border-2 border-primary-dark bg-accent-orange px-7 py-3.5 text-[15px] font-bold text-primary-dark shadow-pop-sm"
-                  >
-                    Book a confidential call
-                    <ArrowRight size={18} strokeWidth={2.5} />
-                  </Link>
-                </div>
-              );
-            }
-            return (
-              <p key={i} className="text-lg leading-relaxed text-neutral-600">
-                {block.text}
-              </p>
-            );
-          })}
+        <div className="mt-10">
+          <Prose value={article.body} />
         </div>
 
-        {post.source && (
-          <p className="mt-10 border-t-2 border-dashed border-neutral-300 pt-5 text-sm italic text-neutral-400">
-            Source cited: {post.source}
+        {article.source && (
+          <p className="mt-10 border-t-2 border-dashed border-neutral-300 pt-5 text-body-sm italic text-neutral-400">
+            Source cited: {article.source}
           </p>
         )}
 
         {/* Related internal links */}
         <section className="mt-14">
-          <p className="text-xs font-bold uppercase tracking-[0.16em] text-primary-violet">
+          <p className="text-caption font-bold uppercase tracking-[0.16em] text-primary-violet">
             Keep going
           </p>
           <div className="mt-4 grid gap-3 sm:grid-cols-3">
@@ -195,13 +224,13 @@ export default async function BlogPostPage({
                     className="shrink-0 text-primary-violet transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                   />
                 </span>
-                <span className="mt-2 text-sm text-neutral-500">{link.note}</span>
+                <span className="mt-2 text-body-sm text-neutral-500">{link.note}</span>
               </Link>
             ))}
           </div>
         </section>
 
-        <p className="mx-auto mt-12 max-w-xl text-center text-xs leading-relaxed text-neutral-400">
+        <p className="mx-auto mt-12 max-w-xl text-center text-caption leading-relaxed text-neutral-400">
           This article is for information only and does not constitute legal or HR advice. For
           personalised guidance, book a confidential consultation.
         </p>

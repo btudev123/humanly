@@ -5,6 +5,8 @@ import { ResourceUnlockForm } from "@/components/resources/ResourceUnlockForm";
 import { getResourceForSlug } from "@/lib/db/repository";
 import { aedFromUsdCents, formatAed } from "@/lib/products";
 import { getResourceUrl, resources } from "@/lib/resources";
+import { getResourceCopyBySlug } from "@/lib/sanity/queries";
+import { buildMetadata } from "@/lib/seo";
 
 export function generateStaticParams() {
   return resources.map((resource) => ({ slug: resource.slug }));
@@ -16,27 +18,26 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const resource = await getResourceForSlug(slug);
+  const [resource, copy] = await Promise.all([
+    getResourceForSlug(slug),
+    getResourceCopyBySlug(slug),
+  ]);
 
   if (!resource) {
     return { title: "Resource Not Found" };
   }
 
-  return {
-    title: `${resource.title} | Humanly Resources`,
-    description: resource.summary,
-    keywords: resource.keywords,
-    alternates: { canonical: getResourceUrl(resource) },
-    openGraph: {
-      title: resource.title,
-      description: resource.summary,
-      url: getResourceUrl(resource),
-      type: "article",
-      publishedTime: resource.updatedAt,
-      modifiedTime: resource.updatedAt,
-      authors: [resource.author],
-    },
-  };
+  return buildMetadata({
+    title: `${copy?.title || resource.title} | Humanly Resources`,
+    description: copy?.summary || resource.summary,
+    path: `/resources/${slug}`,
+    seo: copy?.seo,
+    keywords: copy?.keywords?.length ? copy.keywords : resource.keywords,
+    type: "article",
+    publishedTime: resource.updatedAt,
+    modifiedTime: resource.updatedAt,
+    authors: [resource.author],
+  });
 }
 
 export default async function ResourceDetailPage({
@@ -45,12 +46,15 @@ export default async function ResourceDetailPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const resource = await getResourceForSlug(slug);
+  const [resource, copy] = await Promise.all([
+    getResourceForSlug(slug),
+    getResourceCopyBySlug(slug),
+  ]);
 
   if (!resource) {
     return (
       <div className="mx-auto max-w-2xl px-margin-mobile py-36 text-center md:px-margin-desktop">
-        <h1 className="font-display text-4xl font-extrabold tracking-tight text-primary-dark">Resource not found</h1>
+        <h1 className="text-h1 font-display font-extrabold tracking-tight text-primary-dark">Resource not found</h1>
         <Link href="/resources" className="mt-6 inline-flex font-bold text-primary-violet underline">
           Back to resources
         </Link>
@@ -58,12 +62,16 @@ export default async function ResourceDetailPage({
     );
   }
 
+  // Sanity marketing copy overlaid on the DB/in-code resource (falls back when empty).
+  const title = copy?.title || resource.title;
+  const summary = copy?.summary || resource.summary;
+
   const articleSchema = {
     "@context": "https://schema.org",
     "@type": resource.gated ? "Product" : "Article",
-    name: resource.title,
-    headline: resource.title,
-    description: resource.summary,
+    name: title,
+    headline: title,
+    description: summary,
     url: getResourceUrl(resource),
     dateModified: resource.updatedAt,
     author: { "@type": "Organization", name: resource.author },
@@ -92,10 +100,10 @@ export default async function ResourceDetailPage({
           Back to resources
         </Link>
         <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary-violet">{resource.category}</p>
-        <h1 className="mt-4 font-display text-[clamp(2.25rem,5vw,3.5rem)] font-extrabold leading-[1.04] tracking-tight text-primary-dark">
-          {resource.title}
+        <h1 className="text-h1 mt-4 font-display font-extrabold leading-[1.04] tracking-tight text-primary-dark">
+          {title}
         </h1>
-        <p className="mt-5 text-xl leading-relaxed text-neutral-500">{resource.summary}</p>
+        <p className="mt-5 text-xl leading-relaxed text-neutral-500">{summary}</p>
         <div className="mt-8 grid gap-3 rounded-3xl border-2 border-primary-dark bg-neutral-100 p-5 text-sm text-neutral-500 sm:grid-cols-3">
           <span>Updated {resource.updatedAt}</span>
           <span>Author: {resource.author}</span>
@@ -107,7 +115,7 @@ export default async function ResourceDetailPage({
             calm, documented next steps before they decide whether to escalate, negotiate, resign,
             or get legal advice.
           </p>
-          <h2 className="text-2xl font-extrabold text-primary-dark">What this helps you do</h2>
+          <h2 className="text-h3 font-extrabold text-primary-dark">What this helps you do</h2>
           <ul>
             <li>Clarify what is happening and what evidence matters.</li>
             <li>Prepare questions before a difficult HR or manager conversation.</li>

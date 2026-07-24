@@ -1,7 +1,8 @@
 import { MetadataRoute } from "next";
+import { siteConfig } from "@/lib/site";
 
 export default function robots(): MetadataRoute.Robots {
-  const baseUrl = "https://talkhumanly.com";
+  const baseUrl = siteConfig.url;
 
   return {
     rules: [

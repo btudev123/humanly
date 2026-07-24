@@ -98,7 +98,7 @@ export function BookingFunnel() {
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 border-primary-dark bg-violet-tint text-primary-dark">
               <Calendar size={18} strokeWidth={2.5} />
             </span>
-            <h2 className="text-xl font-extrabold text-primary-dark sm:text-2xl">
+            <h2 className="text-h3 font-extrabold text-primary-dark">
               <span className="text-primary-violet">1.</span> Choose your support
             </h2>
           </div>
@@ -154,7 +154,7 @@ export function BookingFunnel() {
                     {active && <span className="h-2 w-2 rounded-full bg-white" />}
                   </span>
                   <div className="min-w-0 flex-1">
-                    <h3 className="text-base font-extrabold leading-snug text-primary-dark">
+                    <h3 className="text-h4 font-extrabold leading-snug text-primary-dark">
                       {service.name}
                     </h3>
                     <p className="mt-1 flex items-center gap-1.5 text-xs font-semibold text-neutral-400">
@@ -183,7 +183,7 @@ export function BookingFunnel() {
             <Lock size={18} strokeWidth={2.5} />
           </span>
           <div>
-            <h2 className="text-xl font-extrabold text-primary-dark sm:text-2xl">
+            <h2 className="text-h3 font-extrabold text-primary-dark">
               <span className="text-primary-violet">2.</span> Private intake
             </h2>
             <p className="mt-1 text-sm text-neutral-500 sm:text-base">

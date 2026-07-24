@@ -102,7 +102,7 @@ export default function ManagedOutQuiz() {
           <p className="inline-flex items-center gap-2 rounded-full border-2 border-primary-dark bg-violet-tint px-3.5 py-1 text-xs font-bold uppercase tracking-[0.14em] text-primary-dark">
             <LockKeyhole size={12} /> Free &amp; confidential · no sign-up
           </p>
-          <h1 className="mt-5 font-display text-[clamp(2rem,5vw,2.75rem)] font-extrabold leading-tight tracking-tight text-primary-dark">
+          <h1 className="text-h1 mt-5 font-display font-extrabold leading-tight tracking-tight text-primary-dark">
             Are You Being Managed Out?
           </h1>
           <p className="mt-3 text-neutral-500">
@@ -156,7 +156,7 @@ export default function ManagedOutQuiz() {
           ) : (
             <div className="mt-8">
               <p className={`text-xs font-bold uppercase tracking-[0.16em] ${result.tone}`}>{result.band}</p>
-              <h2 className="mt-2 font-display text-2xl font-extrabold text-primary-dark">{result.title}</h2>
+              <h2 className="text-h3 mt-2 font-display font-extrabold text-primary-dark">{result.title}</h2>
               <div className="my-5 h-2.5 overflow-hidden rounded-full bg-surface-container">
                 <div className={`h-full rounded-full ${result.bar}`} style={{ width: result.width }} />
               </div>

@@ -30,6 +30,11 @@ const nextConfig = {
         protocol: "https",
         hostname: "**.ufs.sh",
       },
+      {
+        // Images uploaded through Sanity Studio.
+        protocol: "https",
+        hostname: "cdn.sanity.io",
+      },
     ],
   },
 

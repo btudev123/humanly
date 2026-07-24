@@ -334,7 +334,7 @@ export default function Home() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-on-primary/50">Private Case Room</p>
-                  <h2 className="mt-1.5 font-display text-2xl font-bold text-on-primary">Workplace Strategy</h2>
+                  <h2 className="text-h3 mt-1.5 font-display font-bold text-on-primary">Workplace Strategy</h2>
                 </div>
                 <span className="inline-flex items-center gap-1 rounded-full bg-emerald-400/15 px-3 py-1 text-[11px] font-bold text-emerald-300">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" /> Encrypted
@@ -417,7 +417,7 @@ export default function Home() {
         <div className="mx-auto max-w-max-width">
           <Reveal className="relative mx-auto mb-16 max-w-2xl text-center">
             <Eyebrow color="violet">The Gap</Eyebrow>
-            <h2 className="relative mt-6 inline-block font-display text-h1-mobile font-extrabold tracking-tight text-primary-dark md:text-h1-desktop">
+            <h2 className="text-h2 relative mt-6 inline-block font-display font-extrabold tracking-tight text-primary-dark">
               Caught in the{" "}
               <span className="relative inline-block">
                 unsafe middle?
@@ -436,7 +436,7 @@ export default function Home() {
                 <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border-2 border-primary-dark bg-neutral-200 text-neutral-500">
                   <span className="material-symbols-outlined text-[26px]">corporate_fare</span>
                 </div>
-                <h3 className="font-display text-h3 font-bold text-primary-dark">Internal HR</h3>
+                <h3 className="text-h3 font-display font-bold text-primary-dark">Internal HR</h3>
                 <p className="mt-1 text-xs font-bold uppercase tracking-wider text-neutral-400">The Company</p>
                 <div className="mt-6 space-y-5 border-t-2 border-dashed border-neutral-300 pt-6">
                   <div>
@@ -458,7 +458,7 @@ export default function Home() {
                 <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border-2 border-accent-orange bg-accent-orange text-primary-dark">
                   <span className="material-symbols-outlined fill-icon text-[26px]">balance</span>
                 </div>
-                <h3 className="font-display text-h3 font-bold text-on-primary">Humanly</h3>
+                <h3 className="text-h3 font-display font-bold text-on-primary">Humanly</h3>
                 <p className="mt-1 text-xs font-bold uppercase tracking-wider text-orange-light">The Sweet Spot</p>
                 <div className="mt-6 space-y-5 border-t-2 border-dashed border-white/20 pt-6">
                   <div>
@@ -479,7 +479,7 @@ export default function Home() {
                 <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border-2 border-primary-dark bg-neutral-200 text-neutral-500">
                   <span className="material-symbols-outlined text-[26px]">gavel</span>
                 </div>
-                <h3 className="font-display text-h3 font-bold text-primary-dark">Employment Lawyers</h3>
+                <h3 className="text-h3 font-display font-bold text-primary-dark">Employment Lawyers</h3>
                 <p className="mt-1 text-xs font-bold uppercase tracking-wider text-neutral-400">The Extreme</p>
                 <div className="mt-6 space-y-5 border-t-2 border-dashed border-neutral-300 pt-6">
                   <div>
@@ -502,7 +502,7 @@ export default function Home() {
         <div className="mx-auto max-w-max-width">
           <Reveal className="mb-14 text-center">
             <Eyebrow>What Humanly Is</Eyebrow>
-            <h2 className="mt-6 font-display text-h2 font-extrabold tracking-tight text-primary-dark md:text-[44px]">
+            <h2 className="text-h2 mt-6 font-display font-extrabold tracking-tight text-primary-dark">
               Practical strategy, zero legal jargon.
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-body-lg text-neutral-500">Built on three core principles.</p>
@@ -517,7 +517,7 @@ export default function Home() {
                   <div className="mt-3 flex h-14 w-14 items-center justify-center rounded-2xl border-2 border-primary-dark bg-neutral-100 text-primary-violet">
                     <pillar.icon size={26} />
                   </div>
-                  <h3 className="mt-5 font-display text-h3 font-bold text-primary-dark">{pillar.title}</h3>
+                  <h3 className="text-h3 mt-5 font-display font-bold text-primary-dark">{pillar.title}</h3>
                   <p className="mt-3 leading-relaxed text-neutral-500">{pillar.description}</p>
                 </div>
               </Reveal>
@@ -531,7 +531,7 @@ export default function Home() {
         <div className="mx-auto max-w-max-width">
           <Reveal className="relative mx-auto mb-16 max-w-2xl text-center">
             <Eyebrow color="violet">Pricing</Eyebrow>
-            <h2 className="relative mt-6 inline-block font-display text-h1-mobile font-extrabold tracking-tight text-primary-dark md:text-h1-desktop">
+            <h2 className="text-h2 relative mt-6 inline-block font-display font-extrabold tracking-tight text-primary-dark">
               A confidential reality check
               <Scribble variant="underline" color="#ff6a1a" strokeWidth={4} className="absolute -bottom-3 left-0 h-3.5 w-full" />
             </h2>
@@ -591,7 +591,7 @@ export default function Home() {
                 <Reveal key={service.slug} delay={i * 0.06} className="h-full">
                   <div className="flex h-full flex-col gap-4 rounded-3xl border-2 border-primary-dark bg-violet-tint p-7 transition-transform hover:-translate-y-1">
                     <div>
-                      <h3 className="font-display text-lg font-bold leading-snug text-primary-dark">{service.name}</h3>
+                      <h3 className="text-h4 font-display font-bold leading-snug text-primary-dark">{service.name}</h3>
                       <p className="mt-1 text-sm text-neutral-500">{service.subtitle}</p>
                     </div>
                     <p className="font-display text-4xl font-extrabold text-primary-dark">
@@ -629,7 +629,7 @@ export default function Home() {
                 <Reveal key={service.slug} delay={i * 0.06} className="h-full">
                   <div className="flex h-full flex-col gap-4 rounded-3xl border-2 border-primary-dark bg-orange-tint p-7 transition-transform hover:-translate-y-1">
                     <div>
-                      <h3 className="font-display text-lg font-bold leading-snug text-primary-dark">{service.name}</h3>
+                      <h3 className="text-h4 font-display font-bold leading-snug text-primary-dark">{service.name}</h3>
                       <p className="mt-1 text-sm text-neutral-500">{service.subtitle}</p>
                     </div>
                     <p className="font-display text-4xl font-extrabold text-primary-dark">
@@ -690,7 +690,7 @@ export default function Home() {
           {/* copy */}
           <Reveal delay={0.1} className="order-1 flex flex-col gap-6 md:order-2 md:col-span-7 md:pl-6">
             <Eyebrow>The Founder</Eyebrow>
-            <h2 className="font-display text-h1-mobile font-extrabold tracking-tight text-primary-dark md:text-h1-desktop">
+            <h2 className="text-h2 font-display font-extrabold tracking-tight text-primary-dark">
               Executive experience.{" "}
               <span className="relative inline-block text-primary-violet">
                 Human approach.
@@ -720,7 +720,7 @@ export default function Home() {
         <div className="mx-auto max-w-max-width">
           <Reveal className="mb-14 text-center">
             <Eyebrow color="violet">Who This Is For</Eyebrow>
-            <h2 className="mt-6 font-display text-h2 font-extrabold tracking-tight text-primary-dark md:text-[44px]">Is this you?</h2>
+            <h2 className="text-h2 mt-6 font-display font-extrabold tracking-tight text-primary-dark">Is this you?</h2>
             <p className="mx-auto mt-4 max-w-xl text-body-lg text-neutral-500">If any of these resonate, we can help.</p>
           </Reveal>
 
@@ -731,7 +731,7 @@ export default function Home() {
                   <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border-2 border-primary-dark bg-violet-tint text-primary-violet transition-colors group-hover:bg-accent-orange group-hover:text-primary-dark">
                     <span className="material-symbols-outlined fill-icon text-[26px]">{trigger.icon}</span>
                   </div>
-                  <h3 className="font-display text-[17px] font-bold leading-snug text-primary-dark">{trigger.label}</h3>
+                  <h3 className="text-h4 font-display font-bold leading-snug text-primary-dark">{trigger.label}</h3>
                 </div>
               </Reveal>
             ))}
@@ -759,7 +759,7 @@ export default function Home() {
             <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-orange-light">
               <span className="h-2 w-2 rounded-full bg-accent-orange" /> Low overhead · High efficiency
             </span>
-            <h2 className="mt-6 inline-block font-display text-h1-mobile font-extrabold tracking-tight text-on-primary md:text-h1-desktop">
+            <h2 className="text-h2 mt-6 inline-block font-display font-extrabold tracking-tight text-on-primary">
               From chaos to clarity in{" "}
               <span className="relative inline-block text-accent-orange">
                 48 hours
@@ -783,7 +783,7 @@ export default function Home() {
                     </span>
                   </div>
                   <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
-                    <h3 className="font-display text-h3 font-bold text-on-primary">{step.title}</h3>
+                    <h3 className="text-h3 font-display font-bold text-on-primary">{step.title}</h3>
                     <p className="mt-3 leading-relaxed text-on-primary/70">{step.copy}</p>
                   </div>
                 </div>
@@ -798,7 +798,7 @@ export default function Home() {
         <div className="mx-auto grid max-w-max-width gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
           <Reveal>
             <Eyebrow>Trust Signals</Eyebrow>
-            <h2 className="mt-6 font-display text-h2 font-extrabold tracking-tight text-primary-dark md:text-[40px]">
+            <h2 className="text-h2 mt-6 font-display font-extrabold tracking-tight text-primary-dark">
               No fake reviews. Trust starts cleaner than that.
             </h2>
             <p className="mt-6 text-body-lg text-neutral-500">
@@ -825,7 +825,7 @@ export default function Home() {
           <div className="relative overflow-hidden rounded-[2.5rem] border-2 border-primary-dark bg-violet-tint p-10 text-center md:p-16">
             <Scribble variant="star-fill" color="#ff6a1a" className="absolute left-10 top-10 hidden h-8 w-8 animate-wiggle md:block" />
             <Scribble variant="spiral" color="#7c3aed" className="absolute bottom-8 right-10 hidden h-16 w-16 opacity-50 md:block" />
-            <h2 className="mx-auto max-w-2xl font-display text-h2 font-extrabold tracking-tight text-primary-dark md:text-[40px]">
+            <h2 className="text-h2 mx-auto max-w-2xl font-display font-extrabold tracking-tight text-primary-dark">
               Book your confidential session
             </h2>
             <p className="mx-auto mt-4 max-w-xl text-body-lg text-neutral-500">
@@ -852,7 +852,7 @@ export default function Home() {
         <div className="mx-auto grid max-w-max-width gap-10 lg:grid-cols-[1fr_1.1fr] lg:items-start">
           <Reveal className="lg:sticky lg:top-28">
             <Eyebrow color="violet">FAQ</Eyebrow>
-            <h2 className="mt-6 font-display text-h2 font-extrabold tracking-tight text-primary-dark md:text-[40px]">
+            <h2 className="text-h2 mt-6 font-display font-extrabold tracking-tight text-primary-dark">
               Designed for people who need privacy first.
             </h2>
             <p className="mt-6 text-body-lg text-neutral-500">
@@ -876,7 +876,7 @@ export default function Home() {
           <Scribble variant="star-fill" color="#9d5cff" className="absolute right-10 top-10 hidden h-8 w-8 animate-float md:block" />
           <Scribble variant="heart" color="#ff6a1a" className="absolute bottom-10 left-12 hidden h-9 w-9 animate-float-slow md:block" />
 
-          <h2 className="relative max-w-3xl font-display text-[clamp(2.2rem,5.5vw,3.75rem)] font-extrabold leading-[1.02] tracking-tight">
+          <h2 className="text-h2 relative max-w-3xl font-display font-extrabold leading-[1.02] tracking-tight">
             Ready to find your{" "}
             <span className="relative inline-block text-accent-orange">
               safe space?

@@ -1,0 +1,207 @@
+/**
+ * One-time (idempotent) seed of the Sanity dataset from the site's in-code content.
+ *
+ * Run with:  npx tsx scripts/seed-sanity.ts
+ *
+ * It transforms the existing sources of truth — lib/blog.ts, lib/products.ts,
+ * lib/resources.ts, lib/site.ts, lib/pageMeta.ts — into Sanity documents so that
+ * Studio (/sanity) opens pre-populated with exactly what is already live. Every
+ * document uses a deterministic `_id`, so re-running overwrites rather than
+ * duplicates. Commerce fields (price, Stripe, Cal, gating) are intentionally NOT
+ * seeded — those stay in code; Sanity only owns marketing copy + SEO.
+ *
+ * Auth: the write token is read from the Sanity CLI's own login
+ * (~/.config/sanity/config.json) or the SANITY_AUTH_TOKEN env var. Nothing secret
+ * is written to disk or committed.
+ */
+import { readFileSync } from "node:fs";
+import { homedir } from "node:os";
+import { join } from "node:path";
+import { createClient } from "@sanity/client";
+import type { PortableTextBlock } from "@portabletext/types";
+
+import { projectId, dataset, apiVersion } from "../sanity/env";
+import { blogPosts, type BlogBlock } from "../lib/blog";
+import { serviceProducts } from "../lib/products";
+import { resources } from "../lib/resources";
+import { siteConfig } from "../lib/site";
+import { PAGE_META } from "../lib/pageMeta";
+
+/* ------------------------------------------------------------------- auth */
+
+function resolveToken(): string {
+  if (process.env.SANITY_AUTH_TOKEN) return process.env.SANITY_AUTH_TOKEN;
+  try {
+    const cfg = JSON.parse(
+      readFileSync(join(homedir(), ".config", "sanity", "config.json"), "utf8"),
+    );
+    if (cfg.authToken) return cfg.authToken as string;
+  } catch {
+    /* fall through */
+  }
+  throw new Error(
+    "No Sanity write token. Run `npx sanity login`, or set SANITY_AUTH_TOKEN.",
+  );
+}
+
+const client = createClient({
+  projectId,
+  dataset,
+  apiVersion,
+  token: resolveToken(),
+  useCdn: false,
+});
+
+/* ------------------------------------------------ portable-text builder */
+
+let keySeq = 0;
+const key = () => `k${(keySeq++).toString(36)}`;
+
+/** Convert the hand-written `BlogBlock[]` into clean portable text for storage. */
+function blocksToPortableText(blocks: BlogBlock[]): PortableTextBlock[] {
+  return blocks.flatMap((block): PortableTextBlock[] => {
+    if (block.type === "callout") {
+      return [
+        {
+          _type: "callout",
+          _key: key(),
+          text: block.text,
+          ctaLabel: "Book a confidential call",
+          ctaHref: "/booking",
+        } as unknown as PortableTextBlock,
+      ];
+    }
+    if (block.type === "list") {
+      return block.items.map(
+        (item) =>
+          ({
+            _type: "block",
+            _key: key(),
+            style: "normal",
+            listItem: "bullet",
+            level: 1,
+            markDefs: [],
+            children: [{ _type: "span", _key: key(), text: item, marks: [] }],
+          }) as unknown as PortableTextBlock,
+      );
+    }
+    return [
+      {
+        _type: "block",
+        _key: key(),
+        style: block.type === "h2" ? "h2" : "normal",
+        markDefs: [],
+        children: [{ _type: "span", _key: key(), text: block.text, marks: [] }],
+      } as unknown as PortableTextBlock,
+    ];
+  });
+}
+
+/* -------------------------------------------------------------- documents */
+
+const AUTHOR_ID = "author.karma-harb";
+
+function buildDocs() {
+  const docs: Record<string, unknown>[] = [];
+
+  // Author (single canonical author; role matches the current blog byline).
+  docs.push({
+    _id: AUTHOR_ID,
+    _type: "author",
+    name: siteConfig.founder,
+    role: "Founder of Humanly",
+    bio: "Senior HR leader turned independent advisor. Karma has sat on both sides of the table — issuing PIPs and running investigations inside companies, and now advising the professionals on the receiving end.",
+    linkedinUrl: siteConfig.founderLinkedIn,
+  });
+
+  // Blog posts.
+  for (const post of blogPosts) {
+    docs.push({
+      _id: `post.${post.slug}`,
+      _type: "post",
+      title: post.title,
+      slug: { _type: "slug", current: post.slug },
+      excerpt: post.excerpt,
+      lead: post.lead,
+      body: blocksToPortableText(post.blocks),
+      ...(post.source ? { source: post.source } : {}),
+      author: { _type: "reference", _ref: AUTHOR_ID },
+      category: post.category,
+      publishedAt: new Date(`${post.publishedAt}T09:00:00Z`).toISOString(),
+      readingMinutes: post.readingMinutes,
+      keywords: post.keywords,
+    });
+  }
+
+  // Service copy (marketing fields only).
+  for (const s of serviceProducts) {
+    docs.push({
+      _id: `service.${s.slug}`,
+      _type: "service",
+      slug: s.slug,
+      name: s.name,
+      subtitle: s.subtitle,
+      description: s.description,
+      features: s.features,
+      forWho: s.forWho,
+    });
+  }
+
+  // Resource copy (marketing fields only).
+  for (const r of resources) {
+    docs.push({
+      _id: `resource.${r.slug}`,
+      _type: "resource",
+      slug: r.slug,
+      title: r.title,
+      summary: r.summary,
+      audience: r.audience,
+      keywords: r.keywords,
+    });
+  }
+
+  // Site settings singleton (feeds the Organization / WebSite JSON-LD).
+  docs.push({
+    _id: "siteSettings",
+    _type: "siteSettings",
+    organizationName: siteConfig.name,
+    organizationDescription: siteConfig.description,
+    sameAs: [siteConfig.founderLinkedIn],
+    defaultSeo: {
+      metaTitle: PAGE_META["/"].title,
+      metaDescription: PAGE_META["/"].description,
+    },
+  });
+
+  // Page SEO docs — one per fixed route, pre-filled with the live default copy.
+  for (const [route, meta] of Object.entries(PAGE_META)) {
+    docs.push({
+      _id: `page.${route === "/" ? "home" : route.replace(/\//g, "")}`,
+      _type: "page",
+      route,
+      seo: { metaTitle: meta.title, metaDescription: meta.description },
+    });
+  }
+
+  return docs;
+}
+
+/* -------------------------------------------------------------------- run */
+
+async function main() {
+  const docs = buildDocs();
+  const tx = docs.reduce((t, doc) => t.createOrReplace(doc as never), client.transaction());
+  await tx.commit({ visibility: "async" });
+  console.log(`✓ Seeded ${docs.length} documents into ${projectId}/${dataset}.`);
+  const counts = docs.reduce<Record<string, number>>((acc, d) => {
+    const t = d._type as string;
+    acc[t] = (acc[t] ?? 0) + 1;
+    return acc;
+  }, {});
+  console.table(counts);
+}
+
+main().catch((err) => {
+  console.error("Seed failed:", err.message ?? err);
+  process.exit(1);
+});

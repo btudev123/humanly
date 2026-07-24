@@ -1,12 +1,9 @@
 import type { Metadata } from "next";
-import { absoluteUrl } from "@/lib/site";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Privacy Policy | Humanly",
-  description:
-    "Humanly privacy policy covering confidential intake, booking, payment, resource download, and advisory data handling.",
-  alternates: { canonical: absoluteUrl("/privacy") },
-};
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("/privacy");
+}
 
 export default function PrivacyLayout({ children }: { children: React.ReactNode }) {
   return <>{children}</>;

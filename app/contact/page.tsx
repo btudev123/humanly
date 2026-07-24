@@ -1,6 +1,12 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, CalendarCheck, Mail, MapPin, ShieldCheck } from "lucide-react";
 import { Scribble } from "@/components/ui/Scribble";
+import { pageMetadata } from "@/lib/seo";
+
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("/contact");
+}
 
 export default function ContactPage() {
   return (
@@ -11,7 +17,7 @@ export default function ContactPage() {
         <span className="inline-flex items-center gap-2 rounded-full border-2 border-primary-dark bg-neutral-100 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-primary-dark shadow-pop-sm">
           <ShieldCheck size={13} className="text-primary-violet" /> Warm, private &amp; handled by humans
         </span>
-        <h1 className="mx-auto mt-6 max-w-3xl font-display text-h1-mobile font-extrabold tracking-tight text-primary-dark md:text-h1-desktop">
+        <h1 className="text-h1 mx-auto mt-6 max-w-3xl font-display font-extrabold tracking-tight text-primary-dark">
           Get in touch,{" "}
           <span className="relative inline-block">
             confidentially
@@ -28,7 +34,7 @@ export default function ContactPage() {
         {/* Email */}
         <div className="flex flex-col rounded-3xl border-2 border-primary-dark bg-neutral-100 p-8 text-center shadow-pop-sm">
           <Mail className="mx-auto mb-4 text-primary-violet" size={32} />
-          <h2 className="font-display text-2xl font-bold text-primary-dark">Email us directly</h2>
+          <h2 className="text-h3 font-display font-bold text-primary-dark">Email us directly</h2>
           <p className="mt-2 flex-1 leading-relaxed text-neutral-500">
             Write to us about your situation. Karma reads every message personally — it stays strictly
             confidential and your employer is never contacted.
@@ -45,7 +51,7 @@ export default function ContactPage() {
         {/* Book */}
         <div className="flex flex-col rounded-3xl border-2 border-primary-dark bg-violet-tint p-8 text-center">
           <CalendarCheck className="mx-auto mb-4 text-primary-violet" size={32} />
-          <h2 className="font-display text-2xl font-bold text-primary-dark">Book directly</h2>
+          <h2 className="text-h3 font-display font-bold text-primary-dark">Book directly</h2>
           <p className="mt-2 flex-1 leading-relaxed text-neutral-500">
             Skip the back-and-forth. Book a confidential session now and Karma will review your intake
             before you meet.

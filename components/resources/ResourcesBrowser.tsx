@@ -54,7 +54,7 @@ function ResourceCard({ resource }: { resource: Resource }) {
       {/* Body */}
       <div className="flex flex-1 flex-col gap-4 p-6">
         <div>
-          <h2 className="font-display text-xl font-extrabold leading-tight tracking-tight text-primary-dark">{resource.title}</h2>
+          <h2 className="text-h3 font-display font-extrabold leading-tight tracking-tight text-primary-dark">{resource.title}</h2>
           <p className="mt-2 text-sm leading-relaxed text-neutral-500">{resource.summary}</p>
         </div>
 
@@ -108,7 +108,7 @@ export function ResourcesBrowser({ resources }: { resources: Resource[] }) {
       <section className="mx-auto max-w-max-width px-margin-mobile md:px-margin-desktop">
         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div>
-            <h2 className="font-display text-h2 font-extrabold tracking-tight text-primary-dark">
+            <h2 className="text-h2 font-display font-extrabold tracking-tight text-primary-dark">
               Guides, kits &amp; courses
             </h2>
             <p className="mt-2 max-w-lg text-body-lg text-neutral-500">

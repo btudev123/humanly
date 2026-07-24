@@ -2,19 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Wrench, Zap } from "lucide-react";
 import { Scribble } from "@/components/ui/Scribble";
-import { absoluteUrl } from "@/lib/site";
+import { pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Free HR Tools | Humanly",
-  description:
-    "Free interactive tools for professionals — diagnose if you're being managed out, decide whether to resign or stay, and more. No sign-up required.",
-  alternates: { canonical: absoluteUrl("/tools") },
-  openGraph: {
-    title: "Free HR Tools | Humanly",
-    description: "Free interactive tools to help you navigate workplace challenges.",
-    url: absoluteUrl("/tools"),
-  },
-};
+export function generateMetadata(): Promise<Metadata> {
+  return pageMetadata("/tools");
+}
 
 const tools = [
   {
@@ -57,7 +49,7 @@ export default function ToolsPage() {
         <span className="inline-flex items-center gap-2 rounded-full border-2 border-primary-dark bg-neutral-100 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-primary-dark shadow-pop-sm">
           <Wrench size={13} className="text-primary-violet" /> Free Tools
         </span>
-        <h1 className="mx-auto mt-6 max-w-3xl font-display text-h1-mobile font-extrabold tracking-tight text-primary-dark md:text-h1-desktop">
+        <h1 className="text-h1 mx-auto mt-6 max-w-3xl font-display font-extrabold tracking-tight text-primary-dark">
           Tools to help you{" "}
           <span className="relative inline-block">
             think clearly
@@ -93,7 +85,7 @@ export default function ToolsPage() {
               </div>
 
               <div>
-                <h2 className="font-display text-2xl font-extrabold tracking-tight text-primary-dark">{tool.title}</h2>
+                <h2 className="text-h3 font-display font-extrabold tracking-tight text-primary-dark">{tool.title}</h2>
                 <p className="mt-3 leading-relaxed text-neutral-500">{tool.desc}</p>
               </div>
 
@@ -114,7 +106,7 @@ export default function ToolsPage() {
               key={item.title}
               className="flex flex-col gap-2 rounded-2xl border-2 border-dashed border-neutral-300 bg-neutral-100/50 p-6 opacity-70"
             >
-              <h3 className="font-display text-lg font-bold text-primary-dark">{item.title}</h3>
+              <h3 className="text-h4 font-display font-bold text-primary-dark">{item.title}</h3>
               <p className="text-sm leading-relaxed text-neutral-500">{item.desc}</p>
             </div>
           ))}
@@ -127,7 +119,7 @@ export default function ToolsPage() {
           <Scribble variant="spiral" color="#fda544" className="absolute right-8 top-8 hidden h-20 w-20 opacity-30 md:block" />
           <Scribble variant="star-fill" color="#9d5cff" className="absolute bottom-8 left-10 hidden h-8 w-8 animate-float md:block" />
           <div className="relative z-10">
-            <h2 className="font-display text-h2 font-extrabold tracking-tight">Need personalised advice?</h2>
+            <h2 className="text-h2 font-display font-extrabold tracking-tight">Need personalised advice?</h2>
             <p className="mx-auto mb-8 mt-4 max-w-xl text-body-lg text-on-primary/70">
               Tools give you clarity. A confidential consultation gives you a plan.
             </p>

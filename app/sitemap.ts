@@ -2,11 +2,12 @@ import { MetadataRoute } from "next";
 import { getPublishedResources } from "@/lib/db/repository";
 import { resources } from "@/lib/resources";
 import { blogPosts } from "@/lib/blog";
+import { siteConfig } from "@/lib/site";
 
 export const revalidate = 3600;
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = "https://talkhumanly.com";
+  const baseUrl = siteConfig.url;
   const lastModified = new Date();
   let publicResources = resources;
 

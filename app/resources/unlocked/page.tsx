@@ -35,7 +35,7 @@ export default async function ResourceUnlockedPage({
     return (
       <div className="mx-auto max-w-xl px-margin-mobile py-36 text-center md:px-margin-desktop">
         <div className="rounded-[2rem] border-2 border-primary-dark bg-neutral-100 p-10 shadow-pop">
-          <h1 className="font-display text-4xl font-extrabold tracking-tight text-primary-dark">Resource is still locked</h1>
+          <h1 className="text-h1 font-display font-extrabold tracking-tight text-primary-dark">Resource is still locked</h1>
           <p className="mt-4 text-neutral-500">Payment has not been confirmed for this download link.</p>
           <Link href="/resources" className="btn-pop mt-8 inline-flex items-center gap-2 rounded-full border-2 border-primary-dark bg-accent-orange px-8 py-4 text-[15px] font-bold text-primary-dark shadow-pop-sm">
             Back to resources
@@ -51,7 +51,7 @@ export default async function ResourceUnlockedPage({
         <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full border-2 border-primary-dark bg-[#25D366]/15">
           <CheckCircle2 className="text-[#1da851]" size={42} />
         </div>
-        <h1 className="font-display text-h1-mobile font-extrabold tracking-tight text-primary-dark md:text-h1-desktop">
+        <h1 className="text-h1 font-display font-extrabold tracking-tight text-primary-dark">
           {resource.membership ? "Membership active" : "Resource unlocked"}
         </h1>
         <p className="mt-4 text-body-lg leading-relaxed text-neutral-500">{resource.title}</p>

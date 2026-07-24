@@ -15,7 +15,7 @@ export default function Privacy() {
           <span className="inline-flex items-center gap-2 rounded-full border-2 border-primary-dark bg-neutral-100 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-primary-dark shadow-pop-sm">
             <ShieldCheck size={13} className="text-primary-violet" /> Data first. Humans always.
           </span>
-          <h1 className="mt-6 inline-block font-display text-h1-mobile font-extrabold tracking-tight text-primary-dark md:text-h1-desktop">
+          <h1 className="text-h1 mt-6 inline-block font-display font-extrabold tracking-tight text-primary-dark">
             Privacy{" "}
             <span className="relative inline-block">
               Policy
@@ -34,7 +34,7 @@ export default function Privacy() {
         >
           <div className="relative z-10 space-y-12 leading-relaxed text-neutral-500">
             <section className="space-y-4">
-              <h2 className="flex items-center gap-3 font-display text-2xl font-bold text-primary-dark">
+              <h2 className="text-h3 flex items-center gap-3 font-display font-bold text-primary-dark">
                 <span className="flex h-10 w-10 items-center justify-center rounded-xl border-2 border-primary-dark bg-violet-tint text-primary-violet"><EyeOff size={20} /></span>
                 1. Confidentiality Commitment
               </h2>
@@ -44,7 +44,7 @@ export default function Privacy() {
             </section>
 
             <section className="space-y-4">
-              <h2 className="flex items-center gap-3 font-display text-2xl font-bold text-primary-dark">
+              <h2 className="text-h3 flex items-center gap-3 font-display font-bold text-primary-dark">
                 <span className="flex h-10 w-10 items-center justify-center rounded-xl border-2 border-primary-dark bg-orange-tint text-accent-orange"><HardDrive size={20} /></span>
                 2. Data We Collect
               </h2>
@@ -68,7 +68,7 @@ export default function Privacy() {
             </section>
 
             <section className="space-y-4">
-              <h2 className="flex items-center gap-3 font-display text-2xl font-bold text-primary-dark">
+              <h2 className="text-h3 flex items-center gap-3 font-display font-bold text-primary-dark">
                 <span className="flex h-10 w-10 items-center justify-center rounded-xl border-2 border-primary-dark bg-violet-tint text-primary-violet"><ShieldCheck size={20} /></span>
                 3. Data Sharing & Retention
               </h2>
@@ -83,7 +83,7 @@ export default function Privacy() {
             </section>
 
             <section className="space-y-4">
-              <h2 className="flex items-center gap-3 font-display text-2xl font-bold text-primary-dark">
+              <h2 className="text-h3 flex items-center gap-3 font-display font-bold text-primary-dark">
                 <span className="flex h-10 w-10 items-center justify-center rounded-xl border-2 border-primary-dark bg-violet-tint text-primary-dark"><Lock size={20} /></span>
                 4. Security
               </h2>

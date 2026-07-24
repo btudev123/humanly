@@ -363,7 +363,7 @@ export function TestimonialsGrid({
   return (
     <section className="bg-white px-5 py-24 md:px-[64px]">
       <div className="mx-auto max-w-6xl">
-        <h2 className="text-[32px] font-extrabold text-neutral-900 md:text-[44px]">
+        <h2 className="text-h2 font-extrabold text-neutral-900">
           {title}
         </h2>
         <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">

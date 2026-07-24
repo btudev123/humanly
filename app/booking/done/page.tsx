@@ -31,7 +31,7 @@ export default async function BookingDonePage({
         <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full border-2 border-primary-dark bg-[#25D366]/15">
           <CheckCircle2 className="text-[#1da851]" size={42} />
         </div>
-        <h1 className="font-display text-h1-mobile font-extrabold tracking-tight text-primary-dark md:text-h1-desktop">
+        <h1 className="text-h1 font-display font-extrabold tracking-tight text-primary-dark">
           Your session is booked
         </h1>
         <p className="mt-4 text-body-lg leading-relaxed text-neutral-500">

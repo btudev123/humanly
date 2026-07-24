@@ -4,6 +4,8 @@ import "./globals.css";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { MaybeClerkProvider } from "@/components/auth/MaybeClerkProvider";
+import { siteConfig, absoluteUrl } from "@/lib/site";
+import { getPageContent, getSiteSettings } from "@/lib/sanity/queries";
 
 export const viewport: Viewport = {
   themeColor: "#fbf7f1",
@@ -13,14 +15,18 @@ export const viewport: Viewport = {
 
 const googleSiteVerification = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION;
 
-export const metadata: Metadata = {
-  metadataBase: new URL("https://talkhumanly.com"),
+const TITLE_TEMPLATE = "%s | Humanly — HR with Dignity";
+const DEFAULT_TITLE = "Humanly — Independent, Confidential HR Advisory for Professionals";
+const DEFAULT_DESCRIPTION =
+  "Your HR manages the workplace. We manage your career. Independent, confidential HR advice for professionals worldwide — toxic workplaces, PIPs, burnout, exits, and your rights, without your employer knowing. Regional guides for the UAE, GCC & North America.";
+
+const baseMetadata: Metadata = {
+  metadataBase: new URL(siteConfig.url),
   title: {
-    template: "%s | Humanly — HR with Dignity",
-    default: "Humanly — Independent, Confidential HR Advisory for Professionals",
+    template: TITLE_TEMPLATE,
+    default: DEFAULT_TITLE,
   },
-  description:
-    "Your HR manages the workplace. We manage your career. Independent, confidential HR advice for professionals worldwide — toxic workplaces, PIPs, burnout, exits, and your rights, without your employer knowing. Regional guides for the UAE, GCC & North America.",
+  description: DEFAULT_DESCRIPTION,
   keywords: [
     "independent HR advisor",
     "confidential HR consultation",
@@ -40,7 +46,7 @@ export const metadata: Metadata = {
     title: "Humanly — Independent, Confidential HR Advisory for Professionals",
     description:
       "Your HR manages the workplace. We manage your career. Talk to a real expert — not your employer's HR.",
-    url: "https://talkhumanly.com",
+    url: siteConfig.url,
     locale: "en_US",
   },
   twitter: {
@@ -62,20 +68,58 @@ export const metadata: Metadata = {
     "max-video-preview": -1,
   },
   alternates: {
-    canonical: "https://talkhumanly.com",
+    canonical: siteConfig.url,
   },
   verification: googleSiteVerification ? { google: googleSiteVerification } : undefined,
 };
 
-const organizationSchema = {
+/**
+ * Home + site-wide default metadata. Sanity's `page` ("/") SEO and
+ * `siteSettings.defaultSeo` overlay the in-code defaults above; anything the CMS
+ * leaves blank keeps the shipped copy. The `title.template` is preserved so child
+ * routes without their own metadata still get the brand suffix.
+ */
+export async function generateMetadata(): Promise<Metadata> {
+  const [home, settings] = await Promise.all([
+    getPageContent("/"),
+    getSiteSettings(),
+  ]);
+  const seo = home?.seo;
+  const title = seo?.metaTitle || settings?.defaultSeo?.metaTitle;
+  const description =
+    seo?.metaDescription || settings?.defaultSeo?.metaDescription;
+
+  return {
+    ...baseMetadata,
+    title: { template: TITLE_TEMPLATE, default: title || DEFAULT_TITLE },
+    description: description || DEFAULT_DESCRIPTION,
+    openGraph: {
+      ...baseMetadata.openGraph,
+      ...(title ? { title } : {}),
+      ...(description ? { description } : {}),
+    },
+    ...(seo?.canonicalOverride
+      ? { alternates: { ...baseMetadata.alternates, canonical: seo.canonicalOverride } }
+      : {}),
+  };
+}
+
+const founderSameAs = (settings: { sameAs?: string[] } | null) =>
+  Array.from(new Set([siteConfig.founderLinkedIn, ...(settings?.sameAs ?? [])]));
+
+const buildOrganizationSchema = (
+  settings: Awaited<ReturnType<typeof getSiteSettings>>,
+) => ({
   "@context": "https://schema.org",
   "@type": "Organization",
-  name: "Humanly HR Advisory",
-  url: "https://talkhumanly.com",
-  logo: "https://talkhumanly.com/logo.svg",
+  name: settings?.organizationName || "Humanly HR Advisory",
+  url: siteConfig.url,
+  logo: absoluteUrl("/logo.svg"),
   description:
+    settings?.organizationDescription ||
     "Independent, confidential HR advisory for professionals worldwide, with dedicated guidance for the UAE, GCC and North America.",
   email: "hello@talkhumanly.com",
+  sameAs: settings?.sameAs?.length ? settings.sameAs : undefined,
   contactPoint: {
     "@type": "ContactPoint",
     contactType: "Confidential Consultation",
@@ -83,18 +127,21 @@ const organizationSchema = {
   },
   founder: {
     "@type": "Person",
-    name: "Karma Harb",
-    jobTitle: "Founder & Principal HR Advisor",
+    name: siteConfig.founder,
+    jobTitle: siteConfig.founderRole,
     description:
       "20+ years in HR across UAE, Saudi Arabia, and international environments.",
+    sameAs: founderSameAs(settings),
   },
-};
+});
 
 const founderSchema = {
   "@context": "https://schema.org",
   "@type": "Person",
-  name: "Karma Harb",
-  jobTitle: "Founder & Principal HR Advisor",
+  name: siteConfig.founder,
+  url: absoluteUrl("/about"),
+  jobTitle: siteConfig.founderRole,
+  sameAs: [siteConfig.founderLinkedIn],
   worksFor: {
     "@type": "Organization",
     name: "Humanly HR Advisory",
@@ -114,7 +161,7 @@ const serviceSchema = {
   name: "Humanly HR Advisory",
   areaServed: ["Worldwide", "United Arab Emirates", "Gulf Cooperation Council", "North America"],
   serviceType: "Confidential HR advisory for employees",
-  url: "https://talkhumanly.com",
+  url: siteConfig.url,
   founder: founderSchema,
   priceRange: "$75-$1400",
 };
@@ -123,24 +170,27 @@ const websiteSchema = {
   "@context": "https://schema.org",
   "@type": "WebSite",
   name: "Humanly — HR with Dignity",
-  url: "https://talkhumanly.com",
+  url: siteConfig.url,
   description:
     "Confidential workplace advice for UAE and GCC professionals.",
   potentialAction: {
     "@type": "SearchAction",
     target: {
       "@type": "EntryPoint",
-      urlTemplate: "https://talkhumanly.com/resources?q={search_term_string}",
+      urlTemplate: `${siteConfig.url}/resources?q={search_term_string}`,
     },
     "query-input": "required name=search_term_string",
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const settings = await getSiteSettings();
+  const organizationSchema = buildOrganizationSchema(settings);
+
   return (
     <MaybeClerkProvider>
       <html lang="en">

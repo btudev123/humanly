@@ -27,7 +27,7 @@ export default async function DashboardPage() {
           <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl border-2 border-primary-dark bg-violet-tint text-primary-violet">
             <LockKeyhole size={32} />
           </div>
-          <h1 className="font-display text-4xl font-extrabold tracking-tight text-primary-dark">Dashboard locked</h1>
+          <h1 className="text-h1 font-display font-extrabold tracking-tight text-primary-dark">Dashboard locked</h1>
           <p className="mx-auto mt-4 max-w-xl text-neutral-500">{adminState.message}</p>
         </div>
       </div>
@@ -38,7 +38,7 @@ export default async function DashboardPage() {
     return (
       <div className="min-h-screen bg-surface px-margin-mobile py-36 md:px-margin-desktop">
         <div className="mx-auto max-w-3xl rounded-[2rem] border-2 border-primary-dark bg-neutral-100 p-8 shadow-pop">
-          <h1 className="font-display text-3xl font-extrabold tracking-tight text-primary-dark">Connect Neon Postgres</h1>
+          <h1 className="text-h1 font-display font-extrabold tracking-tight text-primary-dark">Connect Neon Postgres</h1>
           <p className="mt-4 leading-relaxed text-neutral-500">
             Add `DATABASE_URL` or `POSTGRES_URL`, run the SQL in `lib/db/migrations.sql`,
             then return here to track revenue, bookings, resources, and funnel events.
@@ -56,7 +56,7 @@ export default async function DashboardPage() {
         <span className="inline-flex items-center gap-2 rounded-full border-2 border-primary-dark bg-neutral-100 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-primary-dark shadow-pop-sm">
           <span className="h-2 w-2 rounded-full bg-accent-orange" /> Admin · {adminState.email}
         </span>
-        <h1 className="mt-5 font-display text-h1-mobile font-extrabold tracking-tight text-primary-dark md:text-h1-desktop">
+        <h1 className="text-h1 mt-5 font-display font-extrabold tracking-tight text-primary-dark">
           Revenue, bookings, resources, and funnel controls.
         </h1>
         <p className="mt-4 max-w-2xl text-body-lg leading-relaxed text-neutral-500">
@@ -83,7 +83,7 @@ export default async function DashboardPage() {
         <DashboardClient />
       </section>
       <section className="mx-auto mt-8 max-w-max-width rounded-3xl border-2 border-primary-dark bg-neutral-100 p-6">
-        <h2 className="font-display text-xl font-bold text-primary-dark">Funnel events</h2>
+        <h2 className="text-h3 font-display font-bold text-primary-dark">Funnel events</h2>
         <div className="mt-4 grid gap-3 md:grid-cols-3">
           {metrics.funnel.length ? (
             metrics.funnel.map((event) => (

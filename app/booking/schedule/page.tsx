@@ -56,7 +56,7 @@ function ScheduleBlocked({ message }: { message: string }) {
   return (
     <div className="mx-auto max-w-2xl px-margin-mobile py-36 text-center md:px-margin-desktop">
       <div className="rounded-[2rem] border-2 border-primary-dark bg-neutral-100 p-10 shadow-pop md:p-14">
-        <h1 className="font-display text-4xl font-extrabold tracking-tight text-primary-dark">Scheduling is locked</h1>
+        <h1 className="text-h1 font-display font-extrabold tracking-tight text-primary-dark">Scheduling is locked</h1>
         <p className="mt-4 text-body-lg leading-relaxed text-neutral-500">{message}</p>
         <Link
           href="/booking"
