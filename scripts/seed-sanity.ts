@@ -99,7 +99,10 @@ function blocksToPortableText(blocks: BlogBlock[]): PortableTextBlock[] {
 
 /* -------------------------------------------------------------- documents */
 
-const AUTHOR_ID = "author.karma-harb";
+// IDs deliberately use NO dots. A "." in a Sanity document id creates a path
+// namespace that a public dataset's default `path("*")` read grant excludes, which
+// would make these docs invisible to the token-less `sanityFetch`.
+const AUTHOR_ID = "author-karma-harb";
 
 function buildDocs() {
   const docs: Record<string, unknown>[] = [];
@@ -117,7 +120,7 @@ function buildDocs() {
   // Blog posts.
   for (const post of blogPosts) {
     docs.push({
-      _id: `post.${post.slug}`,
+      _id: `post-${post.slug}`,
       _type: "post",
       title: post.title,
       slug: { _type: "slug", current: post.slug },
@@ -136,7 +139,7 @@ function buildDocs() {
   // Service copy (marketing fields only).
   for (const s of serviceProducts) {
     docs.push({
-      _id: `service.${s.slug}`,
+      _id: `service-${s.slug}`,
       _type: "service",
       slug: s.slug,
       name: s.name,
@@ -150,7 +153,7 @@ function buildDocs() {
   // Resource copy (marketing fields only).
   for (const r of resources) {
     docs.push({
-      _id: `resource.${r.slug}`,
+      _id: `resource-${r.slug}`,
       _type: "resource",
       slug: r.slug,
       title: r.title,
@@ -176,7 +179,7 @@ function buildDocs() {
   // Page SEO docs — one per fixed route, pre-filled with the live default copy.
   for (const [route, meta] of Object.entries(PAGE_META)) {
     docs.push({
-      _id: `page.${route === "/" ? "home" : route.replace(/\//g, "")}`,
+      _id: `page-${route === "/" ? "home" : route.replace(/\//g, "")}`,
       _type: "page",
       route,
       seo: { metaTitle: meta.title, metaDescription: meta.description },
@@ -188,7 +191,13 @@ function buildDocs() {
 
 /* -------------------------------------------------------------------- run */
 
+const MANAGED_TYPES = ["post", "page", "service", "resource", "author", "siteSettings"];
+
 async function main() {
+  // Purge any previously-seeded docs (including legacy dotted-id ones) so a re-run
+  // never leaves duplicates or orphaned ids behind.
+  await client.delete({ query: `*[_type in [${MANAGED_TYPES.map((t) => `"${t}"`).join(",")}]]` });
+
   const docs = buildDocs();
   const tx = docs.reduce((t, doc) => t.createOrReplace(doc as never), client.transaction());
   await tx.commit({ visibility: "async" });
