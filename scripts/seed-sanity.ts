@@ -1,18 +1,18 @@
 /**
  * One-time (idempotent) seed of the Sanity dataset from the site's in-code content.
  *
- * Run with:  npx tsx scripts/seed-sanity.ts
+ * Run with:  npx tsx --env-file=.env.local scripts/seed-sanity.ts
  *
  * It transforms the existing sources of truth — lib/blog.ts, lib/products.ts,
  * lib/resources.ts, lib/site.ts, lib/pageMeta.ts — into Sanity documents so that
- * Studio (/sanity) opens pre-populated with exactly what is already live. Every
+ * Studio (/studio) opens pre-populated with exactly what is already live. Every
  * document uses a deterministic `_id`, so re-running overwrites rather than
  * duplicates. Commerce fields (price, Stripe, Cal, gating) are intentionally NOT
  * seeded — those stay in code; Sanity only owns marketing copy + SEO.
  *
- * Auth: the write token is read from the Sanity CLI's own login
- * (~/.config/sanity/config.json) or the SANITY_AUTH_TOKEN env var. Nothing secret
- * is written to disk or committed.
+ * Auth: SANITY_API_WRITE_TOKEN (from .env.local, which is gitignored) is preferred,
+ * falling back to SANITY_AUTH_TOKEN or the Sanity CLI's own login
+ * (~/.config/sanity/config.json). Nothing secret is written to disk or committed.
  */
 import { readFileSync } from "node:fs";
 import { homedir } from "node:os";
@@ -30,6 +30,7 @@ import { PAGE_META } from "../lib/pageMeta";
 /* ------------------------------------------------------------------- auth */
 
 function resolveToken(): string {
+  if (process.env.SANITY_API_WRITE_TOKEN) return process.env.SANITY_API_WRITE_TOKEN;
   if (process.env.SANITY_AUTH_TOKEN) return process.env.SANITY_AUTH_TOKEN;
   try {
     const cfg = JSON.parse(
@@ -40,7 +41,8 @@ function resolveToken(): string {
     /* fall through */
   }
   throw new Error(
-    "No Sanity write token. Run `npx sanity login`, or set SANITY_AUTH_TOKEN.",
+    "No Sanity write token. Set SANITY_API_WRITE_TOKEN in .env.local and run with " +
+      "`npx tsx --env-file=.env.local scripts/seed-sanity.ts`, or run `npx sanity login`.",
   );
 }
 

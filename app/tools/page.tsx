@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowRight, Wrench, Zap } from "lucide-react";
 import { Scribble } from "@/components/ui/Scribble";
 import { pageMetadata } from "@/lib/seo";
+import { LatestPosts } from "@/components/blog/LatestPosts";
 
 export function generateMetadata(): Promise<Metadata> {
   return pageMetadata("/tools");
@@ -133,6 +134,8 @@ export default function ToolsPage() {
           </div>
         </div>
       </section>
+
+      <LatestPosts title="Latest from the blog" />
     </div>
   );
 }

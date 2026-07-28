@@ -22,6 +22,12 @@ export type LeadNotificationEmailProps = {
   urgency?: string | null;
   concern?: string | null;
   message?: string | null;
+  /**
+   * Service-specific intake answers — the job posting link for interview prep, the
+   * document type for a review, headcount for a corporate booking. Labelled rather
+   * than typed, because the questions differ per service (see `lib/intake.ts`).
+   */
+  details?: { label: string; value: string }[] | null;
   paid: boolean;
   orderId?: string | null;
   /** Present only once the client has picked a time in Cal.com. */
@@ -48,6 +54,7 @@ export function LeadNotificationEmail({
   urgency,
   concern,
   message,
+  details,
   paid,
   orderId,
   startTime,
@@ -77,6 +84,9 @@ export function LeadNotificationEmail({
     { label: "Phone", value: phone },
     { label: "Urgency", value: urgency },
     { label: "Situation", value: concern },
+    // Service-specific answers sit with the rest of the intake rather than in a
+    // separate block, so the email reads as one form regardless of which one it was.
+    ...(details ?? []),
     { label: "Order ID", value: orderId },
   ];
 

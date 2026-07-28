@@ -66,6 +66,18 @@ const nextConfig = {
         destination: "/blog/:slug*",
         permanent: true,
       },
+      // The Studio used to live at /sanity. Kept permanently so bookmarked
+      // Studio deep links (e.g. /sanity/structure/post) keep resolving.
+      {
+        source: "/sanity",
+        destination: "/studio",
+        permanent: true,
+      },
+      {
+        source: "/sanity/:path*",
+        destination: "/studio/:path*",
+        permanent: true,
+      },
     ];
   },
 
@@ -104,6 +116,17 @@ const nextConfig = {
           {
             key: "Cache-Control",
             value: "no-store, must-revalidate",
+          },
+        ],
+      },
+      {
+        // The Studio is an authoring app, never a search result. X-Frame-Options
+        // DENY above already blocks framing; this keeps it out of every index.
+        source: "/studio(.*)",
+        headers: [
+          {
+            key: "X-Robots-Tag",
+            value: "noindex, nofollow, noarchive",
           },
         ],
       },

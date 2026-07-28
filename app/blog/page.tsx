@@ -2,9 +2,30 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, BookOpen, Clock } from "lucide-react";
 import { Scribble } from "@/components/ui/Scribble";
+import { AuthorCard } from "@/components/blog/AuthorCard";
 import { formatBlogDate } from "@/lib/blog";
 import { getArticles, getPageContent } from "@/lib/sanity/queries";
 import { buildMetadata } from "@/lib/seo";
+import { siteConfig } from "@/lib/site";
+
+/** Where a reader goes next if no article is the thing they need right now. */
+const nextSteps = [
+  {
+    href: "/tools",
+    label: "Free tools",
+    note: "Diagnose being managed out, or weigh resign vs stay — no sign-up.",
+  },
+  {
+    href: "/resources",
+    label: "Guides & toolkits",
+    note: "PIP responses, contract reviews, harassment documentation. Own them for good.",
+  },
+  {
+    href: "/services",
+    label: "Advisory services",
+    note: "From a 30-minute call to a monthly retainer, priced openly.",
+  },
+];
 
 export const revalidate = 3600;
 
@@ -76,6 +97,42 @@ export default async function BlogPage() {
                   <ArrowRight size={16} strokeWidth={2.5} className="transition-transform group-hover:translate-x-1" />
                 </span>
               </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* Who writes this — and the two routes out of the blog. */}
+      <section className="mx-auto mt-20 max-w-max-width px-margin-mobile md:px-margin-desktop">
+        <AuthorCard
+          author={{
+            name: siteConfig.founder,
+            role: siteConfig.founderRole,
+            linkedinUrl: siteConfig.founderLinkedIn,
+          }}
+        />
+      </section>
+
+      <section className="mx-auto mt-14 max-w-max-width px-margin-mobile md:px-margin-desktop">
+        <p className="text-caption font-bold uppercase tracking-[0.16em] text-primary-violet">
+          Where to next
+        </p>
+        <div className="mt-4 grid gap-4 sm:grid-cols-3">
+          {nextSteps.map((step) => (
+            <Link
+              key={step.href}
+              href={step.href}
+              className="btn-pop group flex flex-col rounded-2xl border-2 border-primary-dark bg-neutral-100 p-6 shadow-pop-sm"
+            >
+              <span className="inline-flex items-center gap-1.5 font-display font-bold text-primary-dark">
+                {step.label}
+                <ArrowRight
+                  size={16}
+                  strokeWidth={2.5}
+                  className="shrink-0 text-primary-violet transition-transform group-hover:translate-x-1"
+                />
+              </span>
+              <span className="mt-2 text-body-sm leading-relaxed text-neutral-500">{step.note}</span>
             </Link>
           ))}
         </div>

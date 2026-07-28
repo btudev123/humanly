@@ -3,6 +3,7 @@ import { ArrowRight, ShieldCheck } from "lucide-react";
 import { Scribble } from "@/components/ui/Scribble";
 import { ServicesCatalog } from "@/components/services/ServicesCatalog";
 import { getServices } from "@/lib/sanity/queries";
+import { LatestPosts } from "@/components/blog/LatestPosts";
 
 const comparison = [
   { aspect: "Who they protect", hr: "The company", humanly: "You, the individual", lawyer: "Your legal position" },
@@ -100,6 +101,8 @@ export default async function ServicesPage() {
           </div>
         </div>
       </section>
+
+      <LatestPosts title="Thinking behind the advice" />
     </div>
   );
 }

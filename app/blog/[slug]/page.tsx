@@ -4,8 +4,10 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight, ArrowUpRight, Clock } from "lucide-react";
 import { getArticle, getArticles } from "@/lib/sanity/queries";
 import { formatBlogDate } from "@/lib/blog";
+import { getRelatedLinks } from "@/lib/related";
 import { buildMetadata } from "@/lib/seo";
 import { siteConfig, absoluteUrl } from "@/lib/site";
+import { AuthorCard, resolveAuthorLinkedIn } from "@/components/blog/AuthorCard";
 import { Prose } from "@/components/ui/Prose";
 
 export const revalidate = 3600;
@@ -40,42 +42,26 @@ export async function generateMetadata({
   });
 }
 
-// Fallback internal links, used when a post has no related links set in Sanity.
-const relatedLinks = [
-  {
-    href: "/resources/managed-out",
-    label: "Are You Being Managed Out?",
-    note: "A free 10-question diagnostic",
-  },
-  {
-    href: "/resources/manager-conflict-script",
-    label: "Manager Conflict Script Pack",
-    note: "Word-for-word scripts for hard conversations",
-  },
-  {
-    href: "/resources/resign-or-stay",
-    label: "Resign or Stay?",
-    note: "A weighted decision framework",
-  },
-];
-
 export default async function BlogPostPage({
   params,
 }: {
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const article = await getArticle(slug);
+  const [article, allArticles] = await Promise.all([getArticle(slug), getArticles()]);
 
   if (!article) {
     notFound();
   }
 
+  const moreArticles = allArticles.filter((item) => item.slug !== article.slug).slice(0, 2);
+
   const url = absoluteUrl(`/blog/${article.slug}`);
   const author = article.author;
-  const authorLinkedIn =
-    author?.linkedinUrl ||
-    (author?.name === siteConfig.founder ? siteConfig.founderLinkedIn : undefined);
+  const authorLinkedIn = resolveAuthorLinkedIn(author);
+  // Internal links chosen from the article's own keywords rather than a fixed list, so
+  // each post routes readers to the guide, tool or service that actually follows on.
+  const relatedLinks = getRelatedLinks(article);
 
   const articleSchema = {
     "@context": "https://schema.org",
@@ -204,6 +190,9 @@ export default async function BlogPostPage({
           </p>
         )}
 
+        {/* Author card — E-E-A-T signal plus a route back into /about and /booking. */}
+        <AuthorCard author={author} className="mt-14" />
+
         {/* Related internal links */}
         <section className="mt-14">
           <p className="text-caption font-bold uppercase tracking-[0.16em] text-primary-violet">
@@ -230,9 +219,52 @@ export default async function BlogPostPage({
           </div>
         </section>
 
+        {/* Article-to-article links: keeps every post one click from the rest of the blog. */}
+        {moreArticles.length > 0 && (
+          <section className="mt-14">
+            <p className="text-caption font-bold uppercase tracking-[0.16em] text-primary-violet">
+              More from the blog
+            </p>
+            <ul className="mt-4 divide-y-2 divide-dashed divide-neutral-300 border-y-2 border-dashed border-neutral-300">
+              {moreArticles.map((item) => (
+                <li key={item.slug}>
+                  <Link
+                    href={`/blog/${item.slug}`}
+                    className="group flex items-start justify-between gap-4 py-4 transition-colors hover:text-primary-violet"
+                  >
+                    <span className="min-w-0">
+                      <span className="block font-display font-bold leading-snug text-primary-dark group-hover:text-primary-violet">
+                        {item.title}
+                      </span>
+                      <span className="mt-1 block text-body-sm text-neutral-500">
+                        {item.category} · {item.readingMinutes} min read
+                      </span>
+                    </span>
+                    <ArrowUpRight
+                      size={18}
+                      strokeWidth={2.5}
+                      className="mt-1 shrink-0 text-primary-violet transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                    />
+                  </Link>
+                </li>
+              ))}
+            </ul>
+            <Link
+              href="/blog"
+              className="mt-5 inline-flex items-center gap-1.5 text-body-sm font-bold text-primary-violet hover:underline"
+            >
+              See every article
+              <ArrowRight size={15} strokeWidth={2.5} />
+            </Link>
+          </section>
+        )}
+
         <p className="mx-auto mt-12 max-w-xl text-center text-caption leading-relaxed text-neutral-400">
-          This article is for information only and does not constitute legal or HR advice. For
-          personalised guidance, book a confidential consultation.
+          This article is for information only and does not constitute legal or HR advice. For{" "}
+          <Link href="/booking" className="font-semibold text-primary-violet hover:underline">
+            personalised guidance, book a confidential consultation
+          </Link>
+          .
         </p>
       </article>
     </div>

@@ -16,14 +16,17 @@ consultations. Positioning is **global-first** with regional guides for the UAE,
 - Dev server: `npm run dev` → http://localhost:3001. Build: `npm run build`. Node 22 (`.nvmrc`).
 
 ## Layout
-- `app/` — routes: `/` (home), `/services`, `/about`, `/resources` (+ `[slug]`), `/booking`
-  (+ `/schedule`, `/done`), `/contact`, `/faq`, `/dashboard` (admin), `/checkout`, `/success`,
-  `/payment-failed`, `/privacy`, `/terms`, `/llms-full`. SEO: `app/sitemap.ts`, `app/robots.ts`,
+- `app/` — routes: `/` (home), `/services`, `/about`, `/resources` (+ `[slug]`), `/blog` (+ `[slug]`),
+  `/tools`, `/booking` (+ `/schedule`, `/done`), `/contact`, `/faq`, `/dashboard` (admin),
+  `/checkout`, `/success`, `/payment-failed`, `/privacy`, `/terms`, `/studio` (Sanity Studio).
+  SEO: `app/sitemap.ts`, `app/robots.ts`, `app/llms.txt/route.ts`, `app/llms-full/`,
   `app/icon.svg` (favicon).
 - `components/` — `layout/` (Navbar, Footer, BrandLogo), `booking/`, `resources/`, `dashboard/`,
   `reviews/`, `ui/`.
 - `lib/` — **`products.ts`** (services source of truth: USD cents, Cal/Stripe env maps),
   **`resources.ts`** (tiered resource catalog), **`site.ts`** (site config),
+  **`intake.ts`** (per-service booking intake forms), `related.ts` (keyword-driven internal links),
+  `seo.ts` + `pageMeta.ts`, `sanity/` (fetch + queries),
   `stripe.ts`, `email/resend.tsx`, `db/` (schema, repository, client), `analytics/funnel.ts`.
 - `emails/` — `BookingConfirmationEmail.tsx`, `ResourceDeliveryEmail.tsx`.
 - `app/api/` — `checkout/`, `webhooks/stripe/`, `webhooks/cal/`, `resources/`, `dashboard/`.
@@ -33,8 +36,17 @@ consultations. Positioning is **global-first** with regional guides for the UAE,
   Use the CSS variables / Tailwind tokens (`text-primary-dark`, `bg-accent-orange`, …), not raw hex.
 - **Logo**: `<BrandLogo />` (transparent SVG mark + live Poppins wordmark). Never reship a logo with a
   baked-in background.
+- **Canonical host is the apex `https://talkhumanly.com`** (`www` redirects to it). Everything
+  outward-facing derives from `siteConfig.url` / `absoluteUrl()` — never hard-code a host.
+- **Sanity Studio is at `/studio`** (`app/studio/[[...tool]]`, `basePath: '/studio'`). `/sanity/*`
+  308-redirects there. The apex must be a CORS origin in Sanity Manage → API.
 - Services/pricing flow: `lib/products.ts` → Stripe checkout (`app/api/checkout`) → success redirect.
   Scheduled services redirect to `/booking/schedule` (Cal.com embed); async items email a delivery link.
+  `/booking?service=<slug>` preselects a service.
+- **Booking intake is per-service** (`lib/intake.ts`): each service declares its own questions, which
+  map onto the three `booking_intakes` columns (`concern`/`urgency`/`message`) plus labelled extras.
+  Nothing is ever uploaded through the site — document review asks the client to reply to the
+  post-payment email instead.
 - Payment-confirmation emails fire from the **Stripe** webhook (resource delivery) and the **Cal.com**
   webhook (booking confirmation) via `lib/email/resend.tsx`.
 - Money is stored in **USD cents** and charged in USD. AED is shown for display only (reference rate).

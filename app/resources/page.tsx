@@ -6,6 +6,7 @@ import { Scribble } from "@/components/ui/Scribble";
 import { getPublishedResources } from "@/lib/db/repository";
 import { getResourceCopy } from "@/lib/sanity/queries";
 import { pageMetadata } from "@/lib/seo";
+import { LatestPosts } from "@/components/blog/LatestPosts";
 
 export const dynamic = "force-dynamic";
 
@@ -81,6 +82,8 @@ export default async function ResourcesPage() {
           </div>
         </div>
       </section>
+
+      <LatestPosts title="Latest from the blog" />
     </div>
   );
 }

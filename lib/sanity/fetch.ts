@@ -1,7 +1,26 @@
+import "server-only";
+
 import { client } from "@/sanity/lib/client";
 
 /** Cache tags used by the Sanity webhook in `app/api/revalidate` to purge on publish. */
 export type SanityTag = "post" | "page" | "service" | "resource" | "author" | "siteSettings";
+
+/**
+ * Server-side read client.
+ *
+ * A token is optional by design: the `production` dataset is currently public, so
+ * unauthenticated reads work. Supplying one (a Viewer token in
+ * `SANITY_API_READ_TOKEN`, or the Editor token as a fallback) means the site keeps
+ * rendering if the dataset is ever flipped to private — which is the safer setting,
+ * since a public dataset also exposes unpublished drafts over the API.
+ *
+ * `perspective: 'published'` on the base client keeps drafts out of the response
+ * either way, so an authenticated read never leaks work-in-progress to visitors.
+ */
+const readToken =
+  process.env.SANITY_API_READ_TOKEN || process.env.SANITY_API_WRITE_TOKEN || undefined;
+
+const readClient = readToken ? client.withConfig({ token: readToken }) : client;
 
 /**
  * Fetch from Sanity, returning `null` on any failure instead of throwing.
@@ -19,7 +38,7 @@ export async function sanityFetch<T>(
   if (!process.env.NEXT_PUBLIC_SANITY_PROJECT_ID) return null;
 
   try {
-    return await client.fetch<T>(query, params, {
+    return await readClient.fetch<T>(query, params, {
       next: { revalidate: 3600, tags },
     });
   } catch (error) {

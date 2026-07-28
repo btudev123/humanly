@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { LatestPosts } from "@/components/blog/LatestPosts";
 import { pageMetadata } from "@/lib/seo";
 
 export function generateMetadata(): Promise<Metadata> {
@@ -41,6 +42,8 @@ export default function FAQLayout({ children }: { children: React.ReactNode }) {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       {children}
+      {/* Rendered here because `page.tsx` is a client component; see AboutLayout. */}
+      <LatestPosts title="Read more on the blog" className="pb-24" />
     </>
   );
 }

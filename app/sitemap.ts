@@ -1,7 +1,7 @@
 import { MetadataRoute } from "next";
 import { getPublishedResources } from "@/lib/db/repository";
 import { resources } from "@/lib/resources";
-import { blogPosts } from "@/lib/blog";
+import { getArticles } from "@/lib/sanity/queries";
 import { siteConfig } from "@/lib/site";
 
 export const revalidate = 3600;
@@ -17,6 +17,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   } catch {
     publicResources = resources;
   }
+
+  // Articles come from the same source the blog routes render, so a post published in
+  // Studio appears here without a deploy — and `_updatedAt` gives an honest lastmod
+  // instead of the publish date frozen in code.
+  const articles = await getArticles();
 
   // Static pages with high priority
   const staticPages = [
@@ -43,9 +48,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: resource.gated ? 0.55 : 0.65,
   }));
 
-  const blogPages = blogPosts.map((post) => ({
-    url: `${baseUrl}/blog/${post.slug}`,
-    lastModified: new Date(post.publishedAt),
+  const blogPages = articles.map((article) => ({
+    url: `${baseUrl}/blog/${article.slug}`,
+    lastModified: new Date(article.updatedAt || article.publishedAt),
     changeFrequency: "monthly" as const,
     priority: 0.7,
   }));

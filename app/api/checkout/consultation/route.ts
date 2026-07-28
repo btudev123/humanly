@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { getServiceProduct, getStripePriceId, formatAed } from "@/lib/products";
+import { allowedDetailLabels, composeStoredMessage, getIntakeForm } from "@/lib/intake";
 import { createPendingOrder, attachStripeSession } from "@/lib/db/repository";
 import { getSql, hasDatabase } from "@/lib/db/client";
 import { recordFunnelEvent } from "@/lib/analytics/funnel";
@@ -14,9 +15,18 @@ const consultationCheckoutSchema = z.object({
   name: z.string().min(2),
   email: z.string().email(),
   phone: z.string().optional(),
-  concern: z.string().optional(),
-  urgency: z.string().optional(),
+  concern: z.string().max(500).optional(),
+  urgency: z.string().max(200).optional(),
   message: z.string().max(4000).optional(),
+  /**
+   * The service-specific intake answers that don't map onto the three canonical
+   * columns — job posting link, interview stage, headcount, and so on. Bounded so a
+   * crafted request can't use the lead email as an amplifier.
+   */
+  details: z
+    .array(z.object({ label: z.string().max(120), value: z.string().max(2000) }))
+    .max(20)
+    .optional(),
 });
 
 export async function POST(request: Request) {
@@ -39,6 +49,14 @@ export async function POST(request: Request) {
     return Response.json({ error: "Unknown consultation product." }, { status: 400 });
   }
 
+  // Keep only the extra answers this service actually asks for; the labels are emailed
+  // verbatim, so they're matched against the server's own copy of the form.
+  const allowedLabels = allowedDetailLabels(getIntakeForm(product));
+  const details = (body.details ?? []).filter(
+    (detail) => allowedLabels.has(detail.label) && detail.value.trim().length > 0,
+  );
+  const storedMessage = composeStoredMessage(body.message, details);
+
   // Consultations are charged in AED (the Stripe account's settlement currency).
   const chargeCurrency = "aed";
   const chargeAmount = product.amountAed * 100; // AED minor units (fils)
@@ -55,16 +73,16 @@ export async function POST(request: Request) {
       metadata: {
         concern: body.concern,
         urgency: body.urgency,
-        message: body.message,
+        message: storedMessage,
         service: product.name,
       },
     });
 
-    if (body.message || body.concern || body.urgency) {
+    if (storedMessage || body.concern || body.urgency) {
       const sql = getSql();
       await sql`
         insert into booking_intakes (order_id, concern, message, urgency)
-        values (${order.id}::uuid, ${body.concern || null}, ${body.message || null}, ${body.urgency || null})
+        values (${order.id}::uuid, ${body.concern || null}, ${storedMessage || null}, ${body.urgency || null})
       `;
     }
 
@@ -78,7 +96,10 @@ export async function POST(request: Request) {
       phone: body.phone,
       urgency: body.urgency,
       concern: body.concern,
+      // The immediate email gets the free text and the extras as separate rows; the
+      // database keeps them merged so the later paid/booked emails carry them too.
       message: body.message,
+      details,
       paid: false,
       orderId: order.id,
     }).catch(() => {});

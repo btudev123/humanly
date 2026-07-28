@@ -1,20 +1,64 @@
 "use client";
 
 import { useEffect, useMemo, useState, useTransition } from "react";
-import { ArrowRight, Calendar, CheckCircle2, Clock, Lock, ShieldCheck } from "lucide-react";
+import { ArrowRight, Calendar, CheckCircle2, Clock, Info, Lock, ShieldCheck } from "lucide-react";
 import {
   serviceProducts,
   formatAed,
   type ServiceCategory,
 } from "@/lib/products";
+import { getIntakeForm, splitAnswers, type IntakeField } from "@/lib/intake";
 import { cn } from "@/lib/utils";
 
-const concerns = [
-  "Performance warning or PIP",
-  "Toxic manager or harassment",
-  "Contract, severance, or redundancy",
-  "Burnout, boundaries, or exit planning",
-];
+const fieldClass =
+  "rounded-2xl border-2 border-primary-dark/20 px-4 py-3 text-base font-normal normal-case tracking-normal text-primary-dark outline-none transition focus:border-primary-dark";
+
+const labelClass =
+  "grid gap-2 text-xs font-bold uppercase tracking-[0.14em] text-neutral-500";
+
+/**
+ * One intake question. Uncontrolled on purpose — the whole form is remounted with a
+ * `key` when the service changes, which clears answers that no longer apply rather
+ * than carrying an interview date over onto a document review.
+ */
+function IntakeFieldInput({ field }: { field: IntakeField }) {
+  return (
+    <label className={cn(labelClass, field.half ? "" : "sm:col-span-2")}>
+      {field.label}
+      {field.required && <span className="sr-only"> (required)</span>}
+
+      {field.type === "select" ? (
+        <select name={field.id} required={field.required} className={fieldClass}>
+          {field.options?.map((option) => (
+            <option key={option}>{option}</option>
+          ))}
+        </select>
+      ) : field.type === "textarea" ? (
+        <textarea
+          name={field.id}
+          rows={4}
+          required={field.required}
+          placeholder={field.placeholder}
+          className={fieldClass}
+        />
+      ) : (
+        <input
+          name={field.id}
+          type={field.type === "url" ? "url" : field.type === "date" ? "date" : "text"}
+          required={field.required}
+          placeholder={field.placeholder}
+          className={fieldClass}
+        />
+      )}
+
+      {field.help && (
+        <span className="text-[11px] font-medium normal-case tracking-normal text-neutral-400">
+          {field.help}
+        </span>
+      )}
+    </label>
+  );
+}
 
 const categoryFilters: { value: ServiceCategory | "all"; label: string }[] = [
   { value: "all", label: "All" },
@@ -30,9 +74,17 @@ export function BookingFunnel() {
   const [showHidden, setShowHidden] = useState(false);
   const [isPending, startTransition] = useTransition();
 
-  // Reveal hidden products (e.g. the internal test service) with ?test=1.
+  // Reveal hidden products (e.g. the internal test service) with ?test=1, and honour
+  // ?service=<slug> so links from articles, services and resources land on the right
+  // one preselected instead of dropping the reader on the default.
   useEffect(() => {
-    setShowHidden(new URLSearchParams(window.location.search).get("test") === "1");
+    const params = new URLSearchParams(window.location.search);
+    setShowHidden(params.get("test") === "1");
+
+    const requested = params.get("service");
+    if (requested && serviceProducts.some((product) => product.slug === requested)) {
+      setSelected(requested);
+    }
   }, []);
 
   const availableProducts = useMemo(
@@ -51,6 +103,10 @@ export function BookingFunnel() {
   const selectedProduct =
     availableProducts.find((product) => product.slug === selected) || availableProducts[0];
 
+  // The intake questions follow the service: an interview-prep client is asked for the
+  // job posting, not whether they've been put on a PIP.
+  const intakeForm = useMemo(() => getIntakeForm(selectedProduct), [selectedProduct]);
+
   function changeCategory(next: ServiceCategory | "all") {
     setCategory(next);
     // Keep the selection valid for the visible set so the summary stays in sync.
@@ -63,14 +119,23 @@ export function BookingFunnel() {
   function submit(formData: FormData) {
     setError("");
     startTransition(async () => {
+      // Collect answers by the selected service's own field list, so a question that
+      // isn't on screen can never be posted.
+      const answers: Record<string, string> = {};
+      for (const field of intakeForm.fields) {
+        answers[field.id] = String(formData.get(field.id) || "");
+      }
+      const { concern, urgency, message, details } = splitAnswers(intakeForm, answers);
+
       const payload = {
         productSlug: selected,
         name: String(formData.get("name") || ""),
         email: String(formData.get("email") || ""),
         phone: String(formData.get("phone") || ""),
-        concern: String(formData.get("concern") || ""),
-        urgency: String(formData.get("urgency") || ""),
-        message: String(formData.get("message") || ""),
+        concern,
+        urgency,
+        message,
+        details,
       };
 
       const response = await fetch("/api/checkout/consultation", {
@@ -187,7 +252,9 @@ export function BookingFunnel() {
               <span className="text-primary-violet">2.</span> Private intake
             </h2>
             <p className="mt-1 text-sm text-neutral-500 sm:text-base">
-              Payment happens first through Stripe. Scheduling unlocks only after a successful payment.
+              {selectedProduct.needsScheduling
+                ? "Payment happens first through Stripe. Scheduling unlocks only after a successful payment."
+                : "Payment happens first through Stripe. This service is delivered by email — there is no call to schedule."}
             </p>
           </div>
         </div>
@@ -207,48 +274,36 @@ export function BookingFunnel() {
           </div>
         </div>
 
-        <form action={submit} className="mt-5 grid gap-4">
+        {/* Remounted per service so answers to questions that no longer apply are dropped. */}
+        <form key={selectedProduct.slug} action={submit} className="mt-5 grid gap-4">
           <div className="grid gap-4 sm:grid-cols-2">
-            <label className="grid gap-2 text-xs font-bold uppercase tracking-[0.14em] text-neutral-500">
+            <label className={labelClass}>
               Name
-              <input name="name" required className="rounded-2xl border-2 border-primary-dark/20 px-4 py-3 text-base font-normal normal-case tracking-normal text-primary-dark outline-none transition focus:border-primary-dark" />
+              <input name="name" required autoComplete="name" className={fieldClass} />
             </label>
-            <label className="grid gap-2 text-xs font-bold uppercase tracking-[0.14em] text-neutral-500">
+            <label className={labelClass}>
               Email
-              <input name="email" type="email" required className="rounded-2xl border-2 border-primary-dark/20 px-4 py-3 text-base font-normal normal-case tracking-normal text-primary-dark outline-none transition focus:border-primary-dark" />
+              <input name="email" type="email" required autoComplete="email" className={fieldClass} />
             </label>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <label className="grid gap-2 text-xs font-bold uppercase tracking-[0.14em] text-neutral-500">
+            <label className={labelClass}>
               Phone
-              <input name="phone" className="rounded-2xl border-2 border-primary-dark/20 px-4 py-3 text-base font-normal normal-case tracking-normal text-primary-dark outline-none transition focus:border-primary-dark" />
-            </label>
-            <label className="grid gap-2 text-xs font-bold uppercase tracking-[0.14em] text-neutral-500">
-              Urgency
-              <select name="urgency" className="rounded-2xl border-2 border-primary-dark/20 px-4 py-3 text-base font-normal normal-case tracking-normal text-primary-dark outline-none transition focus:border-primary-dark">
-                <option>This week</option>
-                <option>Next 48 hours</option>
-                <option>Planning ahead</option>
-              </select>
+              <input name="phone" type="tel" autoComplete="tel" className={fieldClass} />
             </label>
           </div>
-          <label className="grid gap-2 text-xs font-bold uppercase tracking-[0.14em] text-neutral-500">
-            Situation
-            <select name="concern" className="rounded-2xl border-2 border-primary-dark/20 px-4 py-3 text-base font-normal normal-case tracking-normal text-primary-dark outline-none transition focus:border-primary-dark">
-              {concerns.map((concern) => (
-                <option key={concern}>{concern}</option>
-              ))}
-            </select>
-          </label>
-          <label className="grid gap-2 text-xs font-bold uppercase tracking-[0.14em] text-neutral-500">
-            What is happening?
-            <textarea
-              name="message"
-              rows={4}
-              className="rounded-2xl border-2 border-primary-dark/20 px-4 py-3 text-base font-normal normal-case tracking-normal text-primary-dark outline-none transition focus:border-primary-dark"
-              placeholder="A short version is enough. Karma will review this before the call."
-            />
-          </label>
+
+          {intakeForm.note && (
+            <p className="flex items-start gap-2.5 rounded-2xl border-2 border-dashed border-primary-violet/40 bg-violet-tint/50 p-4 text-sm leading-relaxed text-primary-dark">
+              <Info size={16} strokeWidth={2.5} className="mt-0.5 shrink-0 text-primary-violet" />
+              {intakeForm.note}
+            </p>
+          )}
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            {intakeForm.fields.map((field) => (
+              <IntakeFieldInput key={field.id} field={field} />
+            ))}
+          </div>
+
           {error && <p className="rounded-lg bg-red-50 p-4 text-sm font-semibold text-red-700">{error}</p>}
           <button
             type="submit"
@@ -262,7 +317,13 @@ export function BookingFunnel() {
             {!isPending && <ArrowRight size={18} strokeWidth={2.5} />}
           </button>
           <div className="grid gap-3 rounded-2xl border-2 border-dashed border-neutral-300 p-4 text-sm text-neutral-500 sm:grid-cols-3">
-            {["Stripe handles payment", "Scheduling unlocks after payment", "No employer notification"].map((item) => (
+            {[
+              "Stripe handles payment",
+              selectedProduct.needsScheduling
+                ? "Scheduling unlocks after payment"
+                : "Delivered to your inbox",
+              "No employer notification",
+            ].map((item) => (
               <span key={item} className="flex items-center gap-2">
                 <CheckCircle2 size={16} className="shrink-0 text-primary-violet" />
                 {item}

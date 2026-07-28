@@ -25,8 +25,8 @@ type BuildMetadataInput = {
  * CMS field blank keeps the copy that shipped with the build instead of emitting an
  * empty title or description.
  *
- * The canonical is always built from `absoluteUrl()` (which resolves against the
- * `www` host) unless an explicit override is set — the apex 308-redirects, so
+ * The canonical is always built from `absoluteUrl()` (which resolves against the apex
+ * host in `siteConfig.url`) unless an explicit override is set — `www` 308-redirects, so
  * emitting it here would point every canonical at a redirect.
  */
 export function buildMetadata({
