@@ -1,8 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import "./globals.css";
-import { Navbar } from "@/components/layout/Navbar";
-import { Footer } from "@/components/layout/Footer";
+import { SiteChrome } from "@/components/layout/SiteChrome";
 import { MaybeClerkProvider } from "@/components/auth/MaybeClerkProvider";
 import { siteConfig, absoluteUrl } from "@/lib/site";
 import { getPageContent, getSiteSettings } from "@/lib/sanity/queries";
@@ -274,11 +273,9 @@ export default async function RootLayout({
           </noscript>
           {/* End Google Tag Manager (noscript) */}
 
-          <div className="noise-overlay" aria-hidden="true" />
-
-          <Navbar />
-          <main className="flex-grow">{children}</main>
-          <Footer />
+          {/* Navbar, footer and noise overlay — omitted on /studio, which is a
+              full-screen app rather than a page on the site. */}
+          <SiteChrome>{children}</SiteChrome>
         </body>
       </html>
     </MaybeClerkProvider>
