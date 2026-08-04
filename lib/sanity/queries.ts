@@ -1,6 +1,6 @@
 import type { PortableTextBlock } from "@portabletext/types";
 import { sanityFetch } from "./fetch";
-import { blogPosts, type BlogPost, type BlogBlock } from "@/lib/blog";
+import { blocksToPortableText, blogPosts, type BlogPost } from "@/lib/blog";
 import { serviceProducts, type ServiceProduct } from "@/lib/products";
 import { resources, type Resource } from "@/lib/resources";
 import { siteConfig } from "@/lib/site";
@@ -41,50 +41,10 @@ export type Article = {
 /* ------------------------------------------------------- legacy adapters */
 
 /**
- * Convert the hand-written `BlogBlock[]` from `lib/blog.ts` into portable text so
- * that `<Prose>` only ever has to render one format, regardless of whether a post
- * came from Sanity or from the in-code fallback.
+ * A post that hasn't been migrated into Sanity yet, rendered through the same
+ * portable-text conversion the seed script writes with (`blocksToPortableText` in
+ * `lib/blog.ts`), so inline internal links survive either route.
  */
-function legacyBlocksToPortableText(blocks: BlogBlock[]): PortableTextBlock[] {
-  return blocks.flatMap((block, i): PortableTextBlock[] => {
-    const key = `legacy-${i}`;
-
-    if (block.type === "callout") {
-      return [
-        {
-          _type: "callout",
-          _key: key,
-          text: block.text,
-          ctaLabel: "Book a confidential call",
-          ctaHref: "/booking",
-        } as unknown as PortableTextBlock,
-      ];
-    }
-
-    if (block.type === "list") {
-      return block.items.map((item, j) => ({
-        _type: "block",
-        _key: `${key}-${j}`,
-        style: "normal",
-        listItem: "bullet",
-        level: 1,
-        markDefs: [],
-        children: [{ _type: "span", _key: `${key}-${j}-s`, text: item, marks: [] }],
-      })) as unknown as PortableTextBlock[];
-    }
-
-    return [
-      {
-        _type: "block",
-        _key: key,
-        style: block.type === "h2" ? "h2" : "normal",
-        markDefs: [],
-        children: [{ _type: "span", _key: `${key}-s`, text: block.text, marks: [] }],
-      } as unknown as PortableTextBlock,
-    ];
-  });
-}
-
 function legacyPostToArticle(post: BlogPost): Article {
   return {
     slug: post.slug,
@@ -102,7 +62,7 @@ function legacyPostToArticle(post: BlogPost): Article {
       role: post.authorRole,
       linkedinUrl: post.author === siteConfig.founder ? siteConfig.founderLinkedIn : undefined,
     },
-    body: legacyBlocksToPortableText(post.blocks),
+    body: blocksToPortableText(post.blocks),
   };
 }
 

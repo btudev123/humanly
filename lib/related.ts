@@ -58,8 +58,28 @@ const SERVICE_TERMS: Record<string, string[]> = {
   "interview-prep": ["interview", "job search", "hiring", "offer", "cv", "resume"],
   "dubai-job-search": ["job search", "dubai", "relocation", "cv", "market"],
   "uae-relocation-qa": ["relocation", "visa", "uae", "expat", "rights"],
-  "document-review": ["contract", "letter", "notice", "settlement", "severance", "offer"],
-  "individual-advisory": [],
+  "document-review": [
+    "contract",
+    "letter",
+    "notice",
+    "settlement",
+    "severance",
+    "offer",
+    "pip",
+    "performance improvement plan",
+    "letter of expectation",
+    "warning",
+    "termination",
+  ],
+  "individual-advisory": [
+    "manager",
+    "performance",
+    "pip",
+    "investigation",
+    "grievance",
+    "second opinion",
+    "managed out",
+  ],
 };
 
 function normalise(value: string) {

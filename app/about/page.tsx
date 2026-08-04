@@ -8,6 +8,7 @@ import {
   Building2,
   Globe,
   Heart,
+  Linkedin,
   MapPin,
   Quote,
   ScanSearch,
@@ -17,6 +18,7 @@ import {
   Repeat,
 } from "lucide-react";
 import { Scribble } from "@/components/ui/Scribble";
+import { siteConfig } from "@/lib/site";
 
 // Karma's real career path — organisations, no fabricated dates.
 const careerPath = [
@@ -60,20 +62,40 @@ export default function AboutPage() {
       <section className="relative mx-auto grid max-w-max-width items-center gap-12 px-margin-mobile md:grid-cols-12 md:px-margin-desktop">
         <div className="dot-grid pointer-events-none absolute inset-0 -z-10 opacity-50" />
         {/* Visual */}
-        <div className="relative order-2 md:order-1 md:col-span-5">
-          <div className="blob absolute -left-6 -top-6 -z-10 h-44 w-44 bg-accent-orange/30" />
-          <Scribble variant="loop" color="#7c35e3" className="absolute -right-6 -top-8 h-24 w-24 opacity-60" />
-          <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem] border-2 border-primary-dark shadow-pop">
-            <img
-              alt="Karma Harb — founder of Humanly, HR advisor"
-              className="h-full w-full object-cover"
-              src="/karma-harb.png"
-            />
+        <div className="order-2 md:order-1 md:col-span-5">
+          {/* The badge is anchored to the portrait, not the column, so adding anything
+              below the image doesn't push it out from under the frame. */}
+          <div className="relative">
+            <div className="blob absolute -left-6 -top-6 -z-10 h-44 w-44 bg-accent-orange/30" />
+            <Scribble variant="loop" color="#7c35e3" className="absolute -right-6 -top-8 h-24 w-24 opacity-60" />
+            <div className="relative aspect-[4/5] overflow-hidden rounded-[2rem] border-2 border-primary-dark shadow-pop">
+              <img
+                alt="Karma Harb — founder of Humanly, HR advisor"
+                className="h-full w-full object-cover"
+                src="/karma-harb.png"
+              />
+            </div>
+            <div className="absolute -bottom-5 -right-3 rotate-[4deg] rounded-2xl border-2 border-primary-dark bg-accent-orange px-5 py-3 text-primary-dark shadow-pop-sm">
+              <p className="font-display text-2xl font-extrabold leading-none">~20 yrs</p>
+              <p className="text-[11px] font-bold uppercase tracking-wider">in HR leadership</p>
+            </div>
           </div>
-          <div className="absolute -bottom-5 -right-3 rotate-[4deg] rounded-2xl border-2 border-primary-dark bg-accent-orange px-5 py-3 text-primary-dark shadow-pop-sm">
-            <p className="font-display text-2xl font-extrabold leading-none">~20 yrs</p>
-            <p className="text-[11px] font-bold uppercase tracking-wider">in HR leadership</p>
-          </div>
+
+          {/*
+            The verifiable public profile behind the ~20 years claimed just above it.
+            Always the clean canonical URL from siteConfig — the mobile share sheet's
+            `utm_source=share_via` params would break entity resolution against the
+            same profile emitted as `sameAs` in this page's Person JSON-LD.
+          */}
+          <a
+            href={siteConfig.founderLinkedIn}
+            target="_blank"
+            rel="me noopener"
+            className="btn-pop mt-12 inline-flex items-center gap-2 rounded-full border-2 border-primary-dark bg-neutral-100 px-5 py-2.5 text-sm font-bold text-primary-dark shadow-pop-sm"
+          >
+            <Linkedin size={16} strokeWidth={2.5} className="text-primary-violet" />
+            Karma on LinkedIn
+          </a>
         </div>
 
         {/* Copy */}

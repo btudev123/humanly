@@ -140,6 +140,7 @@ const founderSchema = {
   name: siteConfig.founder,
   url: absoluteUrl("/about"),
   jobTitle: siteConfig.founderRole,
+  image: absoluteUrl("/karma-harb.png"),
   sameAs: [siteConfig.founderLinkedIn],
   worksFor: {
     "@type": "Organization",

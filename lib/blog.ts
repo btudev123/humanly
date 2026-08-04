@@ -1,5 +1,16 @@
+import type { PortableTextBlock } from "@portabletext/types";
 import { absoluteUrl } from "@/lib/site";
 
+/**
+ * Body text may carry inline links using markdown's `[label](/href)` form.
+ *
+ * An article that only links from a "keep going" block at the very bottom is a dead
+ * end for most readers and for a crawler weighing the link in context. Writing the
+ * link into the sentence that actually needs it — the PIP paragraph pointing at the
+ * PIP guide, the "no one to go to" paragraph pointing at the earlier post — is what
+ * makes internal linking work. `blocksToPortableText` turns these into real portable
+ * text link marks, which `<Prose>` renders through `next/link` when they're internal.
+ */
 export type BlogBlock =
   | { type: "p"; text: string }
   | { type: "h2"; text: string }
@@ -24,6 +35,132 @@ export type BlogPost = {
 };
 
 export const blogPosts: BlogPost[] = [
+  {
+    slug: "fifteen-years-then-suddenly-a-problem",
+    title: "Fifteen Years, Then Suddenly a Problem",
+    excerpt:
+      "A PIP is only ever as good as the standard sitting behind it. Karma Harb on the fifteen-year employee whose manager could never say what 'better' looked like — and the questions HR should ask before the countdown starts.",
+    category: "Performance & PIPs",
+    author: "Karma Harb",
+    authorRole: "Founder of Humanly",
+    publishedAt: "2026-08-04",
+    readingMinutes: 8,
+    keywords: [
+      "pip",
+      "performance improvement plan",
+      "managed out",
+      "performance management",
+      "manager accountability",
+      "hr support",
+      "termination",
+      "letter of expectation",
+    ],
+    lead:
+      "A PIP is only ever as good as the standard sitting behind it. If a manager cannot say, in concrete and observable terms, what “better” looks like, the employee has been handed a test with no answer key and told to pass it. That isn't a performance plan — it's a setup. This is the story of someone who gave an organisation fifteen years and then, seemingly overnight, stopped being good at his job, and of the questions nobody asked until it was too late.",
+    blocks: [
+      {
+        type: "p",
+        text: "Let me tell you about someone. We'll call him Daniel, though that isn't his name, and I've changed enough of the details to keep confidentiality. The situation itself is real, and I suspect it will feel familiar to a lot of people who have spent time in HR.",
+      },
+
+      { type: "h2", text: "Fifteen Years, Then a Phone Call" },
+      {
+        type: "p",
+        text: "Daniel had been with the company for fifteen years. Over that time he moved around: different teams, different functions, the kind of internal journey you only get when an organization values you enough to keep finding you a home. Then he landed in a new area, and within a few months I got the call.",
+      },
+      {
+        type: "p",
+        text: "It was his new manager. Daniel was underperforming, she told me, and she wanted to put him on a [Performance Improvement Plan](/resources/pip-response-strategy).",
+      },
+      {
+        type: "p",
+        text: "So I asked the obvious question: what specifically needs to improve? This is where it got interesting. “He needs to do this better,” she said. Better how? What does better actually look like? How is this “better” measured? She didn't have a clear answer. What came back was a softer, mumbled version of the same thing, a feeling more than a fact.",
+      },
+      {
+        type: "p",
+        text: "We moved forward with the PIP anyway. Three months, which is a short runway for turning real performance around. I delivered it to Daniel and walked both of them through what it actually means: not just a countdown for the employee, but an obligation on the manager to provide support, guidance, and any training he needed to succeed.",
+      },
+      {
+        type: "p",
+        text: "I checked in with her throughout. Every time, the answer was the same three words: “He's not improving.” Not “here's what we tried.” Not “here's where he's still getting stuck.” Just “he's not improving.”",
+      },
+      {
+        type: "p",
+        text: "At the end of the three months we sat down to weigh the options. She, and her seniors, had already reached their conclusion. They felt we needed to let him go.",
+      },
+
+      { type: "h2", text: "How Does Someone Stop Being Good at Their Job Overnight?" },
+      {
+        type: "p",
+        text: "And I was left sitting with a question I couldn't shake: how does someone give an organization fifteen years, and then, seemingly overnight, stop being good at their job?",
+      },
+      {
+        type: "p",
+        text: "There are honest answers to that. Life happens. Illness, family, grief, the things people carry quietly into work and rarely mention. Sometimes the ground shifts underneath people: technology moves faster than the support around them, and a skills gap opens that nobody ever helped them close. Those explanations are real, and they deserve curiosity and care, not a countdown.",
+      },
+      {
+        type: "p",
+        text: "But there is another answer we don't like to say out loud. Sometimes the person doesn't change. The context did.",
+      },
+
+      { type: "h2", text: "A PIP Is Only as Good as the Standard Behind It" },
+      {
+        type: "p",
+        text: "A PIP is only ever as good as the standard sitting behind it. If a manager cannot articulate what “better” looks like, then the employee has been handed a test with no answer key and told to pass it. That isn't a performance plan. It's a setup. If you've just been handed one, the [managed-out diagnostic](/resources/managed-out) is a free, ten-question way to work out which of the two you're actually holding.",
+      },
+      {
+        type: "p",
+        text: "And the manager's role during those months is not to observe from a distance. It is active work: coaching, clarifying, training, removing obstacles. “He's not improving” is not a status update on the employee. Quite often, it is a description of what the manager didn't do either.",
+      },
+      {
+        type: "p",
+        text: "Fifteen years of being good enough to keep, followed by a few months of being apparently impossible to fix, should make us curious before it makes us decisive.",
+      },
+
+      { type: "h2", text: "What I Look at First Now" },
+      {
+        type: "p",
+        text: "So, these days, when a PIP lands on my desk, the first thing I examine isn't the employee. It's the expectation. Can you tell me, in concrete and observable terms, what success looks like? Because if you can't describe it, we cannot fairly ask another human being to hit it. And if the honest goal here is an exit rather than an improvement, then we should have the courage to name that, because dressing up a decision as a process protects no one, least of all the person living through it.",
+      },
+      {
+        type: "list",
+        items: [
+          "Can the manager state, in observable terms, what success looks like at the end of the plan?",
+          "Is there a written record of the coaching, training and obstacle-removal the plan obliges the manager to provide?",
+          "Has anyone asked what changed — the person, or the context around them?",
+          "If the real goal is an exit rather than an improvement, is anyone willing to say so out loud?",
+        ],
+      },
+
+      { type: "h2", text: "The Conversation That Never Happened" },
+      {
+        type: "p",
+        text: "There is also a conversation I wish we had been able to have, him and me, one that never happened. Before I get to why, I want to be honest about my own part in this, because it would be easy to read this story and decide that HR simply dropped the ball. I did push. I asked the manager, more than once, to tell me exactly what wasn't working, and I stayed close to the plan the whole way through. But I was never sitting in her seat. I couldn't watch the work happen day in and day out, and HR rarely can. We are almost always working from someone else's account of the room, and that account is only ever as good, and as fair, as the person giving it.",
+      },
+      {
+        type: "p",
+        text: "And Daniel never came to me. That is the part I keep returning to, because it points to something bigger than one plan or one manager. A PIP is not something an employee has to carry alone and in silence. If he had picked up the phone, I could have helped him think it through: what he could do, what questions he had every right to ask, how to approach the plan on his own terms, whether it was a genuine chance to turn things around or a quieter route to the door. He didn't. And I don't believe that was because the option didn't exist. I think it was because of what HR represents to so many people. I wasn't there to catch him out, but the perception of HR, the quiet assumption that we sit solely on the company's side of the table, is often enough to stop someone reaching for the very support that could have helped them. It's the same isolation I've [written about from the employee's side](/blog/navigate-a-bad-manager).",
+      },
+
+      { type: "h2", text: "What That Silence Costs" },
+      {
+        type: "p",
+        text: "That silence carries a cost. Being handed a PIP when you believed you were doing fine is a real blow to your confidence. It makes you second-guess work you were proud of a week earlier. Daniel may well have walked out of that meeting convinced he was already finished, when the truth was that he still had room to move. One honest conversation, the kind that reminds you that you have options, that you have agency, and that someone is in your corner, might have given him back enough footing to advocate for himself. Sometimes that footing is the whole difference between a plan that fails and a plan that quietly works.",
+      },
+      {
+        type: "p",
+        text: "I don't know the full story of Daniel's final few months. Maybe he had genuinely checked out. Maybe the role was simply wrong for him. Maybe he was tired in a way that none of us thought to ask about. What I do know is that the hardest questions here were never only about him. They were about whether the standard was ever clear, whether the support was ever real, and whether the people who might have helped him, myself included, ever felt like people he could safely turn to.",
+      },
+      {
+        type: "p",
+        text: "And I know that “he's not improving” should always prompt one more question: are we sure this was ever really about him?",
+      },
+      {
+        type: "callout",
+        text: "If a PIP or a letter of expectation has just landed on your desk, you do not have to read it alone. Send it to Humanly for a written review, or book a confidential call — nothing goes back to your employer, and you'll leave knowing whether you're holding a real plan or a paper trail.",
+      },
+    ],
+  },
   {
     slug: "navigate-a-bad-manager",
     title: "You Don't Have to Navigate a Bad Manager Alone",
@@ -56,7 +193,7 @@ export const blogPosts: BlogPost[] = [
       },
       {
         type: "p",
-        text: "Then I had a health situation and needed time away. When I came back, things didn't improve, they got worse. I was handed a letter of expectation and started to feel watched constantly, every task, every move. I didn't understand what that letter meant for my standing. And I didn't have a single person to ask.",
+        text: "Then I had a health situation and needed time away. When I came back, things didn't improve, they got worse. I was handed a [letter of expectation](/resources/pip-response-strategy) and started to feel watched constantly, every task, every move. I didn't understand what that letter meant for my standing. And I didn't have a single person to ask.",
       },
       {
         type: "p",
@@ -74,7 +211,7 @@ export const blogPosts: BlogPost[] = [
       },
       {
         type: "p",
-        text: "The real problem was that I had no one to go to. Not a mentor. Not HR. Not even a peer who'd been there longer and could tell me whether a letter of expectation after health leave was normal, or something worth pushing back on. I had to interpret every signal alone, with nothing to measure it against.",
+        text: "The real problem was that I had no one to go to. Not a mentor. Not HR. Not even a peer who'd been there longer and could tell me whether a letter of expectation after health leave was normal, or something worth pushing back on. I had to interpret every signal alone, with nothing to measure it against. If you're reading that and recognising it, the [managed-out diagnostic](/resources/managed-out) is the fastest way to check your read against something other than your own nerves.",
       },
       {
         type: "p",
@@ -138,7 +275,7 @@ export const blogPosts: BlogPost[] = [
       { type: "h2", text: "The Fix Isn't a Formal Process. It's a Second Opinion." },
       {
         type: "p",
-        text: "That's the gap I think about most in my work now. Not every workplace situation needs HR intervention or a formal complaint. Most of them just need someone to help you think clearly early enough that you still have real options, including the option to stay and actually get what you came for.",
+        text: "That's the gap I think about most in my work now. Not every workplace situation needs HR intervention or a formal complaint. Most of them just need someone to help you think clearly early enough that you still have real options, including the option to stay and actually get what you came for. That is exactly what a [confidential advisory session](/booking?service=individual-advisory) is for — and if you're already weighing the exit, [Resign or Stay?](/resources/resign-or-stay) will structure the decision before the call.",
       },
       {
         type: "p",
@@ -152,6 +289,98 @@ export const blogPosts: BlogPost[] = [
     source: 'Gallup, "State of the American Manager: Analytics and Advice for Leaders" (2015).',
   },
 ];
+
+/* ------------------------------------------------------- portable text */
+
+const INLINE_LINK = /\[([^\]]+)\]\(([^)\s]+)\)/g;
+
+type Span = { _type: "span"; _key: string; text: string; marks: string[] };
+type LinkDef = { _type: "link"; _key: string; href: string };
+
+/**
+ * Split one run of body text into portable-text spans, lifting `[label](/href)` out
+ * into link marks. Keys are derived from the block's position rather than a counter,
+ * so the same post always produces byte-identical output between builds and between
+ * the site and the seed script.
+ */
+function toSpans(text: string, keyBase: string) {
+  const children: Span[] = [];
+  const markDefs: LinkDef[] = [];
+  let cursor = 0;
+
+  const push = (value: string, marks: string[] = []) => {
+    if (!value) return;
+    children.push({ _type: "span", _key: `${keyBase}-s${children.length}`, text: value, marks });
+  };
+
+  for (const match of text.matchAll(INLINE_LINK)) {
+    const [raw, label, href] = match;
+    const at = match.index ?? 0;
+    push(text.slice(cursor, at));
+    const markKey = `${keyBase}-a${markDefs.length}`;
+    markDefs.push({ _type: "link", _key: markKey, href });
+    push(label, [markKey]);
+    cursor = at + raw.length;
+  }
+
+  push(text.slice(cursor));
+  if (children.length === 0) push("");
+
+  return { children, markDefs };
+}
+
+/**
+ * Convert the in-code `BlogBlock[]` into portable text.
+ *
+ * Shared deliberately: `lib/sanity/queries.ts` uses it to render posts that haven't
+ * been migrated into Sanity yet, and `scripts/seed-sanity.ts` uses it to write them
+ * into the dataset. One implementation means a post reads identically whether it is
+ * being served from code or from Studio.
+ */
+export function blocksToPortableText(blocks: BlogBlock[]): PortableTextBlock[] {
+  return blocks.flatMap((block, i): PortableTextBlock[] => {
+    const keyBase = `b${i}`;
+
+    if (block.type === "callout") {
+      return [
+        {
+          _type: "callout",
+          _key: keyBase,
+          text: block.text,
+          ctaLabel: "Book a confidential call",
+          ctaHref: "/booking",
+        } as unknown as PortableTextBlock,
+      ];
+    }
+
+    if (block.type === "list") {
+      return block.items.map((item, j) => {
+        const itemKey = `${keyBase}-${j}`;
+        const { children, markDefs } = toSpans(item, itemKey);
+        return {
+          _type: "block",
+          _key: itemKey,
+          style: "normal",
+          listItem: "bullet",
+          level: 1,
+          markDefs,
+          children,
+        } as unknown as PortableTextBlock;
+      });
+    }
+
+    const { children, markDefs } = toSpans(block.text, keyBase);
+    return [
+      {
+        _type: "block",
+        _key: keyBase,
+        style: block.type === "h2" ? "h2" : "normal",
+        markDefs,
+        children,
+      } as unknown as PortableTextBlock,
+    ];
+  });
+}
 
 export const blogCategories = [
   "All",

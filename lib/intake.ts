@@ -117,7 +117,7 @@ const advisoryForm: IntakeForm = {
 };
 
 const interviewPrepForm: IntakeForm = {
-  note: "No uploads needed. Paste the job posting link and Karma reads it before the call — there is nothing to attach here.",
+  note: "Nothing is uploaded here. Paste links to the job posting and your CV — or, if neither has a link, reply to the email you get after payment with the CV attached and the job description pasted in. Karma reads both before the call.",
   fields: [
     {
       id: "role",
@@ -159,8 +159,25 @@ const interviewPrepForm: IntakeForm = {
       id: "jobPostingUrl",
       label: "Link to the job posting or JD",
       type: "url",
+      half: true,
       placeholder: "https://…",
       help: "Any public link works — LinkedIn, the company careers page, a job board.",
+    },
+    {
+      id: "cvUrl",
+      label: "Link to your CV or LinkedIn profile",
+      type: "url",
+      half: true,
+      placeholder: "https://linkedin.com/in/…",
+      help: "A LinkedIn profile or a shareable Drive/Dropbox link. No file is uploaded through this form — you can also reply to the payment email with your CV attached.",
+    },
+    {
+      id: "jobDescription",
+      label: "Paste the job description",
+      type: "textarea",
+      placeholder:
+        "Only if the posting isn't public — paste the responsibilities and requirements here and skip the link above.",
+      help: "Optional. Karma prepares against the actual requirements, not a generic version of the role.",
     },
     {
       id: "focus",
@@ -175,7 +192,7 @@ const interviewPrepForm: IntakeForm = {
 
 const interviewPrepPackageForm: IntakeForm = {
   ...interviewPrepForm,
-  note: "No uploads needed — paste the job posting links below. The three sessions are booked one at a time, so only the first interview needs details now.",
+  note: "Nothing is uploaded here — paste the job posting and CV links below. The three sessions are booked one at a time, so only the first interview needs details now.",
   fields: interviewPrepForm.fields.map((field) => {
     if (field.id === "role") {
       return {

@@ -18,10 +18,9 @@ import { readFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { createClient } from "@sanity/client";
-import type { PortableTextBlock } from "@portabletext/types";
 
 import { projectId, dataset, apiVersion } from "../sanity/env";
-import { blogPosts, type BlogBlock } from "../lib/blog";
+import { blocksToPortableText, blogPosts } from "../lib/blog";
 import { serviceProducts } from "../lib/products";
 import { resources } from "../lib/resources";
 import { siteConfig } from "../lib/site";
@@ -53,51 +52,6 @@ const client = createClient({
   token: resolveToken(),
   useCdn: false,
 });
-
-/* ------------------------------------------------ portable-text builder */
-
-let keySeq = 0;
-const key = () => `k${(keySeq++).toString(36)}`;
-
-/** Convert the hand-written `BlogBlock[]` into clean portable text for storage. */
-function blocksToPortableText(blocks: BlogBlock[]): PortableTextBlock[] {
-  return blocks.flatMap((block): PortableTextBlock[] => {
-    if (block.type === "callout") {
-      return [
-        {
-          _type: "callout",
-          _key: key(),
-          text: block.text,
-          ctaLabel: "Book a confidential call",
-          ctaHref: "/booking",
-        } as unknown as PortableTextBlock,
-      ];
-    }
-    if (block.type === "list") {
-      return block.items.map(
-        (item) =>
-          ({
-            _type: "block",
-            _key: key(),
-            style: "normal",
-            listItem: "bullet",
-            level: 1,
-            markDefs: [],
-            children: [{ _type: "span", _key: key(), text: item, marks: [] }],
-          }) as unknown as PortableTextBlock,
-      );
-    }
-    return [
-      {
-        _type: "block",
-        _key: key(),
-        style: block.type === "h2" ? "h2" : "normal",
-        markDefs: [],
-        children: [{ _type: "span", _key: key(), text: block.text, marks: [] }],
-      } as unknown as PortableTextBlock,
-    ];
-  });
-}
 
 /* -------------------------------------------------------------- documents */
 
