@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import Script from "next/script";
 import "./globals.css";
 import { SiteChrome } from "@/components/layout/SiteChrome";
-import { MaybeClerkProvider } from "@/components/auth/MaybeClerkProvider";
 import { siteConfig, absoluteUrl } from "@/lib/site";
 import { getPageContent, getSiteSettings } from "@/lib/sanity/queries";
 
@@ -192,93 +191,91 @@ export default async function RootLayout({
   const organizationSchema = buildOrganizationSchema(settings);
 
   return (
-    <MaybeClerkProvider>
-      <html lang="en">
-        <head>
-          <meta
-            name="google-site-verification"
-            content="aqes15l-sKDJFnhJO3sk6HJ0HcmDajXGKi22TK9NMsQ"
-          />
+    <html lang="en">
+      <head>
+        <meta
+          name="google-site-verification"
+          content="aqes15l-sKDJFnhJO3sk6HJ0HcmDajXGKi22TK9NMsQ"
+        />
 
-          {/* Preconnect for fonts */}
-          <link rel="preconnect" href="https://fonts.googleapis.com" />
-          <link
-            rel="preconnect"
-            href="https://fonts.gstatic.com"
-            crossOrigin="anonymous"
-          />
+        {/* Preconnect for fonts */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
 
-          {/* Brand typeface: Poppins everywhere — 400 body / 500 buttons / 600 sub-head / 700 / 800 headers */}
-          <link
-            href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
-            rel="stylesheet"
-          />
+        {/* Brand typeface: Poppins everywhere — 400 body / 500 buttons / 600 sub-head / 700 / 800 headers */}
+        <link
+          href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet"
+        />
 
-          {/* Material Symbols Outlined + Filled */}
-          <link
-            rel="stylesheet"
-            href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
-          />
+        {/* Material Symbols Outlined + Filled */}
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        />
 
-          {/* Google Tag Manager */}
-          <Script id="gtm-init" strategy="afterInteractive">
-            {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
-            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
-            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
-            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
-            })(window,document,'script','dataLayer','GTM-PGW9TMS8');`}
-          </Script>
-          {/* End Google Tag Manager */}
+        {/* Google Tag Manager */}
+        <Script id="gtm-init" strategy="afterInteractive">
+          {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+          new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+          j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+          'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+          })(window,document,'script','dataLayer','GTM-PGW9TMS8');`}
+        </Script>
+        {/* End Google Tag Manager */}
 
-          {/* Google tag (gtag.js) */}
-          <Script
-            src="https://www.googletagmanager.com/gtag/js?id=G-VS75LYDHVC"
-            strategy="afterInteractive"
-          />
-          <Script id="gtag-init" strategy="afterInteractive">
-            {`window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-            gtag('config', 'G-VS75LYDHVC');`}
-          </Script>
+        {/* Google tag (gtag.js) */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-VS75LYDHVC"
+          strategy="afterInteractive"
+        />
+        <Script id="gtag-init" strategy="afterInteractive">
+          {`window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-VS75LYDHVC');`}
+        </Script>
 
-          {/* JSON-LD Structured Data */}
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
-          />
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(founderSchema) }}
-          />
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }}
-          />
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
-          />
-        </head>
+        {/* JSON-LD Structured Data */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(founderSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+        />
+      </head>
 
-        {/* Noise overlay texture (purely decorative, no performance hit) */}
-        <body className="min-h-screen flex flex-col relative">
-          {/* Google Tag Manager (noscript) */}
-          <noscript>
-            <iframe
-              src="https://www.googletagmanager.com/ns.html?id=GTM-PGW9TMS8"
-              height="0"
-              width="0"
-              style={{ display: "none", visibility: "hidden" }}
-            />
-          </noscript>
-          {/* End Google Tag Manager (noscript) */}
+      {/* Noise overlay texture (purely decorative, no performance hit) */}
+      <body className="min-h-screen flex flex-col relative">
+        {/* Google Tag Manager (noscript) */}
+        <noscript>
+          <iframe
+            src="https://www.googletagmanager.com/ns.html?id=GTM-PGW9TMS8"
+            height="0"
+            width="0"
+            style={{ display: "none", visibility: "hidden" }}
+          />
+        </noscript>
+        {/* End Google Tag Manager (noscript) */}
 
-          {/* Navbar, footer and noise overlay — omitted on /studio, which is a
-              full-screen app rather than a page on the site. */}
-          <SiteChrome>{children}</SiteChrome>
-        </body>
-      </html>
-    </MaybeClerkProvider>
+        {/* Navbar, footer and noise overlay — omitted on /studio, which is a
+            full-screen app rather than a page on the site. */}
+        <SiteChrome>{children}</SiteChrome>
+      </body>
+    </html>
   );
 }

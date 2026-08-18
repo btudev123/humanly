@@ -1,14 +1,38 @@
 import { MetadataRoute } from "next";
 import { getPublishedResources } from "@/lib/db/repository";
 import { resources } from "@/lib/resources";
-import { getArticles } from "@/lib/sanity/queries";
+import { getArticles, getPageUpdatedAtByRoute } from "@/lib/sanity/queries";
 import { siteConfig } from "@/lib/site";
 
 export const revalidate = 3600;
 
+/**
+ * Static routes and how often they turn over.
+ *
+ * `route` is the Sanity `page` document key, used to look up an honest `lastmod`.
+ * Routes with no `page` document (the two standalone resource guides, `/llms-full`)
+ * carry no `lastmod` at all — Google discounts a `lastmod` it judges unreliable, and
+ * an omitted one is better than a fabricated one.
+ */
+const STATIC_ROUTES = [
+  { route: "/", changeFrequency: "weekly" as const, priority: 1.0 },
+  { route: "/services", changeFrequency: "weekly" as const, priority: 0.9 },
+  { route: "/about", changeFrequency: "monthly" as const, priority: 0.8 },
+  { route: "/resources", changeFrequency: "weekly" as const, priority: 0.8 },
+  { route: "/blog", changeFrequency: "weekly" as const, priority: 0.75 },
+  { route: "/tools", changeFrequency: "weekly" as const, priority: 0.75 },
+  { route: "/resources/managed-out", changeFrequency: "monthly" as const, priority: 0.7 },
+  { route: "/resources/resign-or-stay", changeFrequency: "monthly" as const, priority: 0.7 },
+  { route: "/booking", changeFrequency: "weekly" as const, priority: 0.9 },
+  { route: "/contact", changeFrequency: "monthly" as const, priority: 0.5 },
+  { route: "/faq", changeFrequency: "monthly" as const, priority: 0.6 },
+  { route: "/llms-full", changeFrequency: "weekly" as const, priority: 0.5 },
+  { route: "/privacy", changeFrequency: "yearly" as const, priority: 0.3 },
+  { route: "/terms", changeFrequency: "yearly" as const, priority: 0.3 },
+];
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = siteConfig.url;
-  const lastModified = new Date();
   let publicResources = resources;
 
   try {
@@ -21,25 +45,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Articles come from the same source the blog routes render, so a post published in
   // Studio appears here without a deploy — and `_updatedAt` gives an honest lastmod
   // instead of the publish date frozen in code.
-  const articles = await getArticles();
+  const [articles, pageUpdatedAt] = await Promise.all([
+    getArticles(),
+    getPageUpdatedAtByRoute(),
+  ]);
 
-  // Static pages with high priority
-  const staticPages = [
-    { url: baseUrl, lastModified, changeFrequency: "weekly" as const, priority: 1.0 },
-    { url: `${baseUrl}/services`, lastModified, changeFrequency: "weekly" as const, priority: 0.9 },
-    { url: `${baseUrl}/about`, lastModified, changeFrequency: "monthly" as const, priority: 0.8 },
-    { url: `${baseUrl}/resources`, lastModified, changeFrequency: "weekly" as const, priority: 0.8 },
-    { url: `${baseUrl}/blog`, lastModified, changeFrequency: "weekly" as const, priority: 0.75 },
-    { url: `${baseUrl}/tools`, lastModified, changeFrequency: "weekly" as const, priority: 0.75 },
-    { url: `${baseUrl}/resources/managed-out`, lastModified, changeFrequency: "monthly" as const, priority: 0.7 },
-    { url: `${baseUrl}/resources/resign-or-stay`, lastModified, changeFrequency: "monthly" as const, priority: 0.7 },
-    { url: `${baseUrl}/booking`, lastModified, changeFrequency: "weekly" as const, priority: 0.9 },
-    { url: `${baseUrl}/contact`, lastModified, changeFrequency: "monthly" as const, priority: 0.5 },
-    { url: `${baseUrl}/faq`, lastModified, changeFrequency: "monthly" as const, priority: 0.6 },
-    { url: `${baseUrl}/llms-full`, lastModified, changeFrequency: "weekly" as const, priority: 0.5 },
-    { url: `${baseUrl}/privacy`, lastModified, changeFrequency: "yearly" as const, priority: 0.3 },
-    { url: `${baseUrl}/terms`, lastModified, changeFrequency: "yearly" as const, priority: 0.3 },
-  ];
+  const staticPages = STATIC_ROUTES.map(({ route, changeFrequency, priority }) => {
+    const updatedAt = pageUpdatedAt.get(route);
+    return {
+      url: route === "/" ? baseUrl : `${baseUrl}${route}`,
+      ...(updatedAt ? { lastModified: new Date(updatedAt) } : {}),
+      changeFrequency,
+      priority,
+    };
+  });
 
   const resourcePages = publicResources.map((resource) => ({
     url: `${baseUrl}/resources/${resource.slug}`,

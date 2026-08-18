@@ -69,6 +69,7 @@ export default function robots(): MetadataRoute.Robots {
       },
     ],
     sitemap: `${baseUrl}/sitemap.xml`,
-    host: baseUrl,
+    // Yandex's `Host` directive takes a bare hostname, not a URL.
+    host: new URL(baseUrl).host,
   };
 }

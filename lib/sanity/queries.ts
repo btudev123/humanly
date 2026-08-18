@@ -132,15 +132,39 @@ export type PageContent = {
   route: string;
   heading?: string;
   intro?: string;
+  /** Sanity's `_updatedAt` — the only honest `lastmod` signal a static route has. */
+  updatedAt?: string;
   seo?: SeoFields;
 };
 
 export async function getPageContent(route: string): Promise<PageContent | null> {
   return sanityFetch<PageContent | null>(
-    `*[_type == "page" && route == $route][0]{route, heading, intro, ${SEO_PROJECTION}}`,
+    `*[_type == "page" && route == $route][0]{route, heading, intro, "updatedAt": _updatedAt, ${SEO_PROJECTION}}`,
     { route },
     ["page"],
   );
+}
+
+/**
+ * Every page document's route and last-edit time, in one round-trip.
+ *
+ * `app/sitemap.ts` needs a `lastmod` for fourteen static routes; fetching them
+ * one at a time through `getPageContent` would be fourteen queries for two fields.
+ * Routes with no `page` document simply won't appear in the map, and the sitemap
+ * omits `lastmod` for those rather than inventing one.
+ */
+export async function getPageUpdatedAtByRoute(): Promise<Map<string, string>> {
+  const docs = await sanityFetch<Array<{ route?: string; updatedAt?: string }>>(
+    `*[_type == "page" && defined(route)]{route, "updatedAt": _updatedAt}`,
+    {},
+    ["page"],
+  );
+
+  const byRoute = new Map<string, string>();
+  for (const doc of docs ?? []) {
+    if (doc.route && doc.updatedAt) byRoute.set(doc.route, doc.updatedAt);
+  }
+  return byRoute;
 }
 
 /* -------------------------------------------------------------- services */
