@@ -9,6 +9,7 @@ import { sendResourceDelivery, sendLeadNotification, sendPaymentReceipt } from "
 import { getInvoiceForSession, getStripe } from "@/lib/stripe";
 import { formatUsd, formatAed, getServiceProduct } from "@/lib/products";
 import { absoluteUrl } from "@/lib/site";
+import { recordFunnelEvent } from "@/lib/analytics/funnel";
 
 function metaStr(meta: Record<string, unknown> | null | undefined, key: string) {
   const value = meta?.[key];
@@ -48,6 +49,33 @@ async function sendConsultationReceipt(
     });
   } catch {
     // Best-effort; payment is already recorded and the invoice stays in Stripe.
+  }
+}
+
+/**
+ * `checkout_paid` — the missing "actually paid" row `funnel_events` never recorded
+ * (docs/cro/2026-09-pricing-page-cro.md, Track B item 7). Fired here, at the point Stripe
+ * confirms payment. Best-effort: a funnel-recording failure must never block delivery of the
+ * receipt/lead-notification emails that follow.
+ *
+ * Marcus's spec also calls for the identical event in the race-condition fallback path in
+ * `app/booking/schedule/page.tsx` (`markOrderPaidFromSession`) — that call site sits inside
+ * lines 23-52 of that file, which `docs/adr/CONTRACTS.md` lists as byte-for-byte frozen (the
+ * payment gate). Not added here; flagged for Kyle/Jonas to decide how to close that gap without
+ * touching the frozen block.
+ */
+async function recordCheckoutPaid(order: OrderRecord | undefined | null) {
+  if (!order) return;
+  const product = getServiceProduct(order.product_slug);
+  try {
+    await recordFunnelEvent({
+      event: "checkout_paid",
+      productSlug: order.product_slug,
+      customerEmail: order.customer_email,
+      metadata: { orderId: order.id, tier: product?.tier ?? null, kind: order.kind },
+    });
+  } catch {
+    // Best-effort; payment is already recorded and the order row is the source of truth.
   }
 }
 
@@ -133,6 +161,7 @@ export async function POST(request: Request) {
       if (session.payment_status === "paid" || session.mode === "subscription") {
         const invoice = await getInvoiceForSession(session);
         const order = await markOrderPaidFromSession(session, invoice);
+        await recordCheckoutPaid(order);
         await deliverResourceIfNeeded(order, session, invoice);
         await sendConsultationReceipt(order, session);
         await notifyPaidConsultationLead(order);
@@ -143,6 +172,7 @@ export async function POST(request: Request) {
       const session = event.data.object as Stripe.Checkout.Session;
       const invoice = await getInvoiceForSession(session);
       const order = await markOrderPaidFromSession(session, invoice);
+      await recordCheckoutPaid(order);
       await deliverResourceIfNeeded(order, session, invoice);
       await sendConsultationReceipt(order, session);
       await notifyPaidConsultationLead(order);

@@ -22,7 +22,7 @@ export const PAGE_META: Record<string, PageMeta> = {
   "/services": {
     title: "HR Advisory Services & Pricing | Humanly",
     description:
-      "Confidential HR advisory sessions, retainers, and corporate workshops — from a single 30-minute call to ongoing monthly support. Independent advice on PIPs, exits, contracts, and your rights, priced transparently.",
+      "Confidential HR advisory sessions, specialist sessions, and monthly retainers — from a single 30-minute call to ongoing monthly support. Independent advice on PIPs, exits, contracts, and your rights, priced transparently in AED.",
   },
   "/about": {
     title: "About Karma Harb & Humanly",
@@ -47,7 +47,7 @@ export const PAGE_META: Record<string, PageMeta> = {
   "/booking": {
     title: "Book a Confidential HR Consultation",
     description:
-      "Book a private Humanly consultation. Pay securely through Stripe first, then choose a confidential Cal.com session time.",
+      "Book a private Humanly consultation. See real availability, then pay securely through Stripe to confirm your confidential session time.",
   },
   "/contact": {
     title: "Contact Humanly | Confidential HR Advisory",

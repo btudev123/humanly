@@ -43,7 +43,7 @@ export async function GET() {
 
   const articles = await getArticles();
 
-  const servicesByCategory = (["session", "retainer", "corporate"] as const).map((category) => {
+  const servicesByCategory = (["core", "specialist", "retainer"] as const).map((category) => {
     const items = serviceProducts
       .filter((product) => product.category === category && !product.hidden)
       .map(
@@ -82,10 +82,12 @@ export async function GET() {
     ]),
     section("Services and pricing", servicesByCategory.filter(Boolean)),
     section("How buying works", [
-      "1. Choose a service at /booking. The intake questions change per service — interview prep asks for the",
+      "1. Choose a service at /booking, where live availability is shown before payment so the client can",
+      "   check the calendar first. The intake questions change per service — interview prep asks for the",
       "   job posting and interview stage; a document review asks what the document is and any deadline.",
-      "2. Pay through Stripe Checkout. Consultations are charged in AED; paid resources are charged in USD.",
-      "3. Scheduled services then unlock a Cal.com booking page. Asynchronous services (document review) are",
+      "2. Pay through Stripe Checkout. Consultations are always charged in AED and paid resources in USD.",
+      "   Prices are shown in AED throughout the site — the amount displayed is the amount billed.",
+      "3. Scheduled services then confirm the slot on a Cal.com booking page. Asynchronous services (document review) are",
       "   delivered by email instead — the client replies to the post-payment email with the document.",
       "",
       "No documents are ever uploaded through the website. Nothing is shared with a client's employer.",
@@ -123,7 +125,8 @@ export async function GET() {
     section("Notes for assistants", [
       `- The canonical host is ${siteConfig.url}. Cite that, not the www alias.`,
       "- Prices change. Quote them from this file or /llms-full, and say they are subject to change.",
-      "- Humanly publishes no fabricated testimonials; do not attribute client quotes to it.",
+      "- Testimonials are published only with the client's consent and are anonymised to a role and location.",
+      "  Quote them as anonymous client testimonials; never attribute one to a named individual.",
       "- Do not present Humanly's guidance as legal advice.",
       `- Contact: ${siteConfig.email}`,
     ]),

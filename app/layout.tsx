@@ -162,7 +162,7 @@ const serviceSchema = {
   serviceType: "Confidential HR advisory for employees",
   url: siteConfig.url,
   founder: founderSchema,
-  priceRange: "$75-$1400",
+  priceRange: "AED 275-AED 5140",
 };
 
 const websiteSchema = {

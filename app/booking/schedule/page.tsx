@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { PaidScheduler } from "@/components/booking/PaidScheduler";
 import { getPaidOrderBySession, markOrderPaidFromSession } from "@/lib/db/repository";
-import { getCalLink, getServiceProduct } from "@/lib/products";
+import { CAL_USERNAME, getCalLink, getServiceProduct } from "@/lib/products";
 import { getStripe, hasStripe, getInvoiceForSession } from "@/lib/stripe";
 import { absoluteUrl } from "@/lib/site";
 
@@ -48,8 +48,39 @@ export default async function SchedulePage({
     return <ScheduleBlocked message="Payment has not been confirmed for this scheduling link." />;
   }
 
+  // Full read-path resolution — live catalogue, then the retired archive, then the alias map.
+  // This is the one place that knows what was actually bought, so both the Cal link and the
+  // page's product label are derived from it and passed down. `PaidScheduler` deliberately does
+  // no lookup of its own: re-resolving against the *live* catalogue on the client is what made a
+  // retired-slug order render as "The Session scheduling".
   const product = getServiceProduct(order.product_slug);
-  return <PaidScheduler order={order} calLink={product ? getCalLink(product) : "talkhumanly/individual-advisory"} />;
+
+  // ADR-0001 Decision C — the slot the visitor picked in the pre-payment availability preview,
+  // written to `orders.metadata` at checkout. A preference, not a hold: it only tells the embed
+  // where to open. Dropped if it is malformed or already in the past, so a stale link never
+  // deep-links the booker at a day that can't be booked.
+  const rawPreferredSlot = order.metadata?.preferredSlot;
+  let preferredSlot: string | undefined;
+  if (typeof rawPreferredSlot === "string") {
+    const parsed = new Date(rawPreferredSlot);
+    if (!Number.isNaN(parsed.getTime()) && parsed.getTime() > Date.now()) {
+      preferredSlot = parsed.toISOString();
+    }
+  }
+
+  return (
+    <PaidScheduler
+      order={order}
+      // The slug as charged, if nothing resolves it — same `product?.name || order.product_slug`
+      // fallback the Stripe and Cal webhooks use on historical orders. Never a guessed product.
+      productName={product?.name ?? order.product_slug}
+      // Falls back to the live core-ladder default, never a retired slug: `full-support` is the
+      // product `individual-advisory` was replaced by, and the old fallback also carried the
+      // wrong Cal.com username (`talkhumanly`; the account is `talk-humanly`).
+      calLink={product ? getCalLink(product) : `${CAL_USERNAME}/full-support`}
+      preferredSlot={preferredSlot}
+    />
+  );
 }
 
 function ScheduleBlocked({ message }: { message: string }) {

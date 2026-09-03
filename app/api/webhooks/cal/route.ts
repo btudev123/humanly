@@ -1,5 +1,5 @@
 import crypto from "node:crypto";
-import { getOrderById, recordBooking } from "@/lib/db/repository";
+import { getOrderById, markBookingRescheduled, recordBooking } from "@/lib/db/repository";
 import { sendBookingConfirmation, sendLeadNotification } from "@/lib/email/resend";
 
 export const runtime = "nodejs";
@@ -73,16 +73,20 @@ export async function POST(request: Request) {
     return Response.json({ error: "Missing Cal.com booking UID." }, { status: 400 });
   }
 
+  // Owen S2: null, never a literal. `BOOKING_NO_SHOW_UPDATED` sends `attendees: [{ email,
+  // noShow }]` — an email but no name — and the old `|| "Humanly client"` fallback wrote that
+  // placeholder straight over the real attendee name via the upsert, after which the review
+  // email opened "Hi Humanly client". Passing null lets `recordBooking`'s `coalesce` keep
+  // whatever is already stored; the display fallbacks below are for the outgoing email only and
+  // never reach the database.
   const attendeeName =
     stringValue(firstAttendee.name) ||
     stringValue(payload.attendeeName) ||
-    stringValue(payload.name) ||
-    "Humanly client";
+    stringValue(payload.name);
   const attendeeEmail =
     stringValue(firstAttendee.email) ||
     stringValue(payload.email) ||
-    stringValue(payload.attendeeEmail) ||
-    "";
+    stringValue(payload.attendeeEmail);
 
   const attendeeCompany =
     stringValue(firstAttendee.company) ||
@@ -94,6 +98,17 @@ export async function POST(request: Request) {
     stringValue(payload.role) ||
     stringValue(metadata.role) ||
     null;
+
+  // Cal.com delivers every booking trigger to this one URL as `{ triggerEvent, createdAt,
+  // payload }`. The route used to ignore `triggerEvent` entirely, which meant a cancellation
+  // emailed the client "your booking is confirmed" with a dead meeting link (ADR-0001 Decision D).
+  const trigger = stringValue(body.triggerEvent);
+
+  // Cal.com sends the status uppercase (`"ACCEPTED"`, `"CANCELLED"`) and this route stored it
+  // verbatim, so `getBookingsEligibleForReviewRequest`'s `lower(b.status) = 'accepted'` filter
+  // needs a single, lower-cased convention on write. Null when the event carried no status at
+  // all (`BOOKING_NO_SHOW_UPDATED`) — `recordBooking` then keeps whatever is already stored.
+  const status = stringValue(payload.status)?.toLowerCase() || null;
 
   const startTime = stringValue(payload.startTime) || stringValue(payload.start);
   const endTime = stringValue(payload.endTime) || stringValue(payload.end);
@@ -112,9 +127,34 @@ export async function POST(request: Request) {
     startTime,
     endTime,
     meetingUrl,
-    status: stringValue(payload.status) || "accepted",
+    status,
     rawPayload: body,
   });
+
+  // A reschedule arrives as a NEW booking with a new `uid` plus `rescheduleUid` pointing at the
+  // one it replaced. Retire that older row so the review cron can't chase a slot that never
+  // happened (and, via its per-email dedup, burn the request for the slot that did).
+  const rescheduleUid = stringValue(payload.rescheduleUid);
+  if (trigger === "BOOKING_RESCHEDULED" && rescheduleUid && rescheduleUid !== uid) {
+    try {
+      await markBookingRescheduled(rescheduleUid);
+    } catch (error) {
+      console.error("[webhooks/cal] failed to retire rescheduled booking", rescheduleUid, error);
+    }
+  }
+
+  // Guest-facing mail only for the two triggers that mean "you have a confirmed time". Anything
+  // else (cancellation, rejection, no-show, payment/meeting-ended events) is recorded silently.
+  // A payload with no `triggerEvent` at all isn't a shape Cal.com sends, but this route has
+  // always tolerated loose bodies, so it's treated as a creation unless its status says otherwise.
+  const isConfirmingEvent =
+    trigger === "BOOKING_CREATED" ||
+    trigger === "BOOKING_RESCHEDULED" ||
+    (!trigger && status !== "cancelled" && status !== "rejected");
+
+  if (!isConfirmingEvent) {
+    return Response.json({ ok: true, booking, emailed: false });
+  }
 
   const order = orderId ? await getOrderById(orderId) : null;
   const service = order?.product_slug || title || "Humanly consultation";
@@ -132,10 +172,14 @@ export async function POST(request: Request) {
     }
   }
 
+  // Display-only fallbacks. These are what the recipient reads; nothing here is written back to
+  // `bookings` (see the Owen S2 note above).
+  const displayName = attendeeName || "Humanly client";
+
   if (attendeeEmail) {
     await sendBookingConfirmation({
       to: attendeeEmail,
-      name: attendeeName,
+      name: displayName,
       service,
       startTime,
       endTime,
@@ -156,8 +200,8 @@ export async function POST(request: Request) {
     await sendLeadNotification({
       service,
       priceFormatted,
-      name: order?.customer_name || attendeeName,
-      email: order?.customer_email || attendeeEmail,
+      name: order?.customer_name || displayName,
+      email: order?.customer_email || attendeeEmail || "",
       phone: order?.phone,
       urgency: metaStr(order?.metadata, "urgency"),
       concern: metaStr(order?.metadata, "concern"),

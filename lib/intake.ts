@@ -264,62 +264,6 @@ const documentReviewForm: IntakeForm = {
   ],
 };
 
-const relocationForm: IntakeForm = {
-  fields: [
-    {
-      id: "status",
-      label: "Where are you in the move?",
-      type: "select",
-      required: true,
-      half: true,
-      options: [
-        "Already in the UAE",
-        "Moving to the UAE soon",
-        "Considering a move",
-        "Leaving the UAE",
-      ],
-      role: "concern",
-    },
-    {
-      id: "visaStatus",
-      label: "Your visa or status",
-      type: "select",
-      half: true,
-      options: [
-        "Employment visa",
-        "Golden visa",
-        "Freelance permit",
-        "Dependent visa",
-        "No UAE visa yet",
-        "Not sure",
-      ],
-    },
-    {
-      id: "timing",
-      label: "How soon do you need answers?",
-      type: "select",
-      half: true,
-      options: TIMING,
-      role: "urgency",
-    },
-    {
-      id: "employerType",
-      label: "Freezone or mainland?",
-      type: "select",
-      half: true,
-      options: ["Mainland", "Freezone", "DIFC or ADGM", "Not sure yet"],
-    },
-    {
-      id: "questions",
-      label: "Your top questions",
-      type: "textarea",
-      required: true,
-      role: "message",
-      placeholder: "List up to five — Karma works through them in order.",
-    },
-  ],
-};
-
 const jobSearchForm: IntakeForm = {
   note: "This is a market-orientation call. Bring your CV to the session — nothing needs to be sent in advance.",
   fields: [
@@ -421,119 +365,13 @@ const retainerForm: IntakeForm = {
   ],
 };
 
-const corporateBase: IntakeField[] = [
-  {
-    id: "company",
-    label: "Company name",
-    type: "text",
-    half: true,
-    required: true,
-    role: "concern",
-  },
-  { id: "jobTitle", label: "Your role", type: "text", half: true, placeholder: "e.g. HR Manager" },
-];
-
-const lunchAndLearnForm: IntakeForm = {
-  note: "Corporate engagement — invoiced to the company and kept entirely separate from Humanly's employee advisory.",
-  fields: [
-    ...corporateBase,
-    {
-      id: "attendees",
-      label: "Expected attendees",
-      type: "select",
-      half: true,
-      options: ["Up to 10", "11–20", "More than 20 (we'll quote separately)"],
-    },
-    {
-      id: "timing",
-      label: "Preferred timing",
-      type: "select",
-      half: true,
-      options: ["This month", "Next month", "This quarter", "Still planning"],
-      role: "urgency",
-    },
-    {
-      id: "topic",
-      label: "Focus for the workshop",
-      type: "select",
-      options: [
-        "UAE labour law essentials",
-        "Performance management done properly",
-        "Investigations and grievances",
-        "Restructuring and redundancy",
-        "Policy and handbook basics",
-        "Something else",
-      ],
-    },
-    {
-      id: "brief",
-      label: "Anything specific we should cover?",
-      type: "textarea",
-      role: "message",
-      placeholder: "Recent issues, questions the team keeps asking, or a policy you're rolling out.",
-    },
-  ],
-};
-
-const complianceAdvisoryForm: IntakeForm = {
-  note: "Employer-side advisory. Humanly does not advise both sides of the same matter — if we already advise one of your employees, we'll say so and decline.",
-  fields: [
-    ...corporateBase,
-    {
-      id: "headcount",
-      label: "Headcount",
-      type: "select",
-      half: true,
-      options: ["1–10", "11–50", "51–200", "201–500", "500+"],
-    },
-    {
-      id: "setup",
-      label: "Entity setup",
-      type: "select",
-      half: true,
-      options: ["Mainland", "Freezone", "DIFC or ADGM", "Multiple entities", "Not sure"],
-    },
-    {
-      id: "topic",
-      label: "What do you need advice on?",
-      type: "select",
-      options: [
-        "Contracts and offer letters",
-        "Terminations and end-of-service",
-        "Freezone vs mainland compliance",
-        "Policies and handbooks",
-        "Investigations",
-        "Something else",
-      ],
-    },
-    {
-      id: "timing",
-      label: "How urgent is it?",
-      type: "select",
-      half: true,
-      options: TIMING,
-      role: "urgency",
-    },
-    {
-      id: "brief",
-      label: "Give us the short version",
-      type: "textarea",
-      role: "message",
-      placeholder: "Enough to tell whether this is an hour of advice or a bigger piece of work.",
-    },
-  ],
-};
-
 /* ------------------------------------------------------------------ lookup */
 
 const FORMS_BY_SLUG: Record<string, IntakeForm> = {
   "interview-prep": interviewPrepForm,
   "interview-prep-package": interviewPrepPackageForm,
   "document-review": documentReviewForm,
-  "uae-relocation-qa": relocationForm,
   "dubai-job-search": jobSearchForm,
-  "lunch-and-learn": lunchAndLearnForm,
-  "hr-compliance-advisory": complianceAdvisoryForm,
 };
 
 /**
@@ -544,7 +382,8 @@ export function getIntakeForm(product: ServiceProduct): IntakeForm {
   const bySlug = FORMS_BY_SLUG[product.slug];
   if (bySlug) return bySlug;
   if (product.category === "retainer") return retainerForm;
-  if (product.category === "corporate") return complianceAdvisoryForm;
+  // The three core tiers all take the same advisory intake — the tier changes what is
+  // delivered afterwards, not what we need to know up front.
   return advisoryForm;
 }
 

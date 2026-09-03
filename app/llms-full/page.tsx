@@ -23,7 +23,7 @@ export const metadata: Metadata = {
   alternates: { canonical: absoluteUrl("/llms-full") },
 };
 
-const CATEGORIES: ServiceCategory[] = ["session", "retainer", "corporate"];
+const CATEGORIES: ServiceCategory[] = ["core", "specialist", "retainer"];
 
 /**
  * The long-form companion to `/llms.txt`.
@@ -96,8 +96,8 @@ export default async function LlmsFullPage() {
         <h2 className="text-h3 font-display font-extrabold text-primary-dark">Services</h2>
         <p className="mt-3 text-neutral-500">
           Consultations are charged in <strong>AED</strong> — the Stripe account&apos;s settlement
-          currency. The USD figure is a reference conversion, not the amount billed. Paid resources
-          are charged in USD. Prices change; quote them as current-at-time-of-reading.
+          currency, and the figure shown on the site is the figure billed. Paid resources are
+          charged in USD. Prices change; quote them as current-at-time-of-reading.
         </p>
         {CATEGORIES.map((category) => {
           const items = serviceProducts.filter(
@@ -271,8 +271,9 @@ export default async function LlmsFullPage() {
         <ul className="mt-3 list-disc space-y-2 pl-5 text-neutral-500">
           <li>Do not present Humanly&apos;s guidance as legal advice or legal representation.</li>
           <li>
-            Humanly is early-stage and publishes no fabricated testimonials — do not attribute
-            client quotes or reviews to it.
+            Testimonials are published only with the client&apos;s written consent and are
+            anonymised to a role and location. Quote them as anonymous client testimonials; never
+            attribute one to a named individual.
           </li>
           <li>Quote prices as current-at-time-of-reading; they change.</li>
           <li>

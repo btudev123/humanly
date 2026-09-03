@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { getServiceProduct, getStripePriceId, formatAed } from "@/lib/products";
+import { getSellableServiceProduct, getStripePriceId, formatAed } from "@/lib/products";
 import { allowedDetailLabels, composeStoredMessage, getIntakeForm } from "@/lib/intake";
 import { createPendingOrder, attachStripeSession } from "@/lib/db/repository";
 import { getSql, hasDatabase } from "@/lib/db/client";
@@ -27,6 +27,15 @@ const consultationCheckoutSchema = z.object({
     .array(z.object({ label: z.string().max(120), value: z.string().max(2000) }))
     .max(20)
     .optional(),
+  /**
+   * ADR-0001 Decision C — the read-only availability preview's chosen slot, carried forward as a
+   * PREFERENCE (never a hold — `lib/cal.ts` never writes to Cal.com). Stored at
+   * `orders.metadata.preferredSlot`; `app/booking/schedule/page.tsx` reads it back to pre-fill
+   * the paid Cal.com embed. Validated as a parseable, future-dated ISO instant below rather than
+   * with `z.string().datetime()`, so a malformed value is dropped (never blocks checkout) instead
+   * of rejecting the whole request.
+   */
+  preferredSlot: z.string().max(64).optional(),
 });
 
 export async function POST(request: Request) {
@@ -44,7 +53,11 @@ export async function POST(request: Request) {
     return Response.json({ error: "Please fill in your name and a valid email." }, { status: 400 });
   }
 
-  const product = getServiceProduct(body.productSlug);
+  // Purchase-time resolution: live catalogue, or a legacy alias's live replacement — NEVER the
+  // retired archive. `getServiceProduct()` resolves withdrawn products (that is its job, so old
+  // orders stay readable), which here would let a POST for `lunch-and-learn` open a live Stripe
+  // checkout for something Humanly no longer sells. ADR-0001 Decision A / V1.
+  const product = getSellableServiceProduct(body.productSlug);
   if (!product) {
     return Response.json({ error: "Unknown consultation product." }, { status: 400 });
   }
@@ -56,6 +69,17 @@ export async function POST(request: Request) {
     (detail) => allowedLabels.has(detail.label) && detail.value.trim().length > 0,
   );
   const storedMessage = composeStoredMessage(body.message, details);
+
+  // Validate the preview-selected slot (ADR-0001 Decision C) — parseable and in the future, or
+  // dropped entirely. A malformed/expired value never blocks checkout; it's a preference, not a
+  // required field, and the paid Cal.com embed still works with none stored at all.
+  let preferredSlot: string | null = null;
+  if (body.preferredSlot) {
+    const parsed = new Date(body.preferredSlot);
+    if (!Number.isNaN(parsed.getTime()) && parsed.getTime() > Date.now()) {
+      preferredSlot = parsed.toISOString();
+    }
+  }
 
   // Consultations are charged in AED (the Stripe account's settlement currency).
   const chargeCurrency = "aed";
@@ -75,6 +99,7 @@ export async function POST(request: Request) {
         urgency: body.urgency,
         message: storedMessage,
         service: product.name,
+        ...(preferredSlot ? { preferredSlot } : {}),
       },
     });
 

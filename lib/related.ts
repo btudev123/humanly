@@ -56,8 +56,16 @@ const TOOL_LINKS: (RelatedLink & { terms: string[] })[] = [
 /** Advisory services worth surfacing from an article, with the terms they answer to. */
 const SERVICE_TERMS: Record<string, string[]> = {
   "interview-prep": ["interview", "job search", "hiring", "offer", "cv", "resume"],
-  "dubai-job-search": ["job search", "dubai", "relocation", "cv", "market"],
-  "uae-relocation-qa": ["relocation", "visa", "uae", "expat", "rights"],
+  "dubai-job-search": [
+    "job search",
+    "dubai",
+    "relocation",
+    "cv",
+    "market",
+    "visa",
+    "uae",
+    "expat",
+  ],
   "document-review": [
     "contract",
     "letter",
@@ -71,14 +79,25 @@ const SERVICE_TERMS: Record<string, string[]> = {
     "warning",
     "termination",
   ],
-  "individual-advisory": [
+  "the-session": ["question", "quick", "unsure", "second opinion", "advice"],
+  "session-plus-plan": [
+    "plan",
+    "next steps",
+    "prepare",
+    "meeting",
+    "grievance",
+    "investigation",
+  ],
+  "full-support": [
     "manager",
     "performance",
     "pip",
     "investigation",
     "grievance",
-    "second opinion",
     "managed out",
+    "exit",
+    "resignation",
+    "settlement",
   ],
 };
 

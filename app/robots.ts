@@ -8,6 +8,8 @@ import { siteConfig } from "@/lib/site";
  *   - **Post-transaction pages** — `/success`, `/booking/schedule`, `/booking/done`,
  *     `/resources/unlocked`. These are only meaningful with a live Stripe session id, so
  *     an indexed copy is a dead end for anyone who lands on it from search.
+ *   - **Tokenised per-customer pages** — `/review/<token>`, the review-request link. One
+ *     recipient, one signed URL; it carries a `noindex, nofollow` of its own as well.
  *
  * AI crawlers are allowed deliberately. Humanly's audience asks assistants questions like
  * "can my employer put me on a PIP after sick leave" long before they type it into Google,
@@ -27,6 +29,8 @@ export default function robots(): MetadataRoute.Robots {
     "/sanity/",
     "/booking/schedule",
     "/booking/done",
+    // Tokenised, one-per-customer review links. Also `noindex, nofollow` on the page itself.
+    "/review/",
     "/resources/unlocked",
     "/payment-failed",
     "/success",

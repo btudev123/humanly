@@ -98,7 +98,7 @@ export function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="flex flex-col gap-4 border-t border-white/10 py-8 text-sm text-neutral-100/50 md:flex-row md:items-center md:justify-between">
+        <div className="flex flex-col gap-6 border-t border-white/10 py-8 text-sm text-neutral-100/50 md:flex-row md:items-center md:justify-between">
           <p>© {year} Humanly HR Advisory. Neutral advocacy for the modern workplace.</p>
           <div className="flex flex-col gap-2 md:items-end">
             <p className="italic">Humanly provides HR guidance & coaching, not legal advice.</p>

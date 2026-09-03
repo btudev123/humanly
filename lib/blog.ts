@@ -275,7 +275,7 @@ export const blogPosts: BlogPost[] = [
       { type: "h2", text: "The Fix Isn't a Formal Process. It's a Second Opinion." },
       {
         type: "p",
-        text: "That's the gap I think about most in my work now. Not every workplace situation needs HR intervention or a formal complaint. Most of them just need someone to help you think clearly early enough that you still have real options, including the option to stay and actually get what you came for. That is exactly what a [confidential advisory session](/booking?service=individual-advisory) is for — and if you're already weighing the exit, [Resign or Stay?](/resources/resign-or-stay) will structure the decision before the call.",
+        text: "That's the gap I think about most in my work now. Not every workplace situation needs HR intervention or a formal complaint. Most of them just need someone to help you think clearly early enough that you still have real options, including the option to stay and actually get what you came for. That is exactly what a [confidential advisory session](/booking?service=full-support) is for — and if you're already weighing the exit, [Resign or Stay?](/resources/resign-or-stay) will structure the decision before the call.",
       },
       {
         type: "p",

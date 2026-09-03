@@ -1,14 +1,15 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Cal, { getCalApi } from "@calcom/embed-react";
 import { CheckCircle2, Lock } from "lucide-react";
-import { serviceProducts } from "@/lib/products";
 
 export function PaidScheduler({
   order,
+  productName,
   calLink,
+  preferredSlot,
 }: {
   order: {
     id: string;
@@ -16,10 +17,71 @@ export function PaidScheduler({
     customer_name: string;
     customer_email: string;
   };
+  /**
+   * The product name to label this page with, RESOLVED SERVER-SIDE by the caller
+   * (`app/booking/schedule/page.tsx`) through `getServiceProduct()` — live catalogue, then the
+   * retired archive, then the alias map.
+   *
+   * It is a prop rather than a lookup here on purpose. This component used to do
+   * `serviceProducts.find(p => p.slug === order.product_slug) || serviceProducts[0]`, and
+   * `serviceProducts` holds only the *live* catalogue — so a paid order against a retired slug
+   * (`extended-advisory`, 1800 AED / 90 min) fell through the `||` and rendered "The Session
+   * scheduling" to a customer who had bought something else entirely. The `calLink` beside it
+   * was already resolved correctly server-side, so the page contradicted itself.
+   *
+   * The caller passes `order.product_slug` verbatim if even the archive can't resolve it —
+   * matching the `product?.name || order.product_slug` fallback every other read of a historical
+   * order in this codebase uses. A raw slug is ugly; a confidently wrong product name is worse.
+   */
+  productName: string;
   calLink: string;
+  /**
+   * ISO instant from `order.metadata.preferredSlot` (ADR-0001 Decision C), if the visitor picked
+   * one pre-payment. Read and passed in by the caller (`app/booking/schedule/page.tsx`) — this
+   * component only decides what to say and, if the embed config supports it, where to pre-scroll.
+   * `undefined` when no preference was set; that's the unchanged, always-accurate default copy.
+   */
+  preferredSlot?: string;
 }) {
-  const product = serviceProducts.find((item) => item.slug === order.product_slug) || serviceProducts[0];
   const router = useRouter();
+
+  // Three copy states per docs/copy/2026-09-services-and-booking-copy.md §C. Whether the
+  // preferred slot is "still open" can't be verified client-side without re-querying Cal — the
+  // embed itself is the source of truth for that, so this only distinguishes "none was set" from
+  // "one was set," and always uses the safe, non-committal variant for the latter rather than
+  // claiming the slot is confirmed available.
+  const heading = preferredSlot
+    ? "Payment confirmed. Your preferred time is highlighted below."
+    : "Payment confirmed. Choose your time.";
+
+  /**
+   * Cal.com's Booker reads exactly three query params — `month` (`YYYY-MM`), `date`
+   * (`YYYY-MM-DD`) and `slot` — and every `config` key is forwarded verbatim onto the iframe
+   * URL (which is how `metadata[orderId]` already works). Deep-linking the preference is
+   * therefore config-only: no second embed, no second `getCalApi()` handler.
+   *
+   * The parts are derived here, in the browser, on purpose: the embed renders the calendar in
+   * the visitor's own timezone, so splitting the ISO instant server-side (UTC) would land a
+   * late-evening Dubai slot on the wrong day. Nothing below is rendered into the server HTML,
+   * so computing it during hydration is safe.
+   */
+  const preferredConfig = useMemo(() => {
+    if (!preferredSlot) return null;
+    const parsed = new Date(preferredSlot);
+    if (Number.isNaN(parsed.getTime())) return null;
+
+    const year = parsed.getFullYear();
+    const month = String(parsed.getMonth() + 1).padStart(2, "0");
+    const day = String(parsed.getDate()).padStart(2, "0");
+
+    // A preference, never a hold — the slot can be gone by now, in which case Cal's own UI
+    // handles it exactly as it handles any unavailable selection.
+    return {
+      month: `${year}-${month}`,
+      date: `${year}-${month}-${day}`,
+      slot: parsed.toISOString(),
+    };
+  }, [preferredSlot]);
 
   useEffect(() => {
     void (async () => {
@@ -61,7 +123,7 @@ export function PaidScheduler({
         <div className="flex items-start gap-3">
           <CheckCircle2 className="mt-1 shrink-0 text-[#1da851]" size={22} />
           <div className="min-w-0">
-            <h1 className="text-h1 font-display font-bold">Payment confirmed. Choose your time.</h1>
+            <h1 className="text-h1 font-display font-bold">{heading}</h1>
             <p className="mt-1 break-words text-neutral-500">
               This scheduling page is unlocked for {order.customer_email}. Your booking will be linked to order {order.id}.
             </p>
@@ -75,7 +137,7 @@ export function PaidScheduler({
         <div className="flex items-center gap-3 bg-primary-dark px-4 py-3 text-on-primary sm:px-6 sm:py-4">
           <Lock className="shrink-0 text-accent-orange" size={19} />
           <span className="min-w-0 truncate text-xs font-bold uppercase tracking-[0.14em] sm:text-sm">
-            {product.name} scheduling
+            {productName} scheduling
           </span>
         </div>
         {/*
@@ -101,6 +163,7 @@ export function PaidScheduler({
             email: order.customer_email,
             "metadata[orderId]": order.id,
             "metadata[source]": "paid-humanly-site",
+            ...(preferredConfig ?? {}),
           }}
         />
       </div>

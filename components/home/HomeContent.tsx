@@ -2,10 +2,13 @@
 
 import Link from "next/link";
 import { motion, AnimatePresence } from "motion/react";
-import { serviceProducts, formatAed } from "@/lib/products";
-import { useState, useEffect } from "react";
+import { serviceProducts, getCoreLadder, formatAed } from "@/lib/products";
+import { useState, useEffect, useMemo } from "react";
 import { Scribble } from "@/components/ui/Scribble";
+import { Reveal } from "@/components/ui/Reveal";
+import { Eyebrow } from "@/components/ui/Eyebrow";
 import { TestimonialsCarousel, type Testimonial } from "@/components/reviews/TestimonialsCarousel";
+import { testimonials, buildTestimonialReviewJsonLd } from "@/lib/testimonials";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -92,39 +95,6 @@ const steps = [
   },
 ];
 
-const trustSignals: Testimonial[] = [
-  {
-    id: "ts-1",
-    author: "Karma Harb",
-    role: "Founder credibility",
-    company: undefined,
-    quote: "Founded by Karma Harb after 20+ years inside HR leadership across UAE, Saudi Arabia, and international environments.",
-    date: "2025-01-01",
-    verified: true,
-    rating: undefined, thumbnail: undefined, mediaUrl: undefined, mediaType: undefined, transcript: undefined,
-  },
-  {
-    id: "ts-2",
-    author: "Humanly",
-    role: "Early-stage transparency",
-    company: undefined,
-    quote: "Humanly does not publish testimonials until they are verified, consented, and privacy-safe.",
-    date: "2025-01-01",
-    verified: true,
-    rating: undefined, thumbnail: undefined, mediaUrl: undefined, mediaType: undefined, transcript: undefined,
-  },
-  {
-    id: "ts-3",
-    author: "Humanly",
-    role: "Performance-first proof",
-    company: undefined,
-    quote: "Future video or Instagram testimonials will load as lightweight thumbnails with transcripts before third-party embeds.",
-    date: "2025-01-01",
-    verified: true,
-    rating: undefined, thumbnail: undefined, mediaUrl: undefined, mediaType: undefined, transcript: undefined,
-  },
-];
-
 const faqs = [
   {
     q: "Will my employer know I booked a session?",
@@ -161,31 +131,6 @@ const marqueeItems = [
 /* ------------------------------------------------------------------ */
 /*  Small building blocks                                             */
 /* ------------------------------------------------------------------ */
-
-function Eyebrow({ children, color = "orange" }: { children: React.ReactNode; color?: "orange" | "violet" }) {
-  return (
-    <span
-      className={`inline-flex items-center gap-2 rounded-full border-2 border-primary-dark bg-neutral-100 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-primary-dark shadow-pop-sm`}
-    >
-      <span className={`h-2 w-2 rounded-full ${color === "orange" ? "bg-accent-orange" : "bg-primary-violet"}`} />
-      {children}
-    </span>
-  );
-}
-
-function Reveal({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.5, delay, ease: [0.22, 1, 0.36, 1] }}
-      className={className}
-    >
-      {children}
-    </motion.div>
-  );
-}
 
 function FAQAccordion() {
   const [open, setOpen] = useState<number | null>(0);
@@ -235,8 +180,30 @@ function FAQAccordion() {
 /*  Page                                                               */
 /* ------------------------------------------------------------------ */
 
-export function HomeContent() {
+export function HomeContent({
+  /**
+   * Moderated, database-backed testimonials, already mapped to the component type and already
+   * carrying a derived `consented` flag (see `components/reviews/publishedTestimonials.ts`).
+   * Fetched in `app/page.tsx` because this is a Client Component and must not touch the DB.
+   * Defaults to `[]`, so the page still renders if the fetch degraded or the prop is omitted.
+   */
+  dbTestimonials = [],
+}: {
+  dbTestimonials?: Testimonial[];
+}) {
   const [showSticky, setShowSticky] = useState(false);
+
+  // Static in-repo entries first, then approved DB rows. Ids cannot collide: DB entries are
+  // namespaced `db-<uuid>` at mapping time. Neither list is filtered here — the carousel's own
+  // `consented === true` gate is the single place that decides what is publishable.
+  const allTestimonials = useMemo(
+    () => [...testimonials, ...dbTestimonials],
+    [dbTestimonials],
+  );
+
+  // Derived from the same merged list, through the same gate, so schema and screen agree.
+  // Server-rendered from a prop, so SSR and hydration produce identical markup.
+  const reviewJsonLd = buildTestimonialReviewJsonLd(dbTestimonials);
   useEffect(() => {
     const onScroll = () => setShowSticky(window.scrollY > window.innerHeight * 0.4);
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -535,17 +502,17 @@ export function HomeContent() {
               A confidential reality check
               <Scribble variant="underline" color="#ff6a1a" strokeWidth={4} className="absolute -bottom-3 left-0 h-3.5 w-full" />
             </h2>
-            <p className="mt-6 text-body-lg text-neutral-500">From a quick document review to ongoing retainers — see the full range of advisory options.</p>
+            <p className="mt-6 text-body-lg text-neutral-500">Three ways to work together on one situation, plus specialist sessions and ongoing retainers.</p>
           </Reveal>
 
           {/* ONE-OFF ADVISORY SESSIONS */}
           <div className="mb-16">
             <Reveal>
-              <p className="mb-2 text-xs font-bold uppercase tracking-[0.16em] text-primary-violet">One-Off Advisory Sessions</p>
+              <p className="mb-2 text-xs font-bold uppercase tracking-[0.16em] text-primary-violet">Core Advisory</p>
               <div className="mb-8 h-0.5 w-16 bg-accent-orange" />
             </Reveal>
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-              {serviceProducts.filter((s) => s.category === "session").map((service, i) => (
+              {getCoreLadder().map((service, i) => (
                 <Reveal key={service.slug} delay={i * 0.06} className="h-full">
                   <div
                     className={`relative flex h-full flex-col gap-4 rounded-3xl border-2 border-primary-dark p-7 transition-transform hover:-translate-y-1 ${
@@ -554,14 +521,16 @@ export function HomeContent() {
                   >
                     {service.featured && (
                       <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full border-2 border-primary-dark bg-accent-orange px-4 py-1 text-[11px] font-bold uppercase tracking-wider text-primary-dark">
-                        Most Popular
+                        Recommended
                       </span>
                     )}
                     <div>
                       <h3 className={`font-display text-lg font-bold leading-snug ${service.featured ? "text-on-primary" : "text-primary-dark"}`}>{service.name}</h3>
                       <p className={`mt-1 text-sm ${service.featured ? "text-on-primary/60" : "text-neutral-500"}`}>{service.duration}</p>
                     </div>
-                    <p className={`font-display text-4xl font-extrabold ${service.featured ? "text-accent-orange" : "text-primary-dark"}`}>
+                    {/* Prices are quoted and charged in AED — the Stripe account's settlement
+                        currency. There is no display-currency conversion. */}
+                    <p className={`text-h2 font-display font-extrabold ${service.featured ? "text-accent-orange" : "text-primary-dark"}`}>
                       {formatAed(service.amountAed)}
                     </p>
                     <p className={`flex-grow text-sm leading-relaxed ${service.featured ? "text-on-primary/70" : "text-neutral-500"}`}>{service.description}</p>
@@ -594,8 +563,11 @@ export function HomeContent() {
                       <h3 className="text-h4 font-display font-bold leading-snug text-primary-dark">{service.name}</h3>
                       <p className="mt-1 text-sm text-neutral-500">{service.subtitle}</p>
                     </div>
-                    <p className="font-display text-4xl font-extrabold text-primary-dark">
-                      {formatAed(service.amountAed)}<span className="text-2xl">/mo</span>
+                    <p className="text-h2 font-display font-extrabold text-primary-dark">
+                      {formatAed(service.amountAed)}
+                      {service.priceNote && (
+                        <span className="text-h3 font-bold text-neutral-500">{service.priceNote}</span>
+                      )}
                     </p>
                     <ul className="flex-grow space-y-2">
                       {service.features.map((f) => (
@@ -618,22 +590,25 @@ export function HomeContent() {
             </div>
           </div>
 
-          {/* CORPORATE & SME ADD-ONS */}
+          {/* SPECIALIST SESSIONS */}
           <div className="mb-12">
             <Reveal>
-              <p className="mb-2 text-xs font-bold uppercase tracking-[0.16em] text-primary-violet">Corporate & SME Add-Ons</p>
+              <p className="mb-2 text-xs font-bold uppercase tracking-[0.16em] text-primary-violet">Specialist Sessions</p>
               <div className="mb-8 h-0.5 w-16 bg-accent-orange" />
             </Reveal>
-            <div className="grid gap-5 sm:grid-cols-2">
-              {serviceProducts.filter((s) => s.category === "corporate").map((service, i) => (
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {serviceProducts.filter((s) => s.category === "specialist").map((service, i) => (
                 <Reveal key={service.slug} delay={i * 0.06} className="h-full">
                   <div className="flex h-full flex-col gap-4 rounded-3xl border-2 border-primary-dark bg-orange-tint p-7 transition-transform hover:-translate-y-1">
                     <div>
                       <h3 className="text-h4 font-display font-bold leading-snug text-primary-dark">{service.name}</h3>
                       <p className="mt-1 text-sm text-neutral-500">{service.subtitle}</p>
                     </div>
-                    <p className="font-display text-4xl font-extrabold text-primary-dark">
-                      {formatAed(service.amountAed)}{service.priceNote && <span className="text-2xl">{service.priceNote}</span>}
+                    <p className="text-h2 font-display font-extrabold text-primary-dark">
+                      {formatAed(service.amountAed)}
+                      {service.priceNote && (
+                        <span className="text-h3 font-bold text-neutral-500">{service.priceNote}</span>
+                      )}
                     </p>
                     <ul className="flex-grow space-y-2">
                       {service.features.map((f) => (
@@ -799,10 +774,10 @@ export function HomeContent() {
           <Reveal>
             <Eyebrow>Trust Signals</Eyebrow>
             <h2 className="text-h2 mt-6 font-display font-extrabold tracking-tight text-primary-dark">
-              No fake reviews. Trust starts cleaner than that.
+              Verified clients. Nothing published without consent.
             </h2>
             <p className="mt-6 text-body-lg text-neutral-500">
-              Humanly is early-stage, so this focuses on founder expertise, process transparency, and future verified testimonial slots.
+              Every story here is real, and stays offline until the person in it says it&apos;s ready to be shared.
             </p>
             <Link href="/booking" className="group mt-8 inline-flex items-center gap-2 font-bold text-primary-violet transition-colors hover:text-accent-orange">
               Start your story
@@ -810,13 +785,32 @@ export function HomeContent() {
             </Link>
           </Reveal>
           <Reveal delay={0.1}>
-            <TestimonialsCarousel
-              testimonials={trustSignals}
-              title="No fake reviews. Trust starts cleaner than that."
-              subtitle="Humanly is early-stage, so this section focuses on founder expertise, process transparency, and future verified testimonial slots."
-            />
+            {/*
+              The unfiltered merged array (static entries + approved database rows) is passed
+              deliberately. `TestimonialsCarousel` filters it on `consented === true` itself,
+              before its length check and before it indexes anything, so the gate cannot be
+              bypassed by this page, by a future edit to lib/testimonials.ts, or by the DB path.
+              With no consented static entry and an empty/unavailable database this renders the
+              carousel's empty state, which is the accurate thing to show.
+              The section heading lives in the left column above, not inside the carousel.
+            */}
+            <TestimonialsCarousel testimonials={allTestimonials} />
           </Reveal>
         </div>
+        {/*
+          Review JSON-LD (docs/seo/2026-09-restructure-seo-spec.md §3b) — one <script> per
+          consented, dated testimonial, never a bare/empty array. `buildTestimonialReviewJsonLd()`
+          returns `null` while every entry in lib/testimonials.ts is unconsented (the live state
+          today), so this renders nothing rather than an empty `review` block.
+        */}
+        {reviewJsonLd?.map((review, i) => (
+          <script
+            key={i}
+            type="application/ld+json"
+            // eslint-disable-next-line react/no-danger
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(review) }}
+          />
+        ))}
       </section>
 
       {/* ====================== BOOKING CTA BAND ====================== */}

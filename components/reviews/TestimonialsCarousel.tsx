@@ -1,18 +1,25 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Play, Pause, Quote, Instagram, Video, ChevronLeft, ChevronRight } from "lucide-react";
+import { Play, Pause, Quote, Instagram, ChevronLeft, ChevronRight } from "lucide-react";
 
 /* ---------------------------------------------------------------- */
 /*  Types                                                            */
 /* ---------------------------------------------------------------- */
 
+/**
+ * The one testimonial shape. `lib/testimonials.ts` used to extend this locally because the
+ * publish gate lived outside the type; it no longer does, so there is exactly one definition
+ * and every entry must state its consent status to typecheck at all.
+ */
 export interface Testimonial {
   id: string;
   author: string;
   role?: string;
   company?: string;
+  /** Client's general location — city/country level, never more specific than they agreed to. */
+  location?: string;
   quote: string;
   /** Lightweight thumbnail URL – loaded lazily */
   thumbnail?: string;
@@ -23,7 +30,24 @@ export interface Testimonial {
   transcript?: string;
   rating?: number; // 1-5
   date: string; // ISO date
+  /** The quote is a genuine client's words. Separate from, and never a substitute for, `consented`. */
   verified?: boolean;
+  /**
+   * HARD PUBLISH GATE. Required, never optional, never defaulted: an entry is rendered only
+   * when this is exactly `true`, and only a human may set it after confirmed written consent
+   * from the client. See the header of `lib/testimonials.ts`.
+   */
+  consented: boolean;
+}
+
+/**
+ * The gate itself. Both public components run every array through this before they count it,
+ * index it, or render it — so the promise ("nothing published without consent") is enforced by
+ * the render path, not by whichever page happens to import the data. A new entry pasted into
+ * `lib/testimonials.ts` in a hurry is invisible until someone deliberately sets `consented: true`.
+ */
+function consentedOnly(list: Testimonial[]): Testimonial[] {
+  return list.filter((t) => t.consented === true);
 }
 
 /* ---------------------------------------------------------------- */
@@ -175,49 +199,62 @@ function MediaModal({
 
 export function TestimonialsCarousel({
   testimonials,
-  title = "What people are saying",
-  subtitle,
 }: {
   testimonials: Testimonial[];
-  title?: string;
-  subtitle?: string;
 }) {
+  // THE GATE. Everything below — the length check, the empty state, the index arithmetic, the
+  // dots, the modal — reads `published`, never the `testimonials` prop. Nothing unconsented can
+  // reach the DOM even if the caller passes the raw array (it does).
+  const published = useMemo(() => consentedOnly(testimonials), [testimonials]);
+  const count = published.length;
+
   const [active, setActive] = useState(0);
   const [modal, setModal] = useState<Testimonial | null>(null);
   const [isPaused, setIsPaused] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | undefined>(undefined);
-  const len = testimonials.length || 1;
 
-  const next = useCallback(
-    () => setActive((v) => (v + 1) % len),
-    [len],
-  );
-  const prev = useCallback(
-    () => setActive((v) => (v - 1 + len) % len),
-    [len],
-  );
+  const next = useCallback(() => {
+    setActive((v) => (count > 0 ? (v + 1) % count : 0));
+  }, [count]);
+  const prev = useCallback(() => {
+    setActive((v) => (count > 0 ? (v - 1 + count) % count : 0));
+  }, [count]);
 
-  // Auto-advance every 5 seconds unless paused
+  // Auto-advance every 5s. Skipped entirely when there is nothing to advance to (0 or 1 entry)
+  // and when the visitor asks for reduced motion — a carousel that moves on its own is motion
+  // they did not ask for, and with one slide it is a re-render that communicates nothing.
   useEffect(() => {
-    if (isPaused) return;
+    if (isPaused || count < 2) return;
+    if (typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      return;
+    }
     intervalRef.current = setInterval(next, 5000);
     return () => clearInterval(intervalRef.current);
-  }, [next, isPaused]);
+  }, [next, isPaused, count]);
 
-  if (!testimonials.length) {
+  // Empty state — the live state today, because every entry in lib/testimonials.ts is awaiting
+  // written consent. It says why there is nothing here rather than pretending none exists.
+  if (count === 0) {
     return (
-      <section className="px-6 py-24 text-center">
-        <p className="text-neutral-500 italic">
-          Verified testimonials coming soon. We don't publish reviews until they are consented and verified.
+      <section className="rounded-3xl border-2 border-dashed border-primary-dark/25 bg-neutral-100 p-8 md:p-12">
+        <p className="text-body-md font-semibold text-primary-dark">
+          No client stories published yet
+        </p>
+        <p className="mt-2 max-w-md text-body-sm leading-relaxed text-neutral-500">
+          A client&rsquo;s words go here only after they give written permission to publish them.
+          Nothing else fills this space in the meantime.
         </p>
       </section>
     );
   }
 
-  const current = testimonials[active];
+  // `active` can outlive the array it indexes (an entry losing consent shrinks `published` while
+  // this component stays mounted), so it is clamped on every render rather than trusted.
+  const index = active % count;
+  const current = published[index];
 
   return (
-    <section className="relative">
+    <section className="relative" aria-roledescription="carousel" aria-label="Client testimonials">
       <div className="mx-auto max-w-5xl">
 
         {/* Carousel */}
@@ -238,19 +275,21 @@ export function TestimonialsCarousel({
               <div className="flex flex-col gap-6 md:flex-row md:gap-10">
                 {/* Text */}
                 <div className="flex-1">
-                  <Quote className="mb-4 text-accent-orange/50" size={36} />
-                  <blockquote className="text-lg leading-relaxed text-neutral-700 md:text-xl">
+                  <Quote className="mb-4 text-accent-orange/50" size={36} aria-hidden="true" />
+                  {/* `whitespace-pre-line` because real quotes arrive with paragraph breaks in
+                      them; `break-words` so a long unbroken string can't push the card wide. */}
+                  <blockquote className="whitespace-pre-line break-words text-body-md leading-relaxed text-neutral-700 md:text-body-lg">
                     &ldquo;{current.quote}&rdquo;
                   </blockquote>
 
-                  <div className="mt-6 flex items-center gap-3">
-                    <div>
-                      <p className="font-extrabold text-neutral-900">
+                  <div className="mt-6 flex flex-wrap items-center gap-3">
+                    <div className="min-w-0">
+                      <p className="break-words font-extrabold text-neutral-900">
                         {current.author}
                       </p>
-                      {(current.role || current.company) && (
-                        <p className="text-sm text-neutral-500">
-                          {[current.role, current.company]
+                      {(current.role || current.company || current.location) && (
+                        <p className="break-words text-body-sm text-neutral-500">
+                          {[current.role, current.company, current.location]
                             .filter(Boolean)
                             .join(" · ")}
                         </p>
@@ -291,49 +330,57 @@ export function TestimonialsCarousel({
             </motion.div>
           </AnimatePresence>
 
-          {/* Controls */}
-          <div className="mt-8 flex items-center justify-center gap-4">
-            <button
-              aria-label="Previous testimonial"
-              onClick={prev}
-              className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-primary-dark bg-neutral-100 text-primary-dark transition-colors hover:bg-violet-tint"
-            >
-              <ChevronLeft size={20} />
-            </button>
+          {/* Controls — omitted with a single consented entry, where every one of them is a
+              no-op and "Next testimonial" would be a lie to a screen reader. */}
+          {count > 1 && (
+            <div className="mt-8 flex items-center justify-center gap-4">
+              <button
+                type="button"
+                aria-label="Previous testimonial"
+                onClick={prev}
+                className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-primary-dark bg-neutral-100 text-primary-dark transition-colors hover:bg-violet-tint focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-violet"
+              >
+                <ChevronLeft size={20} aria-hidden="true" />
+              </button>
 
-            {/* Dots */}
-            <div className="flex gap-2">
-              {testimonials.map((t, i) => (
-                <button
-                  key={t.id}
-                  aria-label={`Go to testimonial ${i + 1}`}
-                  onClick={() => setActive(i)}
-                  className={`h-2.5 rounded-full transition-all duration-300 ${
-                    active === i
-                      ? "w-8 bg-accent-orange"
-                      : "w-2.5 bg-neutral-300 hover:bg-neutral-400"
-                  }`}
-                />
-              ))}
+              {/* Dots */}
+              <div className="flex gap-2">
+                {published.map((t, i) => (
+                  <button
+                    key={t.id}
+                    type="button"
+                    aria-label={`Show testimonial ${i + 1} of ${count}`}
+                    aria-current={index === i ? "true" : undefined}
+                    onClick={() => setActive(i)}
+                    className={`h-2.5 rounded-full transition-all duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-violet ${
+                      index === i
+                        ? "w-8 bg-accent-orange"
+                        : "w-2.5 bg-neutral-300 hover:bg-neutral-400"
+                    }`}
+                  />
+                ))}
+              </div>
+
+              <button
+                type="button"
+                aria-label="Next testimonial"
+                onClick={next}
+                className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-primary-dark bg-neutral-100 text-primary-dark transition-colors hover:bg-violet-tint focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-violet"
+              >
+                <ChevronRight size={20} aria-hidden="true" />
+              </button>
+
+              {/* Pause/Play */}
+              <button
+                type="button"
+                aria-label={isPaused ? "Resume auto-play" : "Pause auto-play"}
+                onClick={() => setIsPaused(!isPaused)}
+                className="flex h-10 w-10 items-center justify-center rounded-full text-neutral-400 transition-colors hover:text-neutral-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-violet"
+              >
+                {isPaused ? <Play size={16} aria-hidden="true" /> : <Pause size={16} aria-hidden="true" />}
+              </button>
             </div>
-
-            <button
-              aria-label="Next testimonial"
-              onClick={next}
-              className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-primary-dark bg-neutral-100 text-primary-dark transition-colors hover:bg-violet-tint"
-            >
-              <ChevronRight size={20} />
-            </button>
-
-            {/* Pause/Play */}
-            <button
-              aria-label={isPaused ? "Resume auto-play" : "Pause auto-play"}
-              onClick={() => setIsPaused(!isPaused)}
-              className="flex h-10 w-10 items-center justify-center rounded-full text-neutral-400 transition-colors hover:text-neutral-600"
-            >
-              {isPaused ? <Play size={16} /> : <Pause size={16} />}
-            </button>
-          </div>
+          )}
         </div>
       </div>
 
@@ -358,7 +405,10 @@ export function TestimonialsGrid({
   testimonials: Testimonial[];
   title?: string;
 }) {
-  if (!testimonials.length) return null;
+  // Same gate as the carousel, applied before the length check — so an unconsented entry can
+  // never even cause the heading to render, let alone the quote.
+  const published = consentedOnly(testimonials);
+  if (published.length === 0) return null;
 
   return (
     <section className="bg-white px-5 py-24 md:px-[64px]">
@@ -367,20 +417,20 @@ export function TestimonialsGrid({
           {title}
         </h2>
         <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {testimonials.map((t) => (
+          {published.map((t) => (
             <article
               key={t.id}
               className="rounded-xl border border-neutral-200 bg-neutral-50 p-6"
             >
               {t.rating && <StarRating rating={t.rating} />}
-              <blockquote className="mt-3 leading-relaxed text-neutral-700">
+              <blockquote className="mt-3 whitespace-pre-line break-words leading-relaxed text-neutral-700">
                 &ldquo;{t.quote}&rdquo;
               </blockquote>
               <footer className="mt-4 border-t border-neutral-200 pt-4">
-                <p className="font-extrabold text-neutral-900">{t.author}</p>
-                {(t.role || t.company) && (
-                  <p className="text-sm text-neutral-500">
-                    {[t.role, t.company].filter(Boolean).join(" · ")}
+                <p className="break-words font-extrabold text-neutral-900">{t.author}</p>
+                {(t.role || t.company || t.location) && (
+                  <p className="break-words text-body-sm text-neutral-500">
+                    {[t.role, t.company, t.location].filter(Boolean).join(" · ")}
                   </p>
                 )}
                 {t.verified && (
