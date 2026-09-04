@@ -26,14 +26,26 @@ export type AvailableSlot = {
  * example — and the live API, checked 2026-09-04 — return `[{ start }]` **objects**. Reading both
  * costs three lines and means a future reconciliation of Cal's docs with Cal's code degrades to
  * "still works" instead of an empty preview that looks exactly like "no availability."
+ *
+ * A value that is a non-empty string but not a parseable date is dropped, not returned. The one
+ * consumer (`components/booking/AvailabilityPreview.tsx`) feeds every `start` straight into
+ * `new Date(iso)` and `Intl.DateTimeFormat(...).format(...)`, which throws `RangeError: Invalid
+ * time value` on an unparseable instant and takes the whole client component — and `/booking`
+ * with it — down. Dropping the slot here is what makes this module's fail-closed contract
+ * (`getAvailableSlots` below) actually hold for a malformed upstream payload.
  */
 function readSlotStart(slot: unknown): string | null {
-  if (typeof slot === "string") return slot || null;
-  if (slot && typeof slot === "object") {
-    const start = (slot as { start?: unknown }).start;
-    if (typeof start === "string" && start) return start;
-  }
-  return null;
+  const start =
+    typeof slot === "string"
+      ? slot
+      : slot && typeof slot === "object"
+        ? (slot as { start?: unknown }).start
+        : null;
+
+  if (typeof start !== "string" || !start) return null;
+  if (Number.isNaN(new Date(start).getTime())) return null;
+
+  return start;
 }
 
 export type GetAvailableSlotsInput = {

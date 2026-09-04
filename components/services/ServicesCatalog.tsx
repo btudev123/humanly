@@ -9,7 +9,6 @@ import {
   coreTierOrder,
   formatAed,
   getCoreLadder,
-  serviceCategoryLabels,
   type CoreTier,
   type ServiceCategory,
 } from "@/lib/products";
@@ -27,17 +26,36 @@ import type { MergedService } from "@/lib/sanity/queries";
  * (Elena) and `docs/copy/2026-09-services-and-booking-copy.md` (Theo). The comparison
  * table/accordion render straight from `lib/products.ts` (`getCoreLadder()`, `coreComparison`) per
  * Elena's instruction not to re-author the ladder's copy here — only Specialist Sessions and
- * Monthly Retainers use the Sanity-merged `services` prop, unchanged from the prior pattern.
+ * Monthly Retainers use the Sanity-merged `services` prop, and both now render through the one
+ * shared `ServiceCard` below.
  */
 
+/**
+ * The two card strips below the core ladder. The retainer strip's treatment (violet-tint fill,
+ * 2px ink-purple border, violet check icons, deep-purple pill CTA) is the approved reference —
+ * the specialist strip now uses the same tokens so the page reads as one catalogue rather than
+ * two. The only deliberate differences are per-strip layout and which copy field fills the
+ * blurb/price-qualifier slots; both are declared here rather than branched inside the card.
+ */
 const secondaryCategoryOrder: {
   key: ServiceCategory;
   eyebrow: string;
   heading: string;
   intro: string;
-  accent: string;
-  checkColor: string;
+  /** Card fill. Both strips use `bg-violet-tint`. */
+  surfaceClass: string;
+  /** Colour of the decorative check icon on each included-item bullet. */
+  checkClass: string;
   ctaClass: string;
+  /** Column tracks — and, for the aligned strip, the shared row template. */
+  gridClass: string;
+  /** The one short paragraph under the price. */
+  blurb: (service: MergedService) => string;
+  /** The quieter qualifier that follows the big price figure. */
+  priceSuffix: (service: MergedService) => string | undefined;
+  priceSuffixClass: string;
+  /** Opt into the shared-baseline subgrid layout. See `ServiceCard`. */
+  aligned: boolean;
 }[] = [
   {
     key: "specialist",
@@ -45,9 +63,25 @@ const secondaryCategoryOrder: {
     heading: "Built for one specific need",
     intro:
       "Independent, one-off sessions you can book without stepping onto the core ladder — each one built around a single, specific need rather than a general situation.",
-    accent: "bg-orange-tint",
-    checkColor: "text-accent-orange",
-    ctaClass: "bg-accent-orange text-primary-dark",
+    surfaceClass: "bg-violet-tint",
+    checkClass: "text-primary-violet",
+    ctaClass: "bg-primary-dark text-on-primary",
+    gridClass: "sm:grid-cols-2 lg:grid-cols-4 lg:grid-rows-[auto_auto_auto_auto_1fr_auto]",
+    /*
+     * `forWho`, not `description`. Every specialist product's description restates its own
+     * bullet list almost verbatim — e.g. Dubai Job Search reads "UAE job-market orientation,
+     * CV positioning, and outreach strategy" above bullets "UAE job-market orientation" /
+     * "CV positioning review" / "Outreach strategy", and Document Review reads "A written
+     * review of one document: a letter, a contract, or a termination notice. Delivered by
+     * email, no call required." above bullets that say the same three things. The bullets are
+     * the scannable half, so they stay and the paragraph is replaced by the one line that adds
+     * information the bullets don't carry: who the session is for. No copy is invented — both
+     * fields already exist in `lib/products.ts` and are Sanity-overridable.
+     */
+    blurb: (service) => service.forWho,
+    priceSuffix: (service) => service.duration,
+    priceSuffixClass: "mt-1 block text-body-sm font-semibold text-neutral-500",
+    aligned: true,
   },
   {
     key: "retainer",
@@ -60,9 +94,17 @@ const secondaryCategoryOrder: {
     // three retainer subscriptions before that sentence can ship.]`
     intro:
       "Ongoing monthly support for a workplace situation that's still active — more than one live issue, a slow-moving exit, or a role senior enough that things keep coming up.",
-    accent: "bg-violet-tint",
-    checkColor: "text-primary-violet",
+    surfaceClass: "bg-violet-tint",
+    checkClass: "text-primary-violet",
     ctaClass: "bg-primary-dark text-on-primary",
+    gridClass: "md:grid-cols-3",
+    blurb: (service) => service.description,
+    priceSuffix: (service) => service.priceNote,
+    priceSuffixClass: "text-h3 font-bold text-neutral-500",
+    // Left off deliberately: this three-card row is signed off as it stands, so it keeps the
+    // exact markup it shipped with. Flipping this to `true` is the one-line change that gives
+    // it the same shared baselines as the specialist row.
+    aligned: false,
   },
 ];
 
@@ -399,6 +441,118 @@ function FounderCredibility() {
   );
 }
 
+/**
+ * One catalogue card, shared by the Specialist Sessions and Monthly Retainers strips.
+ *
+ * Reading order is fixed: name → subtitle → price → one short paragraph → what's included →
+ * CTA. The name is the `h3` and leads; the price is confident but sits below it, and its
+ * qualifier (`/mo`, or the session length) is deliberately quieter so the figure supports the
+ * service name instead of shouting over it.
+ *
+ * **Equal heights and shared baselines.** With `aligned`, the strip's grid declares one row
+ * template (`lg:grid-rows-[auto_auto_auto_auto_1fr_auto]`) and every card spans all six rows as
+ * a `subgrid`, so the six slots are sized by the tallest card and *every* card's price, blurb,
+ * list and button start on the same line no matter how long its title wraps. The `1fr` row is
+ * the included-list, so it absorbs the slack and the CTA lands flush on the bottom edge of all
+ * four. Nothing is clipped: a long list makes the shared row taller for everyone.
+ *
+ * Below `lg:` the card is the flex column it has always been — `h-full` plus `flex-grow` on the
+ * list still gives equal-height cards with a bottom-flush CTA, which is how the retainer row
+ * already worked. In a browser with no `subgrid` support (~4% at time of writing) only the
+ * `grid-template-rows: subgrid` declaration is dropped: the cards still span the same six rows
+ * so they stay equal height and nothing clips, they just lose the shared baselines and the CTA
+ * sits under the list rather than on the bottom edge. Degraded, not broken.
+ */
+function ServiceCard({
+  service,
+  surfaceClass,
+  checkClass,
+  ctaClass,
+  blurb,
+  priceSuffix,
+  priceSuffixClass,
+  aligned,
+}: {
+  service: MergedService;
+  surfaceClass: string;
+  checkClass: string;
+  ctaClass: string;
+  blurb: string;
+  priceSuffix?: string;
+  priceSuffixClass: string;
+  aligned: boolean;
+}) {
+  return (
+    <article
+      className={cn(
+        "relative flex h-full flex-col gap-4 rounded-3xl border-2 border-primary-dark p-7 transition-transform hover:-translate-y-1",
+        surfaceClass,
+        // `break-words` keeps a 200-character product name or bullet inside the card instead of
+        // pushing the grid track wide and giving the page a horizontal scrollbar.
+        aligned && "break-words lg:row-span-6 lg:grid lg:grid-rows-subgrid",
+      )}
+    >
+      <div className={aligned ? "lg:row-span-2 lg:grid lg:grid-rows-subgrid" : undefined}>
+        <h3 className="text-h4 font-display font-bold leading-snug text-primary-dark">{service.name}</h3>
+        <p className="mt-1 text-body-sm text-neutral-500">{service.subtitle}</p>
+      </div>
+
+      {/* AED only — quoted in the currency Stripe actually charges. */}
+      <p className="text-h2 font-display font-extrabold text-primary-dark">
+        {formatAed(service.amountAed)}
+        {priceSuffix && <span className={priceSuffixClass}>{priceSuffix}</span>}
+      </p>
+
+      {blurb ? (
+        <p className="text-body-sm leading-relaxed text-neutral-500">{blurb}</p>
+      ) : (
+        // A product with no `forWho`/`description` still has to occupy its row, or the cards
+        // beside it would lose their shared baseline.
+        aligned && <div />
+      )}
+
+      {service.features.length > 0 ? (
+        <ul className="flex-grow space-y-2">
+          {service.features.map((f) => (
+            <li key={f} className="flex gap-2 text-body-sm">
+              {/* lucide-react marks an icon with no a11y prop `aria-hidden` for us. */}
+              <CheckCircle2 className={cn("mt-0.5 shrink-0", checkClass)} size={16} />
+              <span className="text-neutral-600">{f}</span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <div className="flex-grow" />
+      )}
+
+      <Link
+        href={`/booking?service=${service.slug}`}
+        onClick={() =>
+          pushDataLayerEvent({
+            event: "select_tier",
+            tier: service.slug,
+            product_slug: service.slug,
+            price_aed: service.amountAed,
+            source: "services_table",
+          })
+        }
+        className={cn(
+          "btn-pop inline-flex items-center justify-center gap-2 rounded-full border-2 border-primary-dark px-5 py-3 text-sm font-bold",
+          ctaClass,
+          // Full width so the longest label ("Book Interview Prep Package (3 Sessions)") wraps
+          // inside the narrowest column instead of squashing the pill or the icon.
+          aligned && "w-full text-center",
+        )}
+      >
+        <Sparkles size={16} strokeWidth={2.5} className={aligned ? "shrink-0" : undefined} />
+        {/* Async products are bought, not booked — "Order" is the accurate verb, and it replaces
+            the previous non-specific "Get started". */}
+        {service.needsScheduling ? `Book ${service.name}` : `Order ${service.name}`}
+      </Link>
+    </article>
+  );
+}
+
 export function ServicesCatalog({ services }: { services: MergedService[] }) {
   const router = useRouter();
 
@@ -450,71 +604,36 @@ export function ServicesCatalog({ services }: { services: MergedService[] }) {
         </Reveal>
       </section>
 
-      {/* ── Specialist sessions + retainers (unchanged card pattern, Sanity-merged copy) ── */}
-      {secondaryCategoryOrder.map(({ key, eyebrow, heading, intro, accent, checkColor, ctaClass }) => {
-        const items = services.filter((product) => product.category === key);
+      {/* ── Specialist sessions + retainers — one shared card, Sanity-merged copy ── */}
+      {secondaryCategoryOrder.map((strip) => {
+        const items = services.filter((product) => product.category === strip.key);
         if (items.length === 0) return null;
 
         return (
-          <section key={key} className="mx-auto mt-20 max-w-max-width px-margin-mobile md:px-margin-desktop">
+          <section key={strip.key} className="mx-auto mt-20 max-w-max-width px-margin-mobile md:px-margin-desktop">
             <Reveal className="mx-auto mb-12 max-w-2xl text-center">
-              <Eyebrow>{eyebrow}</Eyebrow>
-              <h2 className="text-h2 mt-6 font-display font-extrabold tracking-tight text-primary-dark">{heading}</h2>
-              <p className="mt-4 text-body-lg text-neutral-500">{intro}</p>
+              <Eyebrow>{strip.eyebrow}</Eyebrow>
+              <h2 className="text-h2 mt-6 font-display font-extrabold tracking-tight text-primary-dark">{strip.heading}</h2>
+              <p className="mt-4 text-body-lg text-neutral-500">{strip.intro}</p>
             </Reveal>
 
-            <div className={cn("grid items-stretch gap-6", key === "specialist" ? "sm:grid-cols-2 lg:grid-cols-4" : "md:grid-cols-3")}>
+            <div className={cn("grid items-stretch gap-6", strip.gridClass)}>
               {items.map((service, index) => (
-                <Reveal key={service.slug} delay={index * 0.06} className="h-full">
-                  <article
-                    className={cn(
-                      "relative flex h-full flex-col gap-4 rounded-3xl border-2 border-primary-dark p-7 transition-transform hover:-translate-y-1",
-                      accent,
-                    )}
-                  >
-                    <div>
-                      <h3 className="text-h4 font-display font-bold leading-snug text-primary-dark">{service.name}</h3>
-                      <p className="mt-1 text-body-sm text-neutral-500">{service.subtitle}</p>
-                    </div>
-
-                    <p className="text-h2 font-display font-extrabold text-primary-dark">
-                      {formatAed(service.amountAed)}
-                      {service.priceNote && (
-                        <span className="text-h3 font-bold text-neutral-500">{service.priceNote}</span>
-                      )}
-                    </p>
-
-                    <p className="text-body-sm leading-relaxed text-neutral-500">{service.description}</p>
-
-                    <ul className="flex-grow space-y-2">
-                      {service.features.map((f) => (
-                        <li key={f} className="flex gap-2 text-body-sm">
-                          <CheckCircle2 className={cn("mt-0.5 shrink-0", checkColor)} size={16} />
-                          <span className="text-neutral-600">{f}</span>
-                        </li>
-                      ))}
-                    </ul>
-
-                    <Link
-                      href={`/booking?service=${service.slug}`}
-                      onClick={() =>
-                        pushDataLayerEvent({
-                          event: "select_tier",
-                          tier: service.slug,
-                          product_slug: service.slug,
-                          price_aed: service.amountAed,
-                          source: "services_table",
-                        })
-                      }
-                      className={cn(
-                        "btn-pop inline-flex items-center justify-center gap-2 rounded-full border-2 border-primary-dark px-5 py-3 text-sm font-bold",
-                        ctaClass,
-                      )}
-                    >
-                      <Sparkles size={16} strokeWidth={2.5} />
-                      {service.needsScheduling ? `Book ${service.name}` : "Get started"}
-                    </Link>
-                  </article>
+                <Reveal
+                  key={service.slug}
+                  delay={index * 0.06}
+                  className={cn("h-full", strip.aligned && "lg:row-span-6 lg:grid lg:grid-rows-subgrid")}
+                >
+                  <ServiceCard
+                    service={service}
+                    surfaceClass={strip.surfaceClass}
+                    checkClass={strip.checkClass}
+                    ctaClass={strip.ctaClass}
+                    blurb={strip.blurb(service)}
+                    priceSuffix={strip.priceSuffix(service)}
+                    priceSuffixClass={strip.priceSuffixClass}
+                    aligned={strip.aligned}
+                  />
                 </Reveal>
               ))}
             </div>

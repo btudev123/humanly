@@ -23,7 +23,7 @@ did not happen) is a client-trust problem, and that one gets escalated to Karma 
 | Runs on | **Production deployments only.** Vercel does not invoke cron on Preview deployments |
 | Success response | `200` with `{"sent":N,"skipped":N,"failed":N}` |
 | Spec | `docs/adr/0001-...md` Decision D (schema + token) · `docs/lifecycle/2026-09-review-request-sequence.md` (timing, consent, suppression) |
-| Migration | `lib/db/migrations.sql` lines **124–253**. **Not yet applied to production** as of 2026-09-03 |
+| Migration | `lib/db/migrations.sql` lines **124–256** (to end of file). **Not yet applied to production** as of 2026-09-03 |
 
 ### Why 16:00 UTC
 
@@ -89,7 +89,7 @@ generated fresh and independently for each environment.
 ## 2. Apply the migration
 
 ADR-0001's "Shared migration/rollback sequencing" says D's schema goes **first and alone**. Do not
-run the whole of `lib/db/migrations.sql`; run only lines 124–253.
+run the whole of `lib/db/migrations.sql`; run only lines 124–256 (i.e. to the end of the file).
 
 ### 2.0 Read the rollback before you run the migration
 
@@ -101,7 +101,7 @@ review is submitted.
 ### 2.1 Connect
 
 ```bash
-cd /Users/qognitionagency/Documents/GitHub/humanly
+cd /Users/qognitionagency/dev/humanly   # canonical checkout; the ~/Documents copy is abandoned
 export DATABASE_URL="$(grep -E '^DATABASE_URL=' .env.local | head -1 | cut -d= -f2- | tr -d '"')"
 psql "$DATABASE_URL" -c 'select current_database(), now();'
 ```
@@ -142,12 +142,16 @@ Write the numbers down.
 ### 2.4 Run it
 
 ```bash
-sed -n '124,253p' lib/db/migrations.sql > /tmp/migrate-d.sql
-cat /tmp/migrate-d.sql          # eyeball it: 7 add-column lines + 1 create-index line
+sed -n '124,256p' lib/db/migrations.sql > /tmp/migrate-d.sql
+cat /tmp/migrate-d.sql          # eyeball it: the alter table, the dedup, two indexes,
+                                # the do $backfill$ block, and the bookings lower(status) update
 psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -1 -f /tmp/migrate-d.sql
 ```
 
-Expected output: `ALTER TABLE` then `CREATE INDEX`.
+Expected output, in order: `ALTER TABLE`, `CREATE INDEX`, `UPDATE 0` (or higher if there
+were duplicate `cal_booking_uid` rows), `CREATE INDEX`, `DO`, then `UPDATE <n>` for the
+`bookings` case normalisation. Six lines, not two. Anything *else* — an `ERROR` — is the
+stop condition; the five extra success lines are expected and are not a reason to abort.
 The statements are `add column if not exists` / `create index if not exists`, so re-running is
 safe and prints the same thing.
 
@@ -171,8 +175,13 @@ psql "$DATABASE_URL" -c \
 
 `0` → nothing to do. Anything above `0` → those are the live testimonials that will vanish.
 
-**This is a data change to production. Get Karma's explicit yes before running it**, because it
-decides which quotes are publicly visible:
+> **Note — this gate is now mostly historical.** `migrations.sql`'s `do $backfill$` block
+> (added after this runbook was first written) performs this same backfill inside §2.4's
+> transaction, so by the time you reach this section the check above will usually already return
+> `0`. That means the migration takes this decision on its own; the statement below is only a
+> manual fallback for rows the guarded block skipped. **If the check above returns anything above
+> `0`, still get Karma's explicit yes before running it** — it decides which quotes are publicly
+> visible.
 
 ```sql
 update testimonials

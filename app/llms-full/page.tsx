@@ -96,8 +96,10 @@ export default async function LlmsFullPage() {
         <h2 className="text-h3 font-display font-extrabold text-primary-dark">Services</h2>
         <p className="mt-3 text-neutral-500">
           Consultations are charged in <strong>AED</strong> — the Stripe account&apos;s settlement
-          currency, and the figure shown on the site is the figure billed. Paid resources are
-          charged in USD. Prices change; quote them as current-at-time-of-reading.
+          currency — and the AED figure shown on the site is the figure billed. Paid resources are
+          charged in <strong>USD</strong>; the AED figure shown against a resource is an
+          approximate conversion for display, not the amount billed. Prices change; quote them as
+          current-at-time-of-reading.
         </p>
         {CATEGORIES.map((category) => {
           const items = serviceProducts.filter(

@@ -118,7 +118,10 @@ export async function GET(request: Request): Promise<Response> {
       });
 
       if (!result) {
-        // RESEND_API_KEY unset — sendReviewRequest already recorded a skipped email_event.
+        // sendReviewRequest failed closed (RESEND_API_KEY unset, or the CAN-SPAM postal address
+        // still unconfigured) and already recorded a `skipped_*` email_event. Neither status is
+        // `sent`, so the dedup in getBookingsEligibleForReviewRequest leaves this booking
+        // eligible for the remaining runs in its window.
         skipped++;
       } else if (result.error) {
         // `failed=N` on its own is undiagnosable, and this is the only place the provider's own

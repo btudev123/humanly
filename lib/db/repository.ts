@@ -604,7 +604,9 @@ export type ReviewEligibleBooking = {
  *     `status`, correct even if status handling regresses again. `raw_payload` already stores the
  *     whole request body, so this needs no schema change.
  *  3. `not exists (a later booking on the same order)` — correct even if `BOOKING_RESCHEDULED` is
- *     not subscribed at all, which is the one thing this repo cannot verify.
+ *     not subscribed at all, which is the one thing this repo cannot verify. A later booking that
+ *     was itself cancelled or rejected does not count: it never superseded anything, and letting
+ *     it suppress cost a real session its only review request.
  *
  * Residual after all three: a reschedule to an EARLIER slot, delivered without a usable
  * `rescheduleUid` (so `markBookingRescheduled` never retires the old row) and with the
@@ -635,6 +637,14 @@ export async function getBookingsEligibleForReviewRequest(): Promise<ReviewEligi
         from bookings b2
         where b2.order_id = b.order_id
           and b2.end_time > b.end_time
+          -- ...and that later booking is not itself a cancellation/rejection. Without this, a
+          -- cancelled reschedule suppressed the earlier session that DID happen. Deliberately a
+          -- narrow exclusion rather than status = 'accepted': the cal webhook writes a null
+          -- status when the event carried none, and a null- or 'rescheduled'-status later row
+          -- still means this row's slot was superseded, which is the stale-row case this filter
+          -- exists to catch. coalesce keeps a null status suppressing, since null not in (...)
+          -- is unknown and would otherwise drop that row from the subquery.
+          and coalesce(lower(b2.status), '') not in ('cancelled', 'rejected')
       )
       and b.end_time between now() - interval '21 days' and now() - interval '3 days'
       and b.attendee_email is not null

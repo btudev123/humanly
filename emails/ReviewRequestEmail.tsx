@@ -23,8 +23,13 @@ import * as React from "react";
  * and it is not something to guess — a wrong address is worse than an obvious placeholder, so
  * the placeholder is deliberately unmissable and renders in the footer as-is.
  *
- * To fix: replace the string below with Karma's registered business address. `sendReviewRequest`
- * (`lib/email/resend.tsx`) logs a warning on every send while it is still a placeholder.
+ * While it is still a placeholder NOTHING IS SENT: `sendReviewRequest` (`lib/email/resend.tsx`)
+ * fails closed, records an `email_events` row with `status = 'skipped_missing_postal_address'`
+ * and returns `null`. That status is not `sent`, so the review-request dedup does not count it
+ * and no client loses their one request while this is unresolved.
+ *
+ * To fix: replace the string below with Karma's registered business address. Nothing else needs
+ * to change — the send resumes on the next daily cron run.
  */
 export const REVIEW_EMAIL_POSTAL_ADDRESS =
   "[NEEDS DATA — Humanly postal address not yet supplied]";

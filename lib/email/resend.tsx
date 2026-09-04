@@ -355,12 +355,26 @@ export async function sendReviewRequest(input: ReviewRequestEmailProps & { to: s
   }
 
   if (!REVIEW_EMAIL_POSTAL_ADDRESS_CONFIGURED) {
-    // Loud, once per send, because the placeholder renders verbatim in the footer: a commercial
-    // email with no physical postal address does not clear CAN-SPAM, and the address is not
-    // something this codebase can invent. See `emails/ReviewRequestEmail.tsx`.
+    // Fail closed, exactly like the missing-API-key branch above. The placeholder renders
+    // verbatim in the footer, so sending anyway put `[NEEDS DATA — …]` in front of a paying
+    // client, and a commercial email with no physical postal address does not clear CAN-SPAM
+    // (US) or CASL (CA) either way. The address is not something this codebase can invent —
+    // supply it in `emails/ReviewRequestEmail.tsx` and sends resume with no other change.
+    //
+    // The recorded status is deliberately not `sent`: `getBookingsEligibleForReviewRequest`
+    // (`lib/db/repository.ts`) dedups on `status = 'sent'` alone, so this row cannot burn the
+    // client's one review request — the same booking is re-selected by the remaining runs in
+    // its three-day window.
     console.warn(
-      "[email/review_request] sending without a postal address — see REVIEW_EMAIL_POSTAL_ADDRESS in emails/ReviewRequestEmail.tsx",
+      "[email/review_request] not sent — no postal address configured; see REVIEW_EMAIL_POSTAL_ADDRESS in emails/ReviewRequestEmail.tsx",
     );
+    await recordEmailEvent({
+      kind: "review_request",
+      recipient: input.to,
+      status: "skipped_missing_postal_address",
+      metadata: { ...input, reviewUrl: redactCapabilityUrl(input.reviewUrl) },
+    });
+    return null;
   }
 
   const from = process.env.RESEND_FROM || `${siteConfig.name} <hello@talkhumanly.com>`;

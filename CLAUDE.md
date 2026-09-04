@@ -42,6 +42,16 @@ consultations. Positioning is **global-first** with regional guides for the UAE,
   Use the CSS variables / Tailwind tokens (`text-primary-dark`, `bg-accent-orange`, …), not raw hex.
 - **Logo**: `<BrandLogo />` (transparent SVG mark + live Poppins wordmark). Never reship a logo with a
   baked-in background.
+- **Pricing-card pattern — the Monthly Retainers strip on `/services` is the reference.** Signed off
+  by the owner (Sept 2026) as the house treatment; every other pricing/service card should match it
+  rather than invent its own. The pattern: violet-tint fill with a violet border (not flat cream
+  with a hairline outline), then title → subtitle → price → short paragraph → violet circle-check
+  bullets → a solid deep-purple pill CTA pinned to the bottom of the card. The price is a large
+  bold figure with a *smaller, muted* suffix (`/mo`, duration), so the figure never out-shouts the
+  service name. Cards are equal height with the CTAs aligned on one baseline even when a label
+  wraps. Before styling a new card, read that strip in `components/services/ServicesCatalog.tsx`
+  and reuse it — the specialist strip was rebuilt to match after the flat-cream version shipped and
+  read as a bare price list.
 - **Canonical host is the apex `https://talkhumanly.com`** (`www` redirects to it). Everything
   outward-facing derives from `siteConfig.url` / `absoluteUrl()` — never hard-code a host.
 - **Sanity Studio is at `/studio`** (`app/studio/[[...tool]]`, `basePath: '/studio'`). `/sanity/*`
