@@ -14,6 +14,7 @@ export const ROUTES = [
   { title: "Blog (index)", value: "/blog" },
   { title: "Free Tools", value: "/tools" },
   { title: "Booking", value: "/booking" },
+  { title: "Testimonials", value: "/testimonials" },
   { title: "Contact", value: "/contact" },
   { title: "FAQ", value: "/faq" },
   { title: "Privacy Policy", value: "/privacy" },

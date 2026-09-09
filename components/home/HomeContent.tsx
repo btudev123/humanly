@@ -779,10 +779,16 @@ export function HomeContent({
             <p className="mt-6 text-body-lg text-neutral-500">
               Every story here is real, and stays offline until the person in it says it&apos;s ready to be shared.
             </p>
-            <Link href="/booking" className="group mt-8 inline-flex items-center gap-2 font-bold text-primary-violet transition-colors hover:text-accent-orange">
-              Start your story
-              <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
-            </Link>
+            <div className="mt-8 flex flex-wrap items-center gap-x-7 gap-y-3">
+              <Link href="/booking" className="group inline-flex items-center gap-2 font-bold text-primary-violet transition-colors hover:text-accent-orange">
+                Start your story
+                <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
+              </Link>
+              <Link href="/testimonials" className="group inline-flex items-center gap-2 font-bold text-primary-dark transition-colors hover:text-primary-violet">
+                Read all client stories
+                <ArrowRight size={18} className="transition-transform group-hover:translate-x-1" />
+              </Link>
+            </div>
           </Reveal>
           <Reveal delay={0.1}>
             {/*
@@ -790,8 +796,8 @@ export function HomeContent({
               deliberately. `TestimonialsCarousel` filters it on `consented === true` itself,
               before its length check and before it indexes anything, so the gate cannot be
               bypassed by this page, by a future edit to lib/testimonials.ts, or by the DB path.
-              With no consented static entry and an empty/unavailable database this renders the
-              carousel's empty state, which is the accurate thing to show.
+              With nothing consented it renders the carousel's empty state, which is the accurate
+              thing to show. The full set lives at /testimonials, linked in the left column.
               The section heading lives in the left column above, not inside the carousel.
             */}
             <TestimonialsCarousel testimonials={allTestimonials} />
@@ -799,9 +805,9 @@ export function HomeContent({
         </div>
         {/*
           Review JSON-LD (docs/seo/2026-09-restructure-seo-spec.md §3b) — one <script> per
-          consented, dated testimonial, never a bare/empty array. `buildTestimonialReviewJsonLd()`
-          returns `null` while every entry in lib/testimonials.ts is unconsented (the live state
-          today), so this renders nothing rather than an empty `review` block.
+          consented, dated testimonial, never a bare/empty array. Consent alone is not enough:
+          `humanly-001` is consented but carries no real date, so it renders in the carousel and
+          is filtered out here — this emits nothing rather than an empty `review` block.
         */}
         {reviewJsonLd?.map((review, i) => (
           <script

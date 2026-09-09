@@ -49,6 +49,11 @@ export const PAGE_META: Record<string, PageMeta> = {
     description:
       "Book a private Humanly consultation. See real availability, then pay securely through Stripe to confirm your confidential session time.",
   },
+  "/testimonials": {
+    title: "Client Stories & Testimonials | Humanly",
+    description:
+      "What professionals say after a confidential Humanly consultation — in their own words, published only with their permission.",
+  },
   "/contact": {
     title: "Contact Humanly | Confidential HR Advisory",
     description:

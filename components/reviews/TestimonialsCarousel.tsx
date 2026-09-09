@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Play, Pause, Quote, Instagram, ChevronLeft, ChevronRight } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 /* ---------------------------------------------------------------- */
 /*  Types                                                            */
@@ -232,8 +233,8 @@ export function TestimonialsCarousel({
     return () => clearInterval(intervalRef.current);
   }, [next, isPaused, count]);
 
-  // Empty state — the live state today, because every entry in lib/testimonials.ts is awaiting
-  // written consent. It says why there is nothing here rather than pretending none exists.
+  // Empty state — reached when nothing in the merged list is consented. It says why there is
+  // nothing here rather than pretending none exists.
   if (count === 0) {
     return (
       <section className="rounded-3xl border-2 border-dashed border-primary-dark/25 bg-neutral-100 p-8 md:p-12">
@@ -401,32 +402,53 @@ export function TestimonialsCarousel({
 export function TestimonialsGrid({
   testimonials,
   title = "Verified testimonials",
+  className = "bg-white px-5 py-24 md:px-[64px]",
 }: {
   testimonials: Testimonial[];
-  title?: string;
+  /** `null` omits the heading — for a page that already carries its own heading above the grid. */
+  title?: string | null;
+  /** The section wrapper, so a page can supply its own surface and padding. */
+  className?: string;
 }) {
   // Same gate as the carousel, applied before the length check — so an unconsented entry can
   // never even cause the heading to render, let alone the quote.
   const published = consentedOnly(testimonials);
   if (published.length === 0) return null;
 
+  // Column count follows the entry count instead of being fixed at three. These quotes run to
+  // several paragraphs; one of them stranded in a narrow third of a 6xl container reads as a
+  // broken layout, not as a testimonial.
+  const columns =
+    published.length === 1
+      ? "mx-auto max-w-3xl"
+      : published.length === 2
+        ? "md:grid-cols-2"
+        : "md:grid-cols-2 lg:grid-cols-3";
+
   return (
-    <section className="bg-white px-5 py-24 md:px-[64px]">
+    <section className={className}>
       <div className="mx-auto max-w-6xl">
-        <h2 className="text-h2 font-extrabold text-neutral-900">
-          {title}
-        </h2>
-        <div className="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {title !== null && (
+          <h2 className="text-h2 font-extrabold text-neutral-900">
+            {title}
+          </h2>
+        )}
+        <div className={cn("grid gap-6", title !== null && "mt-10", columns)}>
           {published.map((t) => (
+            // Same card treatment as the carousel slide — heavy dark border, off-white fill,
+            // pop shadow — rather than the thin grey card this had while it was unrendered.
+            // A quote is the most important thing on the page it appears on; it should not
+            // read as a lighter-weight component than the surrounding chrome.
             <article
               key={t.id}
-              className="rounded-xl border border-neutral-200 bg-neutral-50 p-6"
+              className="rounded-3xl border-2 border-primary-dark bg-neutral-100 p-6 shadow-pop-sm md:p-8"
             >
               {t.rating && <StarRating rating={t.rating} />}
-              <blockquote className="mt-3 whitespace-pre-line break-words leading-relaxed text-neutral-700">
+              <Quote className="mb-3 text-accent-orange/50" size={30} aria-hidden="true" />
+              <blockquote className="whitespace-pre-line break-words leading-relaxed text-neutral-700">
                 &ldquo;{t.quote}&rdquo;
               </blockquote>
-              <footer className="mt-4 border-t border-neutral-200 pt-4">
+              <footer className="mt-6 border-t-2 border-dashed border-neutral-300 pt-4">
                 <p className="break-words font-extrabold text-neutral-900">{t.author}</p>
                 {(t.role || t.company || t.location) && (
                   <p className="break-words text-body-sm text-neutral-500">

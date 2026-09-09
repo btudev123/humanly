@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { Check, CircleAlert, Info } from "lucide-react";
+import { useEffect, useId, useMemo, useState } from "react";
+import { ArrowRight, Check, ChevronDown, CircleAlert, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { pushDataLayerEvent } from "@/lib/analytics/dataLayer";
 import type { AvailableSlot } from "@/lib/cal";
@@ -16,7 +16,8 @@ import type { AvailabilityApiResponse } from "@/app/api/availability/route";
  * `PaidScheduler.tsx`'s global, unnamespaced `bookingSuccessfulV2` listener.
  *
  * Two density variants (`docs/design/2026-09-services-page-spec.md` §5):
- *  - `compact` — `/services`, a single row of up to 5 chips, no day grouping.
+ *  - `compact` — `/services`, one dropdown carrying every slot the API returned, grouped by day
+ *    into `<optgroup>`s, committed with an explicit button.
  *  - `full` — `/booking` step 2, grouped by day: columns in a row at `md:` and up (day/date lives
  *    inside each chip, not a separate column header), stacked full-width day sections below `md:`
  *    (day shown once as a section heading, chips drop the day line).
@@ -33,7 +34,6 @@ import type { AvailabilityApiResponse } from "@/app/api/availability/route";
  */
 
 const MAX_VISIBLE_PER_DAY = 6;
-const MAX_COMPACT_CHIPS = 5;
 
 export type AvailabilityPreviewVariant = "compact" | "full";
 
@@ -169,6 +169,97 @@ function SlotChip({
   );
 }
 
+/**
+ * The `compact` control. A dropdown rather than the row of chips this used to render: the strip
+ * lives inside a narrow card on `/services`, where a chip row wrapped badly and — capped at five
+ * — hid most of the week’s real openings behind "See full availability during booking". Every
+ * slot the API returned is in here, grouped by day.
+ *
+ * The button is not decoration. A native `<select>` fires `change` on every arrow keypress, so
+ * calling `onConfirm` from `onChange` would push a keyboard visitor to `/booking` while they were
+ * still scrolling the list. Choosing and committing are two separate acts.
+ */
+function CompactSlotSelect({
+  groups,
+  timeZone,
+  selectedSlot,
+  onConfirm,
+}: {
+  groups: { key: string; slots: AvailableSlot[] }[];
+  timeZone: string;
+  selectedSlot?: string | null;
+  onConfirm: (iso: string) => void;
+}) {
+  const selectId = useId();
+  const [pending, setPending] = useState<string | null>(null);
+
+  const offered = useMemo(
+    () => new Set(groups.flatMap((group) => group.slots.map((slot) => slot.start))),
+    [groups],
+  );
+  const firstSlot = groups[0]?.slots[0]?.start ?? "";
+
+  // Both `pending` and the controlled `selectedSlot` can outlive the list they point into — the
+  // slots are refetched on every (service, time zone) change, and the caller may clear its
+  // selection — so the rendered value is reconciled against what is actually offered right now
+  // rather than trusted. Falls back to the soonest opening, never to an empty control.
+  const value =
+    (pending && offered.has(pending) && pending) ||
+    (selectedSlot && offered.has(selectedSlot) && selectedSlot) ||
+    firstSlot;
+
+  return (
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+      <label htmlFor={selectId} className="sr-only">
+        Preferred time
+      </label>
+      <div className="relative min-w-0 flex-1">
+        <select
+          id={selectId}
+          value={value}
+          onChange={(event) => setPending(event.target.value)}
+          className="w-full appearance-none rounded-full border-2 border-primary-dark bg-neutral-100 py-3 pl-5 pr-11 text-body-sm font-bold text-primary-dark outline-none transition-colors hover:border-primary-violet focus-visible:border-primary-violet"
+        >
+          {groups.map((group) => (
+            <optgroup key={group.key} label={formatDayLabel(group.slots[0].start, timeZone)}>
+              {group.slots.map((slot) => (
+                // The day is repeated inside the option on purpose: a collapsed `<select>` shows
+                // the option label alone, never its `<optgroup>`, so a bare "3:30pm" would leave
+                // the visitor unable to see which day they had picked.
+                <option key={slot.start} value={slot.start}>
+                  {formatDayLabel(slot.start, timeZone)} — {formatTimeLabel(slot.start, timeZone)}
+                </option>
+              ))}
+            </optgroup>
+          ))}
+        </select>
+        <ChevronDown
+          size={18}
+          strokeWidth={2.5}
+          aria-hidden="true"
+          className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-primary-dark"
+        />
+      </div>
+      <button
+        type="button"
+        onClick={() => value && onConfirm(value)}
+        disabled={!value}
+        className="btn-pop inline-flex shrink-0 items-center justify-center gap-2 rounded-full border-2 border-primary-dark bg-accent-orange px-5 py-3 text-body-sm font-bold text-primary-dark shadow-pop-sm disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
+      >
+        {selectedSlot && selectedSlot === value ? (
+          <>
+            <Check size={16} strokeWidth={3} aria-hidden="true" /> Selected
+          </>
+        ) : (
+          <>
+            Prefer this time <ArrowRight size={16} strokeWidth={2.5} aria-hidden="true" />
+          </>
+        )}
+      </button>
+    </div>
+  );
+}
+
 export function AvailabilityPreview({
   serviceSlug,
   variant,
@@ -293,9 +384,15 @@ export function AvailabilityPreview({
         {timeZoneControl}
       </div>
 
-      {state.status === "loading" && (
-        <SkeletonChips count={variant === "compact" ? MAX_COMPACT_CHIPS : 6} />
-      )}
+      {state.status === "loading" &&
+        (variant === "compact" ? (
+          <div
+            className="h-[50px] w-full animate-pulse rounded-full border-2 border-transparent bg-neutral-200"
+            aria-hidden="true"
+          />
+        ) : (
+          <SkeletonChips count={6} />
+        ))}
 
       {state.status === "error" && (
         <div className="flex items-start gap-3 rounded-2xl border-2 border-dashed border-error/30 bg-error/6 p-6 text-body-sm text-primary-dark">
@@ -318,18 +415,15 @@ export function AvailabilityPreview({
       )}
 
       {state.status === "loaded" && state.slots.length > 0 && variant === "compact" && (
-        <div className="flex flex-wrap gap-3">
-          {state.slots.slice(0, MAX_COMPACT_CHIPS).map((slot) => (
-            <SlotChip
-              key={slot.start}
-              iso={slot.start}
-              timeZone={resolvedTimeZone}
-              showDay
-              selected={selectedSlot === slot.start}
-              onClick={() => selectSlot(slot.start)}
-            />
-          ))}
-        </div>
+        <CompactSlotSelect
+          // Remounted per (service, zone) so the internal pending value can never survive into a
+          // list it does not belong to; the reconciliation inside covers the rest.
+          key={`${serviceSlug}-${resolvedTimeZone}`}
+          groups={groupedByDay}
+          timeZone={resolvedTimeZone}
+          selectedSlot={selectedSlot}
+          onConfirm={selectSlot}
+        />
       )}
 
       {state.status === "loaded" && state.slots.length > 0 && variant === "full" && (

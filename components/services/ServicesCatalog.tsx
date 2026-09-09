@@ -585,8 +585,8 @@ export function ServicesCatalog({ services }: { services: MergedService[] }) {
         <Reveal delay={0.1} className="mx-auto mt-10 max-w-5xl rounded-3xl border-2 border-primary-dark bg-neutral-100 p-7">
           <h3 className="text-h4 font-display font-bold text-primary-dark">Real times, open this week</h3>
           <p className="mt-1 text-body-sm text-neutral-500">
-            These are live openings on Karma&apos;s calendar. Tap one that works for you — this is a
-            preference, not a booking.
+            These are live openings on Karma&apos;s calendar. Pick the one that works for you — this
+            is a preference, not a booking.
           </p>
           <AvailabilityPreview
             serviceSlug="full-support"

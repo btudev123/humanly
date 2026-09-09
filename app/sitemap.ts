@@ -24,6 +24,7 @@ const STATIC_ROUTES = [
   { route: "/resources/managed-out", changeFrequency: "monthly" as const, priority: 0.7 },
   { route: "/resources/resign-or-stay", changeFrequency: "monthly" as const, priority: 0.7 },
   { route: "/booking", changeFrequency: "weekly" as const, priority: 0.9 },
+  { route: "/testimonials", changeFrequency: "monthly" as const, priority: 0.6 },
   { route: "/contact", changeFrequency: "monthly" as const, priority: 0.5 },
   { route: "/faq", changeFrequency: "monthly" as const, priority: 0.6 },
   { route: "/llms-full", changeFrequency: "weekly" as const, priority: 0.5 },

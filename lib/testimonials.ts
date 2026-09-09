@@ -15,14 +15,18 @@
  * REQUIRED field on the shared `Testimonial` type, so a new entry that omits it fails to
  * typecheck rather than silently defaulting to publishable.
  *
- * THE FIRST ENTRY (`humanly-001`) IS NOT CLEARED TO PUBLISH.
- * - The quote is real and verbatim, supplied by the operator. Do not edit, tighten, or
- *   paraphrase it if you touch this file later.
- * - The client's role, location, and a publish date have NOT been supplied.
- * - Written consent from the client to publish has NOT been confirmed.
- * Only the founder (Karma Harb) can confirm consent and supply the missing facts. Do not
- * guess a job title, a country, or a date, and do not flip `consented` to `true` without
- * that confirmation. See NEEDS DATA in docs/copy/2026-09-services-and-booking-copy.md.
+ * THE FIRST ENTRY (`humanly-001`) WAS CLEARED TO PUBLISH ON 2026-09-09 by the site owner,
+ * who supplied the quote a second time and instructed that it go live on `/testimonials`.
+ * That instruction is the human consent decision this gate exists to wait for. Nothing else
+ * about the entry changed:
+ * - The quote is real and verbatim. Do not edit, tighten, or paraphrase it.
+ * - The client's role, location, and a publish date were still NOT supplied, and stay absent
+ *   rather than guessed — no job title, no country, no invented date. The missing date is
+ *   why this entry emits no `Review` JSON-LD (see the filter at the bottom of this file);
+ *   supply a real one and it becomes eligible automatically.
+ * A NEW entry still starts at `consented: false`. Only the founder (Karma Harb) can clear
+ * one — no agent may flip the flag on its own, and no job title, country or date may be
+ * guessed. See NEEDS DATA in docs/copy/2026-09-services-and-booking-copy.md.
  */
 
 import type { Testimonial } from "@/components/reviews/TestimonialsCarousel";
@@ -31,9 +35,9 @@ import { siteConfig } from "@/lib/site";
 export const testimonials: Testimonial[] = [
   {
     id: "humanly-001",
-    // Non-identifying by design: the client's actual role and location were not supplied
-    // by the owner, and consent to publish has not been confirmed. Do not replace this
-    // with a guessed title or location.
+    // Non-identifying by design: consent to publish is confirmed, but the client's actual
+    // role and location still were not supplied. Do not replace this with a guessed title
+    // or location — the page's own promise is that names are withheld by default.
     author: "A Humanly client", // [NEEDS DATA: real role + location, once confirmed]
     role: undefined,
     company: undefined,
@@ -41,9 +45,9 @@ export const testimonials: Testimonial[] = [
     quote:
       "One day at work it seemed like the world was against me, and even with experience I couldn't get through that stressful day. I was waiting for an important meeting with management about potential acquisition and my future role in the company, I honestly had no idea what to expect. I was really worried knowing that my previous interaction with one of the people didn't go too well over something that I couldn't even control, so I was definitely in panic mode.\n\nThat was the moment when I booked a consultation with Karma. Her timely response and immediate attention were amazing. She gave me the clarity I needed and pointed out the things I was missing, and advised me how to professionally and respectfully stand my ground. I'm so grateful for her support and for breaking down everything so clearly. Karma's help made a real difference, she can help you see a situation in a different light and approach it with the right knowledge and she will definitely bring her kind soul into the conversation.",
     rating: undefined,
-    date: "[NEEDS DATA]", // real ISO date required before publish — do not guess
+    date: "[NEEDS DATA]", // real ISO date still not supplied — do not guess; excluded from JSON-LD
     verified: true, // the quote itself is a genuine client review; `consented` is the separate publish gate
-    consented: false, // HARD GATE — do not flip until the founder confirms written consent
+    consented: true, // cleared by the site owner on 2026-09-09 — see the file header
   },
 ];
 
@@ -78,9 +82,10 @@ export function getConsentedTestimonials(additional: Testimonial[] = []): Testim
  * testimonial that also has a real, stored `datePublished` (the placeholder `"[NEEDS DATA]"`
  * string on `humanly-001` is deliberately excluded, not coerced into a fake date). Returns `null`
  * when there is nothing publishable, so the calling page renders no `<script>` tag at all rather
- * than an empty array. With no consented static entry and an empty (or unavailable) database,
- * `null` is the live return value on deploy, not a hypothetical. A database-backed review joins
- * this output only once it is approved with publish consent AND carries a parseable date.
+ * than an empty array. `null` is still the live return value with an empty (or unavailable)
+ * database, not a hypothetical: `humanly-001` is consented and rendered, but undated, so it is
+ * filtered out here. Consent alone does not buy a `Review` entity — a review joins this output
+ * only once it is consented AND carries a parseable date.
  */
 export function buildTestimonialReviewJsonLd(
   additional: Testimonial[] = [],
