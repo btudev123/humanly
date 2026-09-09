@@ -86,24 +86,8 @@ export default async function TestimonialsPage() {
           )}
         </Reveal>
 
-        {/* ── Why so few, and how they get here ──────────────────── */}
-        <Reveal delay={0.05}>
-          <section className="mt-12 rounded-3xl border-2 border-primary-dark bg-neutral-100 p-7 md:p-9">
-            <h2 className="text-h4 font-display font-bold text-primary-dark">
-              Why this page is short
-            </h2>
-            <p className="mt-3 max-w-2xl text-body-sm leading-relaxed text-neutral-600">
-              People come to Humanly during the worst weeks of their working lives, and most would
-              rather not have that written down in public. After a session, every client is asked
-              for a review, and asked separately whether it may be published — a low rating and a
-              &ldquo;please don&rsquo;t publish this&rdquo; five-star both reach Karma, and neither
-              publishes itself. What you see here is only the part clients chose to share.
-            </p>
-          </section>
-        </Reveal>
-
         {/* ── CTA ────────────────────────────────────────────────── */}
-        <Reveal delay={0.1}>
+        <Reveal delay={0.05}>
           <section className="mt-12 rounded-3xl border-2 border-primary-dark bg-primary-dark p-8 text-on-primary md:p-12">
             <h2 className="text-h3 font-display font-extrabold tracking-tight">
               Your situation, with someone who has seen it before.
