@@ -24,6 +24,10 @@
  *   rather than guessed — no job title, no country, no invented date. The missing date is
  *   why this entry emits no `Review` JSON-LD (see the filter at the bottom of this file);
  *   supply a real one and it becomes eligible automatically.
+ * THE SECOND ENTRY (`humanly-002`) WAS CLEARED TO PUBLISH ON 2026-09-11 on the same terms: the
+ * site owner supplied the quote and instructed that it be added and published. Same handling —
+ * quote verbatim, no role, no location, no date, no rating invented to fill the gaps.
+ *
  * A NEW entry still starts at `consented: false`. Only the founder (Karma Harb) can clear
  * one — no agent may flip the flag on its own, and no job title, country or date may be
  * guessed. See NEEDS DATA in docs/copy/2026-09-services-and-booking-copy.md.
@@ -49,6 +53,22 @@ export const testimonials: Testimonial[] = [
     verified: true, // the quote itself is a genuine client review; `consented` is the separate publish gate
     consented: true, // cleared by the site owner on 2026-09-09 — see the file header
   },
+  {
+    id: "humanly-002",
+    // Same non-identifying treatment as humanly-001: the client's name, role and location were
+    // not supplied with the quote, so none of them are guessed here. The review is about repeated
+    // interview coaching — do not turn that into a job title.
+    author: "A Humanly client", // [NEEDS DATA: real role + location, once confirmed]
+    role: undefined,
+    company: undefined,
+    location: undefined, // [NEEDS DATA: location]
+    quote:
+      "Over the years I've had the opportunity to get coaching from Karma many times over and I've had tremendous success in doing so: up until now I've always received an offer from a job application when I practiced with Karma. Her ability to discern what are the key elements of the job and intuit the type of questions one might face in an interview is uncanny and unparalleled. I owe much of my professional successes to Karma's coaching and encouragement.\n\nMost recently, in our last interaction, she helped me understand how to best position myself and my achievements to break into Director-level interviews from the Manager-level. I approached my interview with a courage and a boldness I would not have had without her support.\n\nThat being said, the most important impact of our latest session is that I now feel ready for this career jump and will no longer even consider other manager-level jobs as I am convinced I am ready for the next step. This allows me to both re-focus my efforts in my job search and also pivot my efforts in development and in my current job to better align to that pivot.\n\nI am eternally grateful for the time spent with Karma: I would spend as much time as possible with her.",
+    rating: undefined,
+    date: "[NEEDS DATA]", // real ISO date still not supplied — do not guess; excluded from JSON-LD
+    verified: true, // the quote itself is a genuine client review; `consented` is the separate publish gate
+    consented: true, // cleared by the site owner on 2026-09-11 — see the file header
+  },
 ];
 
 /**
@@ -60,6 +80,8 @@ export const testimonials: Testimonial[] = [
 export const testimonialPullQuotes: Record<string, string> = {
   "humanly-001":
     "Her timely response and immediate attention were amazing. She gave me the clarity I needed and pointed out the things I was missing, and advised me how to professionally and respectfully stand my ground.",
+  "humanly-002":
+    "Her ability to discern what are the key elements of the job and intuit the type of questions one might face in an interview is uncanny and unparalleled. I owe much of my professional successes to Karma's coaching and encouragement.",
 };
 
 /**
