@@ -7,6 +7,7 @@ Guidance for working in this repository.
 advisory founded by Karma Harb. Visitors learn about advisory services, buy paid resources, and book
 consultations. Positioning is **global-first** with regional guides for the UAE, GCC & North America.
 
+
 ## Stack
 - **Next.js 16 (App Router) + React 19**, TypeScript.
 - **Tailwind CSS v4** (config-less; theme tokens in `app/globals.css` `@theme`).
