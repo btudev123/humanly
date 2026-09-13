@@ -1,17 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useState, useTransition } from "react";
-import { ArrowRight, Calendar, CalendarClock, CheckCircle2, Clock, Info, Lock, ShieldCheck } from "lucide-react";
+import { ArrowRight, Calendar, CheckCircle2, Clock, Info, Lock, ShieldCheck } from "lucide-react";
 import {
   serviceProducts,
   formatAed,
-  getSellableServiceProduct,
   type ServiceCategory,
 } from "@/lib/products";
 import { getIntakeForm, splitAnswers, type IntakeField } from "@/lib/intake";
 import { cn } from "@/lib/utils";
-import { AvailabilityPreview } from "@/components/booking/AvailabilityPreview";
-import { pushDataLayerEvent } from "@/lib/analytics/dataLayer";
 
 const fieldClass =
   "rounded-2xl border-2 border-primary-dark/20 px-4 py-3 text-base font-normal normal-case tracking-normal text-primary-dark outline-none transition focus:border-primary-dark";
@@ -63,44 +60,30 @@ function IntakeFieldInput({ field }: { field: IntakeField }) {
   );
 }
 
-/** Full Support is the intended primary tier, so it is what an unqualified /booking visit selects. */
-const DEFAULT_SERVICE_SLUG = "full-support";
-
 const categoryFilters: { value: ServiceCategory | "all"; label: string }[] = [
   { value: "all", label: "All" },
-  { value: "core", label: "Core advisory" },
-  { value: "specialist", label: "Specialist" },
+  { value: "session", label: "Sessions" },
   { value: "retainer", label: "Retainers" },
+  { value: "corporate", label: "Corporate" },
 ];
 
 export function BookingFunnel() {
   const [category, setCategory] = useState<ServiceCategory | "all">("all");
-  const [selected, setSelected] = useState(DEFAULT_SERVICE_SLUG);
-  const [preferredSlot, setPreferredSlot] = useState<string | null>(null);
+  const [selected, setSelected] = useState("individual-advisory");
   const [error, setError] = useState("");
   const [showHidden, setShowHidden] = useState(false);
   const [isPending, startTransition] = useTransition();
 
-  // Reveal hidden products (e.g. the internal test service) with ?test=1, honour
-  // ?service=<slug> so links from articles, services and resources land on the right one
-  // preselected instead of dropping the reader on the default, and honour ?slot=<iso> — the
-  // preference carried over from the compact availability strip on /services (Marcus's CRO spec
-  // §4: "Clicking a chip carries the preference to /booking?service=<slug>&slot=<iso>").
+  // Reveal hidden products (e.g. the internal test service) with ?test=1, and honour
+  // ?service=<slug> so links from articles, services and resources land on the right
+  // one preselected instead of dropping the reader on the default.
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     setShowHidden(params.get("test") === "1");
 
-    const requested = getSellableServiceProduct(params.get("service"));
-    if (requested) {
-      setSelected(requested.slug);
-    }
-
-    const slotParam = params.get("slot");
-    if (slotParam) {
-      const parsed = new Date(slotParam);
-      if (!Number.isNaN(parsed.getTime()) && parsed.getTime() > Date.now()) {
-        setPreferredSlot(parsed.toISOString());
-      }
+    const requested = params.get("service");
+    if (requested && serviceProducts.some((product) => product.slug === requested)) {
+      setSelected(requested);
     }
   }, []);
 
@@ -124,29 +107,12 @@ export function BookingFunnel() {
   // job posting, not whether they've been put on a PIP.
   const intakeForm = useMemo(() => getIntakeForm(selectedProduct), [selectedProduct]);
 
-  // A preferred slot only means anything against the calendar it was picked from — switching
-  // services clears it rather than silently carrying a Full Support time onto The Session.
-  function selectService(slug: string) {
-    if (slug !== selected) setPreferredSlot(null);
-    setSelected(slug);
-    const product = availableProducts.find((p) => p.slug === slug);
-    if (product) {
-      pushDataLayerEvent({
-        event: "select_tier",
-        tier: product.tier ?? product.slug,
-        product_slug: product.slug,
-        price_aed: product.amountAed,
-        source: "booking_funnel",
-      });
-    }
-  }
-
   function changeCategory(next: ServiceCategory | "all") {
     setCategory(next);
     // Keep the selection valid for the visible set so the summary stays in sync.
     if (next !== "all" && selectedProduct.category !== next) {
       const firstInCategory = availableProducts.find((product) => product.category === next);
-      if (firstInCategory) selectService(firstInCategory.slug);
+      if (firstInCategory) setSelected(firstInCategory.slug);
     }
   }
 
@@ -170,9 +136,6 @@ export function BookingFunnel() {
         urgency,
         message,
         details,
-        // ADR-0001 Decision C — carried as a PREFERENCE only; never a hold. Omitted entirely
-        // (rather than sent as null) when nothing was picked, matching the API's optional field.
-        ...(preferredSlot ? { preferredSlot } : {}),
       };
 
       const response = await fetch("/api/checkout/consultation", {
@@ -186,15 +149,6 @@ export function BookingFunnel() {
         setError(data.error || "Checkout could not be started. Please try again.");
         return;
       }
-
-      pushDataLayerEvent({
-        event: "begin_checkout",
-        product_slug: selectedProduct.slug,
-        tier: selectedProduct.tier,
-        value: selectedProduct.amountAed,
-        currency: "AED",
-        had_preferred_slot: Boolean(preferredSlot),
-      });
 
       window.location.assign(data.url);
     });
@@ -252,7 +206,7 @@ export function BookingFunnel() {
                   name="service"
                   value={service.slug}
                   checked={active}
-                  onChange={() => selectService(service.slug)}
+                  onChange={() => setSelected(service.slug)}
                   className="sr-only"
                 />
                 <div className="flex items-start gap-3">
@@ -287,36 +241,7 @@ export function BookingFunnel() {
         </div>
       </section>
 
-      {/* ── Step 2 — pick a preferred time (scheduled services only) ── */}
-      {selectedProduct.needsScheduling && (
-        <section className="min-w-0 rounded-3xl border-2 border-primary-dark bg-neutral-100 p-5 shadow-pop-sm sm:p-6 md:p-8">
-          <div className="flex items-start gap-3">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 border-primary-dark bg-violet-tint text-primary-dark">
-              <CalendarClock size={18} strokeWidth={2.5} />
-            </span>
-            <div>
-              <h2 className="text-h3 font-extrabold text-primary-dark">
-                <span className="text-primary-violet">2.</span> Pick a preferred time
-              </h2>
-              <p className="mt-1 text-sm text-neutral-500 sm:text-base">
-                This is a preference, not a booking — we confirm your exact time after payment, on
-                the next screen.
-              </p>
-            </div>
-          </div>
-
-          <AvailabilityPreview
-            serviceSlug={selectedProduct.slug}
-            variant="full"
-            source="booking_step2"
-            selectedSlot={preferredSlot}
-            onSelectSlot={setPreferredSlot}
-            className="mt-5"
-          />
-        </section>
-      )}
-
-      {/* ── Step 2/3 — private intake ─────────────────────────────── */}
+      {/* ── Step 2 — private intake ───────────────────────────────── */}
       <section className="min-w-0 rounded-3xl border-2 border-primary-dark bg-neutral-100 p-5 shadow-pop-sm sm:p-6 md:p-8">
         <div className="flex items-start gap-3">
           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 border-primary-dark bg-violet-tint text-primary-dark">
@@ -324,17 +249,11 @@ export function BookingFunnel() {
           </span>
           <div>
             <h2 className="text-h3 font-extrabold text-primary-dark">
-              <span className="text-primary-violet">{selectedProduct.needsScheduling ? "3." : "2."}</span> Private intake
+              <span className="text-primary-violet">2.</span> Private intake
             </h2>
-            {/*
-              Theo's copy deck (docs/copy/2026-09-services-and-booking-copy.md §C) verbatim, used
-              regardless of whether a chip was actually clicked — picking a preferred time is
-              optional, so this reads slightly presumptuous for someone who skipped step 2. Not
-              rewritten here per the "use these strings verbatim" instruction; flag for Ruth.
-            */}
             <p className="mt-1 text-sm text-neutral-500 sm:text-base">
               {selectedProduct.needsScheduling
-                ? "You picked a preferred time on the last step. Complete this intake and pay securely — we'll confirm your exact slot on the next screen."
+                ? "Payment happens first through Stripe. Scheduling unlocks only after a successful payment."
                 : "Payment happens first through Stripe. This service is delivered by email — there is no call to schedule."}
             </p>
           </div>
@@ -385,11 +304,7 @@ export function BookingFunnel() {
             ))}
           </div>
 
-          {error && (
-            <p className="rounded-2xl border-2 border-dashed border-error/30 bg-error/6 p-4 text-sm font-semibold text-primary-dark">
-              {error}
-            </p>
-          )}
+          {error && <p className="rounded-lg bg-red-50 p-4 text-sm font-semibold text-red-700">{error}</p>}
           <button
             type="submit"
             disabled={isPending}
@@ -405,7 +320,7 @@ export function BookingFunnel() {
             {[
               "Stripe handles payment",
               selectedProduct.needsScheduling
-                ? "Exact time confirmed after payment"
+                ? "Scheduling unlocks after payment"
                 : "Delivered to your inbox",
               "No employer notification",
             ].map((item) => (

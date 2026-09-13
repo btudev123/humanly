@@ -58,25 +58,7 @@ type FetchState =
   | { status: "error" }
   | { status: "loaded"; slots: AvailableSlot[] };
 
-function detectTimeZone(): string {
-  try {
-    return Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
-  } catch {
-    return "UTC";
-  }
-}
 
-function listTimeZones(): string[] | null {
-  try {
-    // `Intl.supportedValuesOf` — widely supported since 2023; guarded rather than assumed so an
-    // older engine degrades to "detected zone, not changeable" instead of throwing.
-    const supportedValuesOf = (Intl as unknown as { supportedValuesOf?: (key: string) => string[] })
-      .supportedValuesOf;
-    return supportedValuesOf ? supportedValuesOf("timeZone") : null;
-  } catch {
-    return null;
-  }
-}
 
 function dayKey(iso: string, timeZone: string): string {
   return new Intl.DateTimeFormat("en-CA", {
@@ -268,26 +250,15 @@ export function AvailabilityPreview({
   selectedSlot,
   className,
 }: AvailabilityPreviewProps) {
-  // `null` until the post-mount effect below detects the visitor's real zone — the fetch effect
-  // waits on this so the component makes exactly one request per (service, zone) pair instead of
-  // one throwaway request against a hardcoded guess followed immediately by a second, correct one.
-  const [timeZone, setTimeZoneState] = useState<string | null>(null);
-  const resolvedTimeZone = timeZone ?? "UTC";
-  const [zoneOptions, setZoneOptions] = useState<string[] | null>(null);
+  const resolvedTimeZone = "Asia/Dubai";
   const [state, setState] = useState<FetchState>({ status: "loading" });
   const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set());
 
   useEffect(() => {
-    setTimeZoneState(detectTimeZone());
-    setZoneOptions(listTimeZones());
-  }, []);
-
-  useEffect(() => {
-    if (!timeZone) return;
     let cancelled = false;
     setState({ status: "loading" });
 
-    fetch(`/api/availability?service=${encodeURIComponent(serviceSlug)}&tz=${encodeURIComponent(timeZone)}`)
+    fetch(`/api/availability?service=${encodeURIComponent(serviceSlug)}&tz=${encodeURIComponent(resolvedTimeZone)}`)
       .then((res) => {
         if (!res.ok) throw new Error(`availability fetch failed: ${res.status}`);
         return res.json() as Promise<AvailabilityApiResponse>;
@@ -308,8 +279,7 @@ export function AvailabilityPreview({
     return () => {
       cancelled = true;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [serviceSlug, timeZone]);
+  }, [serviceSlug, resolvedTimeZone]);
 
   const groupedByDay = useMemo(() => {
     if (state.status !== "loaded") return [];
@@ -350,27 +320,6 @@ export function AvailabilityPreview({
     </p>
   );
 
-  const timeZoneControl = (
-    <label className="flex items-center gap-2 text-caption font-semibold text-neutral-500">
-      Time zone
-      {zoneOptions ? (
-        <select
-          value={resolvedTimeZone}
-          onChange={(event) => setTimeZoneState(event.target.value)}
-          className="rounded-full border-2 border-primary-dark/20 bg-neutral-100 px-2.5 py-1 text-caption font-semibold text-primary-dark outline-none focus:border-primary-dark"
-        >
-          {zoneOptions.map((zone) => (
-            <option key={zone} value={zone}>
-              {zone.replace(/_/g, " ")}
-            </option>
-          ))}
-        </select>
-      ) : (
-        <span className="font-bold text-primary-dark">{resolvedTimeZone.replace(/_/g, " ")}</span>
-      )}
-    </label>
-  );
-
   return (
     <div className={className}>
       <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
@@ -381,7 +330,6 @@ export function AvailabilityPreview({
               ? `${state.slots.length} available times loaded.`
               : ""}
         </span>
-        {timeZoneControl}
       </div>
 
       {state.status === "loading" &&
