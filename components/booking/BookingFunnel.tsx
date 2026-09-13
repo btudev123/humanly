@@ -62,9 +62,9 @@ function IntakeFieldInput({ field }: { field: IntakeField }) {
 
 const categoryFilters: { value: ServiceCategory | "all"; label: string }[] = [
   { value: "all", label: "All" },
-  { value: "session", label: "Sessions" },
+  { value: "core", label: "Core advisory" },
+  { value: "specialist", label: "Specialist" },
   { value: "retainer", label: "Retainers" },
-  { value: "corporate", label: "Corporate" },
 ];
 
 export function BookingFunnel() {
