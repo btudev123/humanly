@@ -162,7 +162,9 @@ function DaySlotPicker({
     liveSelection && activeGroup.slots.some((slot) => slot.start === liveSelection) ? liveSelection : "";
 
   return (
-    <div className="grid gap-4">
+    // `minmax(0,1fr)`, not the implicit `auto` track: an `auto` track grows to the day strip's
+    // unscrolled width, which pushed the strip and the time dropdown out past the card on mobile.
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-4">
       <div>
         <p id={stripLabelId} className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-neutral-500">
           Choose a day
@@ -418,7 +420,7 @@ export function AvailabilityPreview({
             aria-hidden="true"
           />
         ) : (
-          <div className="grid gap-4" aria-hidden="true">
+          <div className="grid grid-cols-[minmax(0,1fr)] gap-4" aria-hidden="true">
             <div className="flex gap-2.5 overflow-hidden">
               {Array.from({ length: 6 }).map((_, i) => (
                 <div key={i} className="h-[84px] w-[84px] shrink-0 animate-pulse rounded-2xl bg-neutral-200" />
