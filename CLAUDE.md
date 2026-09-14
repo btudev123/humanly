@@ -70,10 +70,16 @@ consultations. Positioning is **global-first** with regional guides for the UAE,
   money-adjacent history. Use `getSellableServiceProduct()` when resolving a slug for *purchase*;
   that one never returns a retired product.
 - Services/pricing flow: `lib/products.ts` → Stripe checkout (`app/api/checkout`) → success redirect.
-  Visitors see **live Cal.com availability before paying** (read-only grid fed by `lib/cal.ts` →
-  `/api/availability`); the previewed slot is carried as a *preference* only, never a hold. Scheduled
-  services then confirm the real slot at `/booking/schedule` (Cal.com embed); async items email a
-  delivery link. `/booking?service=<slug>` preselects a service and resolves retired slugs.
+  Visitors pick a **Dubai-time slot before paying** (day buttons → time dropdown, `Asia/Dubai`
+  only, fed by `lib/cal.ts` → `/api/availability`). Nothing is written to Cal.com pre-payment; the
+  slot is re-checked uncached at checkout (409 if taken) and **auto-booked after payment** by
+  `lib/calBooking.ts`, called from the Stripe webhook and `/booking/schedule` (idempotent claim on
+  `orders.metadata.calBooking`). If Cal.com refuses it, `/booking/schedule` falls back to the paid
+  Cal.com embed (ADR-0001 Decision C′). Async items email a delivery link.
+  `/booking?service=<slug>&slot=<iso>` preselects a service/time and resolves retired slugs.
+  Hidden products (`test-service`, AED 5, `/booking?test=1`) live in `hiddenServiceProducts`, never
+  in the public `serviceProducts`. The Cal.com webhook must point at the **apex** — `www` 308s and
+  Cal.com does not follow redirects.
 - **Booking intake is per-service** (`lib/intake.ts`): each service declares its own questions, which
   map onto the three `booking_intakes` columns (`concern`/`urgency`/`message`) plus labelled extras.
   Nothing is ever uploaded through the site — document review asks the client to reply to the

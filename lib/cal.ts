@@ -60,6 +60,9 @@ export type GetAvailableSlotsInput = {
    *  `normaliseTimeZone` before it reaches Cal.com (and therefore the fetch cache key) — see
    *  that function for why. Returned `start` values are fully-qualified instants regardless. */
   timeZone: string;
+  /** Bypass the 60s Data Cache. Only for the checkout-time re-check (`isSlotStillOpen`), where a
+   *  stale "still open" answer would send a visitor to pay for a slot someone else just took. */
+  fresh?: boolean;
 };
 
 /**
@@ -164,9 +167,11 @@ export function normaliseTimeZone(timeZone: string): string {
  * per-date grouping; a caller that wants slots grouped by day groups this array client-side by
  * the date portion of each `start`).
  *
- * Cached 300 seconds (Next's fetch Data Cache — `next: { revalidate: 300 }`, same mechanism
- * already used in `lib/sanity/fetch.ts`). See ADR-0001 Decision C for why 300s is a starting
- * point, not a data-derived number.
+ * Cached 60 seconds (Next's fetch Data Cache — `next: { revalidate: 60 }`, same mechanism
+ * already used in `lib/sanity/fetch.ts`). Lowered from 300s on 2026-09-14: the picked slot is now
+ * auto-booked after payment (ADR-0001 Decision C′), so a slot taken on Karma's calendar has to
+ * drop out of the picker within a minute, not five. The timezone bucketing below still bounds the
+ * cache key space. `fresh: true` skips the cache entirely.
  *
  * FAIL-CLOSED CONTRACT: returns `[]` on every failure mode — missing/invalid `CAL_API_KEY`,
  * network error, non-200 response, malformed JSON, an `eventTypeSlug`/`username` Cal.com doesn't
@@ -195,7 +200,7 @@ export async function getAvailableSlots(input: GetAvailableSlotsInput): Promise<
         Authorization: `Bearer ${apiKey}`,
         "cal-api-version": "2024-09-04",
       },
-      next: { revalidate: 300 },
+      ...(input.fresh ? { cache: "no-store" as const } : { next: { revalidate: 60 } }),
     });
 
     if (!response.ok) return [];
@@ -223,4 +228,29 @@ export async function getAvailableSlots(input: GetAvailableSlotsInput): Promise<
   } catch {
     return [];
   }
+}
+
+/**
+ * Is `iso` still an open slot for `product` right now? Uncached.
+ *
+ * Three answers, not two: `null` means Cal.com gave us nothing to judge by (outage, missing key —
+ * `getAvailableSlots` fails closed to `[]`), and the caller must not treat an outage as "taken".
+ * Slots are compared as instants, so `…T09:00:00.000+04:00` and `…T05:00:00.000Z` match.
+ */
+export async function isSlotStillOpen(product: ServiceProduct, iso: string): Promise<boolean | null> {
+  const target = new Date(iso).getTime();
+  if (Number.isNaN(target)) return false;
+
+  const toIsoDate = (d: Date) => d.toISOString().slice(0, 10);
+  const slots = await getAvailableSlots({
+    product,
+    from: toIsoDate(new Date()),
+    // One day past the slot's UTC date covers a Dubai-morning slot that is still "yesterday" in UTC.
+    to: toIsoDate(new Date(target + 24 * 60 * 60 * 1000)),
+    timeZone: "Asia/Dubai",
+    fresh: true,
+  });
+
+  if (slots.length === 0) return null;
+  return slots.some((slot) => new Date(slot.start).getTime() === target);
 }

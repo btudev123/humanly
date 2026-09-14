@@ -1,14 +1,18 @@
 "use client";
 
 import { useEffect, useMemo, useState, useTransition } from "react";
-import { ArrowRight, Calendar, CheckCircle2, Clock, Info, Lock, ShieldCheck } from "lucide-react";
+import { ArrowRight, Calendar, CalendarClock, CheckCircle2, Clock, Info, Lock, ShieldCheck } from "lucide-react";
 import {
   serviceProducts,
+  hiddenServiceProducts,
+  getSellableServiceProduct,
   formatAed,
   type ServiceCategory,
 } from "@/lib/products";
 import { getIntakeForm, splitAnswers, type IntakeField } from "@/lib/intake";
 import { cn } from "@/lib/utils";
+import { AvailabilityPreview } from "@/components/booking/AvailabilityPreview";
+import { pushDataLayerEvent } from "@/lib/analytics/dataLayer";
 
 const fieldClass =
   "rounded-2xl border-2 border-primary-dark/20 px-4 py-3 text-base font-normal normal-case tracking-normal text-primary-dark outline-none transition focus:border-primary-dark";
@@ -60,6 +64,9 @@ function IntakeFieldInput({ field }: { field: IntakeField }) {
   );
 }
 
+/** Full Support is the intended primary tier, so it is what an unqualified /booking visit selects. */
+const DEFAULT_SERVICE_SLUG = "full-support";
+
 const categoryFilters: { value: ServiceCategory | "all"; label: string }[] = [
   { value: "all", label: "All" },
   { value: "core", label: "Core advisory" },
@@ -69,26 +76,46 @@ const categoryFilters: { value: ServiceCategory | "all"; label: string }[] = [
 
 export function BookingFunnel() {
   const [category, setCategory] = useState<ServiceCategory | "all">("all");
-  const [selected, setSelected] = useState("individual-advisory");
+  const [selected, setSelected] = useState(DEFAULT_SERVICE_SLUG);
+  // The Dubai-time slot picked in step 2. Booked in Cal.com for real once payment clears
+  // (ADR-0001 Decision C′) — nothing is written to Cal.com before that.
+  const [preferredSlot, setPreferredSlot] = useState<string | null>(null);
+  // How many slots the picker loaded for the selected service: `null` while loading or when the
+  // fetch failed. A time is only required when there were times to choose from.
+  const [slotCount, setSlotCount] = useState<number | null>(null);
+  // Bumped to force the picker to refetch after checkout reports the chosen slot was taken.
+  const [availabilityVersion, setAvailabilityVersion] = useState(0);
   const [error, setError] = useState("");
   const [showHidden, setShowHidden] = useState(false);
   const [isPending, startTransition] = useTransition();
 
-  // Reveal hidden products (e.g. the internal test service) with ?test=1, and honour
-  // ?service=<slug> so links from articles, services and resources land on the right
-  // one preselected instead of dropping the reader on the default.
+  // Reveal hidden products (the internal test service) with ?test=1, honour ?service=<slug>
+  // (retired slugs resolve to their live replacement) so links from articles, services and
+  // resources land on the right one preselected, and honour ?slot=<iso> — the time carried over
+  // from the compact picker on /services.
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    setShowHidden(params.get("test") === "1");
+    const testMode = params.get("test") === "1";
+    setShowHidden(testMode);
 
-    const requested = params.get("service");
-    if (requested && serviceProducts.some((product) => product.slug === requested)) {
-      setSelected(requested);
+    // Hidden products resolve only in test mode — otherwise `selected` would name a product the
+    // list can't show, and the page would display one service while checkout charged another.
+    const requested = getSellableServiceProduct(params.get("service"));
+    if (requested && (testMode || !requested.hidden)) {
+      setSelected(requested.slug);
+    }
+
+    const slotParam = params.get("slot");
+    if (slotParam) {
+      const parsed = new Date(slotParam);
+      if (!Number.isNaN(parsed.getTime()) && parsed.getTime() > Date.now()) {
+        setPreferredSlot(parsed.toISOString());
+      }
     }
   }, []);
 
   const availableProducts = useMemo(
-    () => serviceProducts.filter((product) => showHidden || !product.hidden),
+    () => (showHidden ? [...serviceProducts, ...hiddenServiceProducts] : serviceProducts),
     [showHidden]
   );
 
@@ -107,13 +134,45 @@ export function BookingFunnel() {
   // job posting, not whether they've been put on a PIP.
   const intakeForm = useMemo(() => getIntakeForm(selectedProduct), [selectedProduct]);
 
+  // A picked time only means anything against the calendar it was picked from — switching
+  // services clears it rather than silently carrying a Full Support time onto The Session.
+  function selectService(slug: string) {
+    if (slug !== selected) {
+      setPreferredSlot(null);
+      setSlotCount(null);
+    }
+    setSelected(slug);
+    const product = availableProducts.find((p) => p.slug === slug);
+    if (product) {
+      pushDataLayerEvent({
+        event: "select_tier",
+        tier: product.tier ?? product.slug,
+        product_slug: product.slug,
+        price_aed: product.amountAed,
+        source: "booking_funnel",
+      });
+    }
+  }
+
   function changeCategory(next: ServiceCategory | "all") {
     setCategory(next);
     // Keep the selection valid for the visible set so the summary stays in sync.
     if (next !== "all" && selectedProduct.category !== next) {
       const firstInCategory = availableProducts.find((product) => product.category === next);
-      if (firstInCategory) setSelected(firstInCategory.slug);
+      if (firstInCategory) selectService(firstInCategory.slug);
     }
+  }
+
+  // The time is what gets booked after payment, so it is required whenever there were times to
+  // pick from. Checked in `onSubmit`, before the form action runs: React resets an uncontrolled
+  // form once its action completes, and a missing time must not wipe the intake answers.
+  const needsTime = selectedProduct.needsScheduling && Boolean(slotCount) && !preferredSlot;
+
+  function guardMissingTime(event: React.FormEvent<HTMLFormElement>) {
+    if (!needsTime) return;
+    event.preventDefault();
+    setError("Please choose a day and time in step 2 before paying.");
+    document.getElementById("pick-time")?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   function submit(formData: FormData) {
@@ -128,7 +187,9 @@ export function BookingFunnel() {
       const { concern, urgency, message, details } = splitAnswers(intakeForm, answers);
 
       const payload = {
-        productSlug: selected,
+        // The product on screen, never the raw `selected` state — the two can differ when a slug
+        // isn't in the visible list, and what is charged must be what was shown.
+        productSlug: selectedProduct.slug,
         name: String(formData.get("name") || ""),
         email: String(formData.get("email") || ""),
         phone: String(formData.get("phone") || ""),
@@ -136,6 +197,9 @@ export function BookingFunnel() {
         urgency,
         message,
         details,
+        // Omitted entirely (rather than sent as null) when nothing was picked, matching the API's
+        // optional field. Only sent for scheduled services.
+        ...(preferredSlot && selectedProduct.needsScheduling ? { preferredSlot } : {}),
       };
 
       const response = await fetch("/api/checkout/consultation", {
@@ -143,12 +207,31 @@ export function BookingFunnel() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
-      const data = (await response.json()) as { url?: string; error?: string };
+      const data = (await response.json()) as { url?: string; error?: string; code?: string };
+
+      if (response.status === 409 && data.code === "slot_taken") {
+        // Someone booked that slot between picking and paying: drop it and reload the picker.
+        setPreferredSlot(null);
+        setSlotCount(null);
+        setAvailabilityVersion((version) => version + 1);
+        setError(data.error || "That time was just taken — please pick another.");
+        document.getElementById("pick-time")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        return;
+      }
 
       if (!response.ok || !data.url) {
         setError(data.error || "Checkout could not be started. Please try again.");
         return;
       }
+
+      pushDataLayerEvent({
+        event: "begin_checkout",
+        product_slug: selectedProduct.slug,
+        tier: selectedProduct.tier,
+        value: selectedProduct.amountAed,
+        currency: "AED",
+        had_preferred_slot: Boolean(preferredSlot),
+      });
 
       window.location.assign(data.url);
     });
@@ -206,7 +289,7 @@ export function BookingFunnel() {
                   name="service"
                   value={service.slug}
                   checked={active}
-                  onChange={() => setSelected(service.slug)}
+                  onChange={() => selectService(service.slug)}
                   className="sr-only"
                 />
                 <div className="flex items-start gap-3">
@@ -241,7 +324,43 @@ export function BookingFunnel() {
         </div>
       </section>
 
-      {/* ── Step 2 — private intake ───────────────────────────────── */}
+      {/* ── Step 2 — pick a Dubai-time slot (scheduled services only) ── */}
+      {selectedProduct.needsScheduling && (
+        <section
+          id="pick-time"
+          className="min-w-0 scroll-mt-28 rounded-3xl border-2 border-primary-dark bg-neutral-100 p-5 shadow-pop-sm sm:p-6 md:p-8"
+        >
+          <div className="flex items-start gap-3">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 border-primary-dark bg-violet-tint text-primary-dark">
+              <CalendarClock size={18} strokeWidth={2.5} />
+            </span>
+            <div>
+              <h2 className="text-h3 font-extrabold text-primary-dark">
+                <span className="text-primary-violet">2.</span> Pick a time
+              </h2>
+              <p className="mt-1 text-sm text-neutral-500 sm:text-base">
+                Real openings over the next two weeks. Choose a day, then a time.
+              </p>
+            </div>
+          </div>
+
+          <AvailabilityPreview
+            key={`${selectedProduct.slug}-${availabilityVersion}`}
+            serviceSlug={selectedProduct.slug}
+            variant="full"
+            source="booking_step2"
+            selectedSlot={preferredSlot}
+            onSelectSlot={(iso) => {
+              setPreferredSlot(iso);
+              setError("");
+            }}
+            onAvailabilityChange={setSlotCount}
+            className="mt-5"
+          />
+        </section>
+      )}
+
+      {/* ── Step 2/3 — private intake ─────────────────────────────── */}
       <section className="min-w-0 rounded-3xl border-2 border-primary-dark bg-neutral-100 p-5 shadow-pop-sm sm:p-6 md:p-8">
         <div className="flex items-start gap-3">
           <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-2 border-primary-dark bg-violet-tint text-primary-dark">
@@ -249,12 +368,14 @@ export function BookingFunnel() {
           </span>
           <div>
             <h2 className="text-h3 font-extrabold text-primary-dark">
-              <span className="text-primary-violet">2.</span> Private intake
+              <span className="text-primary-violet">{selectedProduct.needsScheduling ? "3." : "2."}</span> Private intake
             </h2>
             <p className="mt-1 text-sm text-neutral-500 sm:text-base">
-              {selectedProduct.needsScheduling
-                ? "Payment happens first through Stripe. Scheduling unlocks only after a successful payment."
-                : "Payment happens first through Stripe. This service is delivered by email — there is no call to schedule."}
+              {!selectedProduct.needsScheduling
+                ? "Payment happens first through Stripe. This service is delivered by email — there is no call to schedule."
+                : preferredSlot
+                  ? "Complete this intake and pay securely through Stripe — we book the time you picked as soon as payment clears."
+                  : "Payment happens first through Stripe. You'll choose your exact time right after payment."}
             </p>
           </div>
         </div>
@@ -275,7 +396,7 @@ export function BookingFunnel() {
         </div>
 
         {/* Remounted per service so answers to questions that no longer apply are dropped. */}
-        <form key={selectedProduct.slug} action={submit} className="mt-5 grid gap-4">
+        <form key={selectedProduct.slug} action={submit} onSubmit={guardMissingTime} className="mt-5 grid gap-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <label className={labelClass}>
               Name
@@ -304,7 +425,14 @@ export function BookingFunnel() {
             ))}
           </div>
 
-          {error && <p className="rounded-lg bg-red-50 p-4 text-sm font-semibold text-red-700">{error}</p>}
+          {error && (
+            <p
+              role="alert"
+              className="rounded-2xl border-2 border-dashed border-error/30 bg-error/6 p-4 text-sm font-semibold text-primary-dark"
+            >
+              {error}
+            </p>
+          )}
           <button
             type="submit"
             disabled={isPending}
@@ -320,7 +448,7 @@ export function BookingFunnel() {
             {[
               "Stripe handles payment",
               selectedProduct.needsScheduling
-                ? "Scheduling unlocks after payment"
+                ? "Time confirmed after payment"
                 : "Delivered to your inbox",
               "No employer notification",
             ].map((item) => (

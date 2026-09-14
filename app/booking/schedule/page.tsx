@@ -1,5 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import {
+  bookPreferredSlot,
+  recoverCalBooking,
+  waitForCalBooking,
+  type BookPreferredSlotResult,
+} from "@/lib/calBooking";
+import { isSlotStillOpen } from "@/lib/cal";
 import { PaidScheduler } from "@/components/booking/PaidScheduler";
 import { getPaidOrderBySession, markOrderPaidFromSession } from "@/lib/db/repository";
 import { CAL_USERNAME, getCalLink, getServiceProduct } from "@/lib/products";
@@ -68,8 +76,57 @@ export default async function SchedulePage({
     }
   }
 
+  // ADR-0001 Decision C′ — book the picked slot now if the Stripe webhook hasn't already. Outside
+  // any try/catch on purpose: `redirect()` works by throwing.
+  let autoBooking: BookPreferredSlotResult = { status: "skipped" };
+  try {
+    autoBooking = await bookPreferredSlot(order);
+    if (autoBooking.status === "pending") autoBooking = await waitForCalBooking(order.id);
+    // Our record can't say whether a booking exists — ask Cal.com before offering the embed, so
+    // an attempt that landed after all is shown as booked rather than booked a second time.
+    if (autoBooking.status === "pending" || autoBooking.status === "error") {
+      autoBooking = (await recoverCalBooking(order)) ?? autoBooking;
+    }
+  } catch (error) {
+    console.error("[booking/schedule] auto-booking failed", order.id, error);
+    autoBooking = { status: "error" };
+  }
+
+  if (autoBooking.status === "booked") {
+    // Same parameters `PaidScheduler`'s `bookingSuccessfulV2` handler sends, so /booking/done
+    // renders an auto-booked session exactly like one picked in the embed.
+    const params = new URLSearchParams();
+    if (autoBooking.booking.title) params.set("title", autoBooking.booking.title);
+    params.set("startTime", autoBooking.booking.start);
+    if (autoBooking.booking.end) params.set("endTime", autoBooking.booking.end);
+    params.set("uid", autoBooking.booking.uid);
+    params.set("attendeeName", order.customer_name);
+    params.set("email", order.customer_email);
+    redirect(`/booking/done?${params.toString()}`);
+  }
+
+  const notice =
+    autoBooking.status === "unavailable"
+      ? ("slot_taken" as const)
+      : autoBooking.status === "error" || autoBooking.status === "pending"
+        ? ("not_confirmed" as const)
+        : undefined;
+
+  // Only deep-link the embed to the picked slot when it is provably still open. A `pending`
+  // attempt may yet take it, and an `error` may be a booking Cal.com made that we never heard
+  // back about — pointing the client at the same time in either case invites a double booking.
+  let embedSlot = preferredSlot;
+  if (autoBooking.status === "unavailable" || autoBooking.status === "pending") {
+    embedSlot = undefined;
+  } else if (autoBooking.status === "error" && preferredSlot) {
+    const product = getServiceProduct(order.product_slug);
+    const stillOpen = product ? await isSlotStillOpen(product, preferredSlot).catch(() => null) : null;
+    if (stillOpen !== true) embedSlot = undefined;
+  }
+
   return (
     <PaidScheduler
+      notice={notice}
       order={order}
       // The slug as charged, if nothing resolves it — same `product?.name || order.product_slug`
       // fallback the Stripe and Cal webhooks use on historical orders. Never a guessed product.
@@ -78,7 +135,7 @@ export default async function SchedulePage({
       // product `individual-advisory` was replaced by, and the old fallback also carried the
       // wrong Cal.com username (`talkhumanly`; the account is `talk-humanly`).
       calLink={product ? getCalLink(product) : `${CAL_USERNAME}/full-support`}
-      preferredSlot={preferredSlot}
+      preferredSlot={embedSlot}
     />
   );
 }

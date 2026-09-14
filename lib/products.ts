@@ -304,26 +304,45 @@ const withUsdReference = (seed: ServiceProductSeed): ServiceProduct => ({
   amount: usdCentsFromAed(seed.amountAed),
 });
 
-const devSeeds: ServiceProductSeed[] = process.env.NODE_ENV === "development" ? [
+/**
+ * Internal pipeline test product. `hidden`, so it is only listed at `/booking?test=1`, and live
+ * in production on purpose: it exercises the real path — Stripe (AED) → auto-booked Cal.com slot
+ * on the hidden `talk-humanly/test-service` event type → webhook emails — for a charge small
+ * enough to refund. It used to be gated on `NODE_ENV === "development"` at AED 1, which meant
+ * production could never test the scheduled path and the charge sat below Stripe's AED minimum.
+ * Never delete: test orders store this slug.
+ */
+const testSeeds: ServiceProductSeed[] = [
   {
     slug: "test-service",
-    name: "Test Service (Dev Only)",
-    subtitle: "1 AED test service",
-    description: "For testing payments in development mode.",
-    amountAed: 1,
+    name: "Test Service",
+    subtitle: "Internal pipeline test",
+    description: "Internal end-to-end test of payment, booking and email. Not for clients.",
+    amountAed: 5,
     duration: "15 minutes",
     category: "specialist",
-    features: ["Test feature"],
-    forWho: "Developers",
-    needsScheduling: false,
+    features: ["Internal test only"],
+    forWho: "The Humanly team, for pipeline testing.",
+    needsScheduling: true,
     stripePriceEnv: "STRIPE_PRICE_TEST_SERVICE",
     mode: "payment",
     calLinkEnv: "NEXT_PUBLIC_CAL_LINK_TEST_SERVICE",
-  }
-] : [];
+    hidden: true,
+  },
+];
 
-/** Everything currently for sale. This is the list the public UI maps over. */
-export const serviceProducts: ServiceProduct[] = [...seeds, ...devSeeds].map(withUsdReference);
+/**
+ * Everything currently for sale publicly. This is the list the public UI maps over — the home
+ * page strips, `/services` (and its JSON-LD), `llms.txt`, internal links, the Sanity seed — so it
+ * must never carry a hidden product: most of those call sites do not filter on `hidden`.
+ */
+export const serviceProducts: ServiceProduct[] = seeds.map(withUsdReference);
+
+/** Purchasable but unlisted (the internal test product). Only `/booking?test=1` lists these. */
+export const hiddenServiceProducts: ServiceProduct[] = testSeeds.map(withUsdReference);
+
+/** Live catalogue for slug resolution: public + hidden. Never map over this in public UI. */
+const sellableServiceProducts: ServiceProduct[] = [...serviceProducts, ...hiddenServiceProducts];
 
 /**
  * Products withdrawn in the Sept 2026 restructure.
@@ -518,7 +537,7 @@ export function formatUsd(amount: number) {
  */
 export function getServiceProduct(slug: string | null | undefined) {
   if (!slug) return undefined;
-  const live = serviceProducts.find((product) => product.slug === slug);
+  const live = sellableServiceProducts.find((product) => product.slug === slug);
   if (live) return live;
 
   const retired = retiredServiceProducts.find((product) => product.slug === slug);
@@ -536,7 +555,7 @@ export function getServiceProduct(slug: string | null | undefined) {
 export function getSellableServiceProduct(slug: string | null | undefined) {
   if (!slug) return undefined;
   const resolved = LEGACY_SLUG_ALIASES[slug] ?? slug;
-  return serviceProducts.find((product) => product.slug === resolved);
+  return sellableServiceProducts.find((product) => product.slug === resolved);
 }
 
 export function getServicesByCategory(category: ServiceCategory) {

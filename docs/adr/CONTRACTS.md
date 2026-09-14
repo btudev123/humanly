@@ -147,3 +147,19 @@ The ADR's decision history stays as written; Decision B is superseded, not wrong
 
 `proxy.ts`, `next.config.js` and `scripts/seo-check.mjs` remain byte-for-byte untouched, as the
 "Everything not listed here" section above requires.
+
+### Decision C′ — auto-booking (2026-09-14)
+
+| File | Change |
+|---|---|
+| `lib/calBooking.ts` | new — `bookPreferredSlot`, `waitForCalBooking`, `readCalBooking`; the only module that writes to Cal.com |
+| `lib/db/repository.ts` | new `claimOrderCalBooking`, `setOrderCalBooking` (`orders.metadata.calBooking`) |
+| `lib/cal.ts` | `fresh` option, `isSlotStillOpen`; cache 300s → 60s |
+| `app/api/checkout/consultation/route.ts` | `409 { code: "slot_taken" }` when the picked slot is gone |
+| `app/api/webhooks/stripe/route.ts` | calls `bookPreferredSlot` after marking paid; receipt omits the schedule CTA when booked |
+| `app/booking/schedule/page.tsx` | auto-book → `redirect('/booking/done')`, else embed with `notice`. Payment gate untouched |
+| `components/booking/PaidScheduler.tsx` | optional `notice` prop; Dubai-zone date parts |
+| `components/booking/AvailabilityPreview.tsx` | Dubai-only; `full` = day buttons + time dropdown; `onAvailabilityChange` prop |
+| `lib/products.ts` | `serviceProducts` excludes hidden products; new `hiddenServiceProducts` |
+
+`app/api/webhooks/cal/route.ts` is unchanged — the auto-booking reuses its `metadata.orderId` join.

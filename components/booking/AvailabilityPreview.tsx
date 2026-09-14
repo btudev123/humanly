@@ -1,39 +1,42 @@
 "use client";
 
 import { useEffect, useId, useMemo, useState } from "react";
-import { ArrowRight, Check, ChevronDown, CircleAlert, Info } from "lucide-react";
+import { ArrowRight, Check, ChevronDown, CircleAlert, Clock, Info } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { pushDataLayerEvent } from "@/lib/analytics/dataLayer";
 import type { AvailableSlot } from "@/lib/cal";
 import type { AvailabilityApiResponse } from "@/app/api/availability/route";
 
 /**
- * Read-only pre-payment availability preview. Sourced from `/api/availability` (Luke's
- * server-side proxy to Cal.com's Slots API) — this component NEVER imports `@calcom/embed-react`
- * or calls `getCalApi()`. See `docs/adr/0001-pricing-currency-availability-reviews.md` Decision C
- * and `docs/design/2026-09-services-page-spec.md` §5 for why: a second, bookable Cal embed
- * pre-payment would let a visitor complete a real, unpaid booking and could collide with
- * `PaidScheduler.tsx`'s global, unnamespaced `bookingSuccessfulV2` listener.
+ * Pre-payment time picker. Sourced from `/api/availability` (the server-side proxy to Cal.com's
+ * Slots API) — this component NEVER imports `@calcom/embed-react` or calls `getCalApi()`, so a
+ * visitor cannot complete an unpaid booking here and nothing collides with `PaidScheduler.tsx`'s
+ * global `bookingSuccessfulV2` listener.
  *
- * Two density variants (`docs/design/2026-09-services-page-spec.md` §5):
- *  - `compact` — `/services`, one dropdown carrying every slot the API returned, grouped by day
- *    into `<optgroup>`s, committed with an explicit button.
- *  - `full` — `/booking` step 2, grouped by day: columns in a row at `md:` and up (day/date lives
- *    inside each chip, not a separate column header), stacked full-width day sections below `md:`
- *    (day shown once as a section heading, chips drop the day line).
+ * The chosen instant travels to checkout as `preferredSlot`; once Stripe confirms payment,
+ * `lib/calBooking.ts` books exactly that slot through the Cal.com API (ADR-0001 Decision C′).
+ * Nothing is written to Cal.com before payment.
  *
- * Five states: loading, empty, error, populated, overflowing (capped-and-scrolling day column).
- * The distinction between "empty" and "error" is real, not decorative, but it is drawn at the
- * boundary this component can actually observe: `getAvailableSlots` (Luke's `lib/cal.ts`) is
- * deliberately FAIL-CLOSED — a Cal.com outage, an expired API key, and a genuinely empty calendar
- * all produce the same `{ available: false, slots: [] }` response (see ADR-0001 Decision C
- * consequences). This component cannot and does not try to tell those apart; it treats any
- * successful-but-empty response as "empty" (Theo's low-friction copy already covers a real outage
- * gracefully: "pick your tier and continue"). "Error" here means OUR OWN fetch to `/api/availability`
- * failed outright — a network error or non-2xx from this site's own route, not Cal.com's.
+ * DUBAI TIME ONLY. Every label is rendered in `Asia/Dubai`, whatever the visitor's device says.
+ * Karma's working hours and the Cal.com schedule are both in Dubai time, and the owner asked for
+ * a single, unambiguous clock rather than a converted one a visitor has to reconcile. The zone is
+ * stated on screen next to the picker so nobody reads 9:00am as their own local time.
+ *
+ * Two density variants:
+ *  - `compact` — `/services`, one dropdown carrying every slot, grouped by day, committed with an
+ *    explicit button (the button navigates to `/booking`, so it must not fire on arrow keys).
+ *  - `full` — `/booking` step 2: a strip of open days; clicking a day reveals a dropdown of that
+ *    day's free times.
+ *
+ * Five states: loading, empty, error, populated, overflowing (the day strip scrolls sideways).
+ * "Empty" and "error" are drawn where this component can observe them: `getAvailableSlots` is
+ * FAIL-CLOSED, so a Cal.com outage and a genuinely empty calendar both arrive as `slots: []` and
+ * read as "empty". "Error" means this site's own `/api/availability` fetch failed.
  */
 
-const MAX_VISIBLE_PER_DAY = 6;
+/** The one clock the whole booking flow speaks. */
+const DISPLAY_TZ = "Asia/Dubai";
+const DISPLAY_TZ_LABEL = "Dubai time (GST, UTC+4)";
 
 export type AvailabilityPreviewVariant = "compact" | "full";
 
@@ -43,13 +46,15 @@ export type AvailabilityPreviewProps = {
   variant: AvailabilityPreviewVariant;
   /** Analytics-only context for `select_preferred_slot`'s `source` property. */
   source: "services" | "booking_step2";
-  /** Called with the ISO instant when a visitor picks a chip. On `/services` this is expected to
-   *  navigate to `/booking?service=<slug>&slot=<iso>`; inside `BookingFunnel` it just records the
-   *  local preference. Either way, this NEVER creates a Cal.com booking — see the file header. */
+  /** Called with the ISO instant when a visitor picks a time. On `/services` this navigates to
+   *  `/booking?service=<slug>&slot=<iso>`; inside `BookingFunnel` it records the choice that is
+   *  sent to checkout. Either way, this NEVER creates a Cal.com booking. */
   onSelectSlot?: (iso: string) => void;
-  /** The currently-selected ISO instant, if any — controlled so the caller can clear it (e.g. on
-   *  service change) without this component losing sync with what will actually be submitted. */
+  /** The currently-selected ISO instant, if any — controlled so the caller can clear it. */
   selectedSlot?: string | null;
+  /** Reports how many slots loaded (`null` on a failed fetch), so the caller can decide whether
+   *  a time is required before payment. */
+  onAvailabilityChange?: (slotCount: number | null) => void;
   className?: string;
 };
 
@@ -58,117 +63,207 @@ type FetchState =
   | { status: "error" }
   | { status: "loaded"; slots: AvailableSlot[] };
 
+type DayGroup = { key: string; slots: AvailableSlot[] };
 
-
-function dayKey(iso: string, timeZone: string): string {
+function dayKey(iso: string): string {
   return new Intl.DateTimeFormat("en-CA", {
-    timeZone,
+    timeZone: DISPLAY_TZ,
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
   }).format(new Date(iso));
 }
 
-function formatDayLabel(iso: string, timeZone: string): string {
+function formatDayLabel(iso: string): string {
   return new Intl.DateTimeFormat("en-US", {
-    timeZone,
+    timeZone: DISPLAY_TZ,
     weekday: "short",
     day: "numeric",
     month: "short",
   }).format(new Date(iso));
 }
 
-function formatTimeLabel(iso: string, timeZone: string): string {
+function formatLongDayLabel(iso: string): string {
+  return new Intl.DateTimeFormat("en-GB", {
+    timeZone: DISPLAY_TZ,
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  }).format(new Date(iso));
+}
+
+function dayParts(iso: string) {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: DISPLAY_TZ,
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+  }).formatToParts(new Date(iso));
+  const get = (type: Intl.DateTimeFormatPartTypes) => parts.find((part) => part.type === type)?.value ?? "";
+  return { weekday: get("weekday"), day: get("day"), month: get("month") };
+}
+
+function formatTimeLabel(iso: string): string {
   const formatted = new Intl.DateTimeFormat("en-US", {
-    timeZone,
+    timeZone: DISPLAY_TZ,
     hour: "numeric",
     minute: "2-digit",
     hour12: true,
   }).format(new Date(iso));
-  // Intl gives "2:00 PM" — the spec's chip copy is "2:00pm".
-  return formatted.replace(" ", "").toLowerCase();
+  // Intl gives "2:00 PM" (with a narrow no-break space on some engines) — the house style is "2:00pm".
+  return formatted.replace(/\s/g, "").toLowerCase();
 }
 
-function SkeletonChips({ count }: { count: number }) {
+function TimeZoneNote() {
   return (
-    <div className="flex flex-wrap gap-3" aria-hidden="true">
-      {Array.from({ length: count }).map((_, i) => (
-        <div
-          key={i}
-          className="h-[62px] w-[124px] animate-pulse rounded-full border-2 border-transparent bg-neutral-200"
-        />
-      ))}
-    </div>
-  );
-}
-
-function SlotChip({
-  iso,
-  timeZone,
-  showDay,
-  selected,
-  onClick,
-}: {
-  iso: string;
-  timeZone: string;
-  showDay: boolean;
-  selected: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-pressed={selected}
-      className={cn(
-        "flex min-w-[124px] flex-col items-start gap-0.5 rounded-full border-2 px-4 py-2.5 text-left transition-colors",
-        selected
-          ? "border-primary-violet bg-primary-violet text-on-primary"
-          : "border-primary-dark bg-neutral-100 text-primary-dark hover:border-primary-violet hover:bg-violet-tint",
-      )}
-    >
-      {showDay && (
-        <span
-          className={cn(
-            "text-caption font-medium uppercase tracking-wide",
-            selected ? "text-on-primary/70" : "text-neutral-500",
-          )}
-        >
-          {formatDayLabel(iso, timeZone)}
-        </span>
-      )}
-      <span className={cn("text-body-sm font-bold", selected ? "text-on-primary" : "text-primary-dark")}>
-        {formatTimeLabel(iso, timeZone)}
-      </span>
-      {selected ? (
-        <span className="flex items-center gap-1 text-caption font-semibold text-on-primary/85">
-          <Check size={12} strokeWidth={3} /> Selected
-        </span>
-      ) : (
-        <span className="text-caption font-semibold text-primary-violet">Prefer this time →</span>
-      )}
-    </button>
+    <p className="flex items-center gap-2 text-caption font-semibold text-neutral-500">
+      <Clock size={14} strokeWidth={2.5} className="shrink-0 text-primary-violet" aria-hidden="true" />
+      All times are {DISPLAY_TZ_LABEL}
+    </p>
   );
 }
 
 /**
- * The `compact` control. A dropdown rather than the row of chips this used to render: the strip
- * lives inside a narrow card on `/services`, where a chip row wrapped badly and — capped at five
- * — hid most of the week’s real openings behind "See full availability during booking". Every
- * slot the API returned is in here, grouped by day.
+ * The `full` control: open days as buttons, then a dropdown of the chosen day's times.
  *
- * The button is not decoration. A native `<select>` fires `change` on every arrow keypress, so
- * calling `onConfirm` from `onChange` would push a keyboard visitor to `/booking` while they were
- * still scrolling the list. Choosing and committing are two separate acts.
+ * Clicking a day only changes which day's times are listed — it never picks a time on the
+ * visitor's behalf. Picking from the dropdown commits immediately (nothing navigates here, so an
+ * arrow-key `change` is harmless), and the confirmation line underneath stays visible even while
+ * the visitor browses another day, so they always know what will be booked.
+ */
+function DaySlotPicker({
+  groups,
+  selectedSlot,
+  onSelect,
+}: {
+  groups: DayGroup[];
+  selectedSlot?: string | null;
+  onSelect: (iso: string) => void;
+}) {
+  const stripLabelId = useId();
+  const selectId = useId();
+  const [activeDay, setActiveDay] = useState<string | null>(null);
+
+  const offered = useMemo(
+    () => new Set(groups.flatMap((group) => group.slots.map((slot) => slot.start))),
+    [groups],
+  );
+  // A selection only counts if it is still in the list we are showing — slots are refetched and
+  // the caller may clear its choice, so it is reconciled rather than trusted.
+  const liveSelection = selectedSlot && offered.has(selectedSlot) ? selectedSlot : null;
+  const selectedDayKey = liveSelection ? dayKey(liveSelection) : null;
+
+  const activeKey =
+    (activeDay && groups.some((group) => group.key === activeDay) && activeDay) ||
+    selectedDayKey ||
+    groups[0].key;
+  const activeGroup = groups.find((group) => group.key === activeKey) ?? groups[0];
+  const timeValue =
+    liveSelection && activeGroup.slots.some((slot) => slot.start === liveSelection) ? liveSelection : "";
+
+  return (
+    <div className="grid gap-4">
+      <div>
+        <p id={stripLabelId} className="mb-2 text-xs font-bold uppercase tracking-[0.14em] text-neutral-500">
+          Choose a day
+        </p>
+        <div
+          role="group"
+          aria-labelledby={stripLabelId}
+          className="-mx-1 flex snap-x gap-2.5 overflow-x-auto px-1 pb-2"
+        >
+          {groups.map((group) => {
+            const active = group.key === activeKey;
+            const holdsSelection = group.key === selectedDayKey;
+            const { weekday, day, month } = dayParts(group.slots[0].start);
+            return (
+              <button
+                key={group.key}
+                type="button"
+                aria-pressed={active}
+                aria-label={`${formatLongDayLabel(group.slots[0].start)}, ${group.slots.length} times available`}
+                onClick={() => setActiveDay(group.key)}
+                className={cn(
+                  "relative flex w-[84px] shrink-0 snap-start flex-col items-center gap-0.5 rounded-2xl border-2 px-2 py-2.5 transition-colors",
+                  active
+                    ? "border-primary-dark bg-primary-dark text-on-primary"
+                    : "border-primary-dark/20 bg-neutral-100 text-primary-dark hover:border-primary-violet hover:bg-violet-tint",
+                )}
+              >
+                <span className={cn("text-caption font-semibold uppercase tracking-wide", active ? "text-on-primary/75" : "text-neutral-500")}>
+                  {weekday}
+                </span>
+                <span className="text-h4 font-extrabold leading-none">{day}</span>
+                <span className={cn("text-caption font-medium", active ? "text-on-primary/75" : "text-neutral-500")}>
+                  {month}
+                </span>
+                {holdsSelection && (
+                  <span
+                    className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full border-2 border-primary-dark bg-accent-orange text-primary-dark"
+                    aria-hidden="true"
+                  >
+                    <Check size={11} strokeWidth={3.5} />
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div>
+        <label htmlFor={selectId} className="mb-2 block text-xs font-bold uppercase tracking-[0.14em] text-neutral-500">
+          Available times · {formatLongDayLabel(activeGroup.slots[0].start)}
+        </label>
+        <div className="relative">
+          <select
+            // Remounted per day so the placeholder shows again when the listed day has no selection.
+            key={activeGroup.key}
+            id={selectId}
+            value={timeValue}
+            onChange={(event) => event.target.value && onSelect(event.target.value)}
+            className="w-full appearance-none rounded-full border-2 border-primary-dark bg-neutral-100 py-3 pl-5 pr-11 text-body-sm font-bold text-primary-dark outline-none transition-colors hover:border-primary-violet focus-visible:border-primary-violet"
+          >
+            <option value="" disabled>
+              Choose a time ({activeGroup.slots.length} available)
+            </option>
+            {activeGroup.slots.map((slot) => (
+              <option key={slot.start} value={slot.start}>
+                {formatTimeLabel(slot.start)}
+              </option>
+            ))}
+          </select>
+          <ChevronDown
+            size={18}
+            strokeWidth={2.5}
+            aria-hidden="true"
+            className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-primary-dark"
+          />
+        </div>
+      </div>
+
+      {liveSelection && (
+        <p className="flex items-center gap-2 rounded-2xl border-2 border-primary-violet/40 bg-violet-tint/60 px-4 py-3 text-body-sm font-semibold text-primary-dark">
+          <Check size={16} strokeWidth={3} className="shrink-0 text-primary-violet" aria-hidden="true" />
+          Preferred time: {formatLongDayLabel(liveSelection)} at {formatTimeLabel(liveSelection)} (Dubai) —
+          confirmed once you pay.
+        </p>
+      )}
+    </div>
+  );
+}
+
+/**
+ * The `compact` control on `/services`: one dropdown carrying every slot, grouped by day. The
+ * button is not decoration — a native `<select>` fires `change` on every arrow keypress, and this
+ * commit navigates to `/booking`, so choosing and committing are two separate acts.
  */
 function CompactSlotSelect({
   groups,
-  timeZone,
   selectedSlot,
   onConfirm,
 }: {
-  groups: { key: string; slots: AvailableSlot[] }[];
-  timeZone: string;
+  groups: DayGroup[];
   selectedSlot?: string | null;
   onConfirm: (iso: string) => void;
 }) {
@@ -181,10 +276,6 @@ function CompactSlotSelect({
   );
   const firstSlot = groups[0]?.slots[0]?.start ?? "";
 
-  // Both `pending` and the controlled `selectedSlot` can outlive the list they point into — the
-  // slots are refetched on every (service, time zone) change, and the caller may clear its
-  // selection — so the rendered value is reconciled against what is actually offered right now
-  // rather than trusted. Falls back to the soonest opening, never to an empty control.
   const value =
     (pending && offered.has(pending) && pending) ||
     (selectedSlot && offered.has(selectedSlot) && selectedSlot) ||
@@ -193,7 +284,7 @@ function CompactSlotSelect({
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
       <label htmlFor={selectId} className="sr-only">
-        Preferred time
+        Preferred time (Dubai time)
       </label>
       <div className="relative min-w-0 flex-1">
         <select
@@ -203,13 +294,12 @@ function CompactSlotSelect({
           className="w-full appearance-none rounded-full border-2 border-primary-dark bg-neutral-100 py-3 pl-5 pr-11 text-body-sm font-bold text-primary-dark outline-none transition-colors hover:border-primary-violet focus-visible:border-primary-violet"
         >
           {groups.map((group) => (
-            <optgroup key={group.key} label={formatDayLabel(group.slots[0].start, timeZone)}>
+            <optgroup key={group.key} label={formatDayLabel(group.slots[0].start)}>
               {group.slots.map((slot) => (
-                // The day is repeated inside the option on purpose: a collapsed `<select>` shows
-                // the option label alone, never its `<optgroup>`, so a bare "3:30pm" would leave
-                // the visitor unable to see which day they had picked.
+                // The day is repeated inside the option: a collapsed `<select>` shows the option
+                // label alone, never its `<optgroup>`.
                 <option key={slot.start} value={slot.start}>
-                  {formatDayLabel(slot.start, timeZone)} — {formatTimeLabel(slot.start, timeZone)}
+                  {formatDayLabel(slot.start)} — {formatTimeLabel(slot.start)}
                 </option>
               ))}
             </optgroup>
@@ -234,7 +324,7 @@ function CompactSlotSelect({
           </>
         ) : (
           <>
-            Prefer this time <ArrowRight size={16} strokeWidth={2.5} aria-hidden="true" />
+            Choose this time <ArrowRight size={16} strokeWidth={2.5} aria-hidden="true" />
           </>
         )}
       </button>
@@ -248,17 +338,16 @@ export function AvailabilityPreview({
   source,
   onSelectSlot,
   selectedSlot,
+  onAvailabilityChange,
   className,
 }: AvailabilityPreviewProps) {
-  const resolvedTimeZone = "Asia/Dubai";
   const [state, setState] = useState<FetchState>({ status: "loading" });
-  const [expandedDays, setExpandedDays] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     let cancelled = false;
     setState({ status: "loading" });
 
-    fetch(`/api/availability?service=${encodeURIComponent(serviceSlug)}&tz=${encodeURIComponent(resolvedTimeZone)}`)
+    fetch(`/api/availability?service=${encodeURIComponent(serviceSlug)}&tz=${encodeURIComponent(DISPLAY_TZ)}`)
       .then((res) => {
         if (!res.ok) throw new Error(`availability fetch failed: ${res.status}`);
         return res.json() as Promise<AvailabilityApiResponse>;
@@ -266,6 +355,7 @@ export function AvailabilityPreview({
       .then((body) => {
         if (cancelled) return;
         setState({ status: "loaded", slots: body.slots });
+        onAvailabilityChange?.(body.slots.length);
         pushDataLayerEvent({
           event: "view_availability",
           product_slug: serviceSlug,
@@ -273,25 +363,30 @@ export function AvailabilityPreview({
         });
       })
       .catch(() => {
-        if (!cancelled) setState({ status: "error" });
+        if (cancelled) return;
+        setState({ status: "error" });
+        onAvailabilityChange?.(null);
       });
 
     return () => {
       cancelled = true;
     };
-  }, [serviceSlug, resolvedTimeZone]);
+    // `onAvailabilityChange` is deliberately not a dependency: an inline callback from the parent
+    // would otherwise refetch on every parent render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [serviceSlug]);
 
-  const groupedByDay = useMemo(() => {
+  const groupedByDay = useMemo<DayGroup[]>(() => {
     if (state.status !== "loaded") return [];
     const groups = new Map<string, AvailableSlot[]>();
     for (const slot of state.slots) {
-      const key = dayKey(slot.start, resolvedTimeZone);
+      const key = dayKey(slot.start);
       const bucket = groups.get(key);
       if (bucket) bucket.push(slot);
       else groups.set(key, [slot]);
     }
     return Array.from(groups.entries()).map(([key, slots]) => ({ key, slots }));
-  }, [state, resolvedTimeZone]);
+  }, [state]);
 
   function selectSlot(iso: string) {
     onSelectSlot?.(iso);
@@ -303,33 +398,17 @@ export function AvailabilityPreview({
     });
   }
 
-  function toggleExpanded(key: string) {
-    setExpandedDays((prev) => {
-      const next = new Set(prev);
-      if (next.has(key)) next.delete(key);
-      else next.add(key);
-      return next;
-    });
-  }
-
-  const disclaimer = (
-    <p className="mt-4 flex items-start gap-2.5 text-body-sm text-neutral-500">
-      <Info size={16} strokeWidth={2.5} className="mt-0.5 shrink-0 text-primary-violet" aria-hidden="true" />
-      This is a preference, not a booking — we confirm your exact time after payment, on the next
-      screen.
-    </p>
-  );
-
   return (
     <div className={className}>
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <span className="sr-only" role="status" aria-live="polite">
           {state.status === "loading"
             ? "Loading available times…"
             : state.status === "loaded"
-              ? `${state.slots.length} available times loaded.`
+              ? `${state.slots.length} available times loaded, shown in Dubai time.`
               : ""}
         </span>
+        <TimeZoneNote />
       </div>
 
       {state.status === "loading" &&
@@ -339,15 +418,22 @@ export function AvailabilityPreview({
             aria-hidden="true"
           />
         ) : (
-          <SkeletonChips count={6} />
+          <div className="grid gap-4" aria-hidden="true">
+            <div className="flex gap-2.5 overflow-hidden">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="h-[84px] w-[84px] shrink-0 animate-pulse rounded-2xl bg-neutral-200" />
+              ))}
+            </div>
+            <div className="h-[50px] w-full animate-pulse rounded-full bg-neutral-200" />
+          </div>
         ))}
 
       {state.status === "error" && (
         <div className="flex items-start gap-3 rounded-2xl border-2 border-dashed border-error/30 bg-error/6 p-6 text-body-sm text-primary-dark">
           <CircleAlert size={20} className="mt-0.5 shrink-0 text-error" aria-hidden="true" />
           <p>
-            Couldn&apos;t load live availability right now. You can still book — we&apos;ll confirm
-            your exact time after payment.
+            Couldn&apos;t load live availability right now. You can still book — you&apos;ll choose
+            your exact time straight after payment.
           </p>
         </div>
       )}
@@ -364,99 +450,31 @@ export function AvailabilityPreview({
 
       {state.status === "loaded" && state.slots.length > 0 && variant === "compact" && (
         <CompactSlotSelect
-          // Remounted per (service, zone) so the internal pending value can never survive into a
-          // list it does not belong to; the reconciliation inside covers the rest.
-          key={`${serviceSlug}-${resolvedTimeZone}`}
+          // Remounted per service so the internal pending value never survives into another list.
+          key={serviceSlug}
           groups={groupedByDay}
-          timeZone={resolvedTimeZone}
           selectedSlot={selectedSlot}
           onConfirm={selectSlot}
         />
       )}
 
       {state.status === "loaded" && state.slots.length > 0 && variant === "full" && (
-        <>
-          {/* Desktop: day columns in a row, day/date lives inside each chip. */}
-          <div
-            className="hidden gap-4 md:grid"
-            style={{ gridTemplateColumns: `repeat(auto-fit, minmax(140px, 1fr))` }}
-          >
-            {groupedByDay.map(({ key, slots }) => {
-              const expanded = expandedDays.has(key);
-              const visible = expanded ? slots : slots.slice(0, MAX_VISIBLE_PER_DAY);
-              const hiddenCount = slots.length - visible.length;
-              return (
-                <div
-                  key={key}
-                  className={cn(
-                    "flex flex-col gap-2",
-                    expanded && "max-h-56 overflow-y-auto pr-1",
-                  )}
-                >
-                  {visible.map((slot) => (
-                    <SlotChip
-                      key={slot.start}
-                      iso={slot.start}
-                      timeZone={resolvedTimeZone}
-                      showDay
-                      selected={selectedSlot === slot.start}
-                      onClick={() => selectSlot(slot.start)}
-                    />
-                  ))}
-                  {hiddenCount > 0 && (
-                    <button
-                      type="button"
-                      onClick={() => toggleExpanded(key)}
-                      className="rounded-full border-2 border-dashed border-neutral-300 px-4 py-2.5 text-body-sm font-semibold text-neutral-500 hover:border-primary-violet hover:text-primary-violet"
-                    >
-                      +{hiddenCount} more
-                    </button>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Mobile: day sections stacked full-width, chips drop the day line. */}
-          <div className="grid gap-6 md:hidden">
-            {groupedByDay.map(({ key, slots }) => {
-              const expanded = expandedDays.has(key);
-              const visible = expanded ? slots : slots.slice(0, MAX_VISIBLE_PER_DAY);
-              const hiddenCount = slots.length - visible.length;
-              return (
-                <section key={key}>
-                  <h3 className="mb-2 text-caption font-bold uppercase tracking-wide text-neutral-500">
-                    {formatDayLabel(slots[0].start, resolvedTimeZone)}
-                  </h3>
-                  <div className={cn("flex flex-wrap gap-2.5", expanded && "max-h-56 overflow-y-auto pr-1")}>
-                    {visible.map((slot) => (
-                      <SlotChip
-                        key={slot.start}
-                        iso={slot.start}
-                        timeZone={resolvedTimeZone}
-                        showDay={false}
-                        selected={selectedSlot === slot.start}
-                        onClick={() => selectSlot(slot.start)}
-                      />
-                    ))}
-                    {hiddenCount > 0 && (
-                      <button
-                        type="button"
-                        onClick={() => toggleExpanded(key)}
-                        className="rounded-full border-2 border-dashed border-neutral-300 px-4 py-2.5 text-body-sm font-semibold text-neutral-500 hover:border-primary-violet hover:text-primary-violet"
-                      >
-                        +{hiddenCount} more
-                      </button>
-                    )}
-                  </div>
-                </section>
-              );
-            })}
-          </div>
-        </>
+        <DaySlotPicker
+          key={serviceSlug}
+          groups={groupedByDay}
+          selectedSlot={selectedSlot}
+          onSelect={selectSlot}
+        />
       )}
 
-      {disclaimer}
+      {state.status !== "error" && (
+        <p className="mt-4 flex items-start gap-2.5 text-body-sm text-neutral-500">
+          <Info size={16} strokeWidth={2.5} className="mt-0.5 shrink-0 text-primary-violet" aria-hidden="true" />
+          {variant === "full"
+            ? "We book this time for you as soon as payment clears. If someone takes it first, you'll choose another straight after payment."
+            : "Pick a time here and we'll book it for you once payment clears."}
+        </p>
+      )}
     </div>
   );
 }

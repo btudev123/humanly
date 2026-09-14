@@ -10,6 +10,7 @@ export function PaidScheduler({
   productName,
   calLink,
   preferredSlot,
+  notice,
 }: {
   order: {
     id: string;
@@ -42,17 +43,23 @@ export function PaidScheduler({
    * `undefined` when no preference was set; that's the unchanged, always-accurate default copy.
    */
   preferredSlot?: string;
+  /**
+   * Why the embed is showing even though the visitor picked a time before paying — the
+   * auto-booking in `lib/calBooking.ts` did not go through (ADR-0001 Decision C′).
+   * `slot_taken`: Cal.com refused the slot. `not_confirmed`: anything else.
+   */
+  notice?: "slot_taken" | "not_confirmed";
 }) {
   const router = useRouter();
 
-  // Three copy states per docs/copy/2026-09-services-and-booking-copy.md §C. Whether the
-  // preferred slot is "still open" can't be verified client-side without re-querying Cal — the
-  // embed itself is the source of truth for that, so this only distinguishes "none was set" from
-  // "one was set," and always uses the safe, non-committal variant for the latter rather than
-  // claiming the slot is confirmed available.
-  const heading = preferredSlot
-    ? "Payment confirmed. Your preferred time is highlighted below."
-    : "Payment confirmed. Choose your time.";
+  const heading =
+    notice === "slot_taken"
+      ? "Payment confirmed. That time was just taken — please choose another below."
+      : notice === "not_confirmed"
+        ? "Payment confirmed. We couldn't lock in your time automatically — please choose it below."
+        : preferredSlot
+          ? "Payment confirmed. Your preferred time is highlighted below."
+          : "Payment confirmed. Choose your time.";
 
   /**
    * Cal.com's Booker reads exactly three query params — `month` (`YYYY-MM`), `date`
@@ -60,19 +67,25 @@ export function PaidScheduler({
    * URL (which is how `metadata[orderId]` already works). Deep-linking the preference is
    * therefore config-only: no second embed, no second `getCalApi()` handler.
    *
-   * The parts are derived here, in the browser, on purpose: the embed renders the calendar in
-   * the visitor's own timezone, so splitting the ISO instant server-side (UTC) would land a
-   * late-evening Dubai slot on the wrong day. Nothing below is rendered into the server HTML,
-   * so computing it during hydration is safe.
+   * The date parts are taken in Asia/Dubai, not the browser's zone: the booking flow speaks Dubai
+   * time only (the picker, the Cal.com schedule, the auto-booking), and the old
+   * `getFullYear()`/`getDate()` split used the visitor's device zone, which put an early-morning
+   * Dubai slot on the previous day for anyone west of UTC.
    */
   const preferredConfig = useMemo(() => {
     if (!preferredSlot) return null;
     const parsed = new Date(preferredSlot);
     if (Number.isNaN(parsed.getTime())) return null;
 
-    const year = parsed.getFullYear();
-    const month = String(parsed.getMonth() + 1).padStart(2, "0");
-    const day = String(parsed.getDate()).padStart(2, "0");
+    // en-CA formats as YYYY-MM-DD.
+    const [year, month, day] = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Asia/Dubai",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    })
+      .format(parsed)
+      .split("-");
 
     // A preference, never a hold — the slot can be gone by now, in which case Cal's own UI
     // handles it exactly as it handles any unavailable selection.

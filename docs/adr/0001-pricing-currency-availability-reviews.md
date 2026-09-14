@@ -835,10 +835,44 @@ V2 is unchanged and still open as an **owner action** — the three missing core
 have not been created. `getCalLink()` now logs a `console.warn` (once per env var, server-side)
 whenever it takes the fallback, so this is visible in production logs rather than silent.
 
+## Decision C′ — The pre-payment pick is auto-booked after payment (2026-09-14)
+
+**Supersedes** Decision C's "a preference, never a hold" for the *post-payment* half only. The
+pre-payment half stands: nothing is written to Cal.com before Stripe confirms payment.
+
+**Why.** The owner asked for one pick, in Dubai time, that is actually booked — not a picked time
+the client then has to click again in an embed that renders in their device's zone. Decision C's
+objection was an *unpaid* booking; a booking made only once the order is `paid` doesn't carry it.
+
+**What.**
+- `/booking` step 2 shows open days as buttons and the selected day's times in a dropdown, in
+  `Asia/Dubai` only — no visitor timezone control (`components/booking/AvailabilityPreview.tsx`).
+  A time is required when slots loaded; when Cal.com returns nothing (fail-closed), checkout still
+  proceeds and the embed covers scheduling.
+- Checkout re-checks the slot uncached (`isSlotStillOpen` in `lib/cal.ts`) and returns `409
+  slot_taken` before any order or Stripe session exists. The preview cache drops 300s → 60s.
+- `lib/calBooking.ts` `bookPreferredSlot(order)` books the slot via `POST /v2/bookings` with
+  `metadata.orderId`, so the unchanged Cal webhook joins it, records it and sends the emails. Called
+  from the Stripe webhook (so it happens even if the tab closes) and `/booking/schedule` (covers the
+  webhook race).
+- **Idempotency**: `claimOrderCalBooking` is a conditional UPDATE on `orders.metadata.calBooking`;
+  only the claimer calls Cal.com. States `pending` → `booked` | `failed(unavailable|error)`; a
+  `pending` older than 2 minutes is treated as failed.
+- **Fallback**: `unavailable`/`error` renders the paid embed with a notice. A paying client always
+  has a way to book.
+
+**Consequences.**
+- A slot can still be taken in the seconds between the checkout re-check and payment; that client
+  lands on the embed with "That time was just taken". Accepted: it is rare and self-service.
+- A crashed attempt whose Cal.com call *did* succeed but whose write-back didn't would, after the
+  stale window, show the embed to a client who is already booked. Their Cal.com confirmation email
+  still arrives; a second booking would be visible to Karma. Accepted at current volume.
+- The Cal.com webhook must point at the apex. `www` 308s, and Cal.com does not follow redirects.
+
 ## `[NEEDS DATA]`
 
-- Booking volume/concurrency, to size `getAvailableSlots`'s 300s cache TTL against real traffic
-  (Decision C).
+- Booking volume/concurrency, to size `getAvailableSlots`'s cache TTL (60s since Decision C′)
+  against real traffic.
 - Confirmation of whether any live `orders` row actually references the five slugs being retired
   (Decision A) — informs whether the archive is precautionary or immediately load-bearing.
   Still open: the `select product_slug, status, count(*) from orders group by 1,2` needed to

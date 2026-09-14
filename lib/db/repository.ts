@@ -194,6 +194,43 @@ export async function getOrderById(orderId: string) {
   return rows[0] || null;
 }
 
+/**
+ * Claim the right to auto-book this order's preferred slot in Cal.com (ADR-0001 Decision C′).
+ *
+ * Two paths race to book the same paid order — the Stripe webhook and `/booking/schedule` — and
+ * a visitor can reload the schedule page. This single conditional UPDATE is the lock: only the
+ * caller that flips `metadata.calBooking` from absent to `pending` gets `true` and may call Cal.
+ * Everyone else reads the state back instead of booking a second time.
+ */
+export async function claimOrderCalBooking(orderId: string): Promise<boolean> {
+  const sql = getSql();
+  const rows = (await sql`
+    update orders
+    set
+      metadata = metadata || jsonb_build_object(
+        'calBooking', jsonb_build_object('state', 'pending', 'at', now())
+      ),
+      updated_at = now()
+    where id = ${orderId}::uuid
+      and not (metadata ? 'calBooking')
+    returning id
+  `) as { id: string }[];
+
+  return rows.length > 0;
+}
+
+/** Write the outcome of an auto-booking attempt to `orders.metadata.calBooking`. */
+export async function setOrderCalBooking(orderId: string, calBooking: Record<string, unknown>) {
+  const sql = getSql();
+  await sql`
+    update orders
+    set
+      metadata = metadata || jsonb_build_object('calBooking', ${JSON.stringify(calBooking)}::jsonb),
+      updated_at = now()
+    where id = ${orderId}::uuid
+  `;
+}
+
 export async function getPaidResourceOrder(sessionId: string, resourceSlug?: string | null) {
   const order = await getPaidOrderBySession(sessionId);
   if (!order || order.kind !== "resource") return null;

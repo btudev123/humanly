@@ -7,6 +7,7 @@ import { recordFunnelEvent } from "@/lib/analytics/funnel";
 import { sendLeadNotification } from "@/lib/email/resend";
 import { absoluteUrl } from "@/lib/site";
 import { getStripe, hasStripe } from "@/lib/stripe";
+import { isSlotStillOpen } from "@/lib/cal";
 
 export const runtime = "nodejs";
 
@@ -78,6 +79,19 @@ export async function POST(request: Request) {
     const parsed = new Date(body.preferredSlot);
     if (!Number.isNaN(parsed.getTime()) && parsed.getTime() > Date.now()) {
       preferredSlot = parsed.toISOString();
+    }
+  }
+
+  // The picked slot is booked for real once payment clears (ADR-0001 Decision C′), so re-check it
+  // against Cal.com uncached before taking money for it. `null` means Cal.com gave no answer — an
+  // outage is not proof the slot is taken, so checkout proceeds and the paid embed is the fallback.
+  if (preferredSlot && product.needsScheduling) {
+    const stillOpen = await isSlotStillOpen(product, preferredSlot);
+    if (stillOpen === false) {
+      return Response.json(
+        { error: "That time was just taken — please pick another.", code: "slot_taken" },
+        { status: 409 },
+      );
     }
   }
 

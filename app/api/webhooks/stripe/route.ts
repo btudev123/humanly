@@ -10,6 +10,7 @@ import { getInvoiceForSession, getStripe } from "@/lib/stripe";
 import { formatUsd, formatAed, getServiceProduct } from "@/lib/products";
 import { absoluteUrl } from "@/lib/site";
 import { recordFunnelEvent } from "@/lib/analytics/funnel";
+import { bookPreferredSlot } from "@/lib/calBooking";
 
 function metaStr(meta: Record<string, unknown> | null | undefined, key: string) {
   const value = meta?.[key];
@@ -25,7 +26,10 @@ function metaStr(meta: Record<string, unknown> | null | undefined, key: string) 
  */
 async function sendConsultationReceipt(
   order: OrderRecord | undefined | null,
-  session: Stripe.Checkout.Session
+  session: Stripe.Checkout.Session,
+  /** True when the picked slot was already booked — the receipt then has no "Choose your time"
+   *  button; Cal.com's `BOOKING_CREATED` webhook sends the booking confirmation instead. */
+  alreadyBooked = false
 ) {
   if (!order || order.kind !== "consultation") return;
 
@@ -40,7 +44,7 @@ async function sendConsultationReceipt(
       name: order.customer_name,
       service: product?.name || order.product_slug,
       priceFormatted,
-      scheduleUrl: product?.needsScheduling
+      scheduleUrl: product?.needsScheduling && !alreadyBooked
         ? absoluteUrl(`/booking/schedule?session_id=${encodeURIComponent(session.id)}`)
         : null,
       invoiceUrl: order.stripe_invoice_url,
@@ -103,6 +107,22 @@ async function notifyPaidConsultationLead(order: OrderRecord | undefined | null)
   }
 }
 
+/**
+ * Book the Dubai-time slot the client picked before paying (ADR-0001 Decision C′). Done here, not
+ * only on `/booking/schedule`, so the slot is taken even if the client closes the tab after
+ * Stripe. Idempotent — the schedule page may race this and only one of them books. Cal.com's own
+ * `BOOKING_CREATED` webhook then sends the confirmation and lead emails. Best-effort: a failure
+ * leaves the paid embed on `/booking/schedule` as the fallback.
+ */
+async function autoBookPreferredSlot(order: OrderRecord | undefined | null): Promise<boolean> {
+  try {
+    return (await bookPreferredSlot(order)).status === "booked";
+  } catch (error) {
+    console.error("[webhooks/stripe] auto-booking failed", order?.id, error);
+    return false;
+  }
+}
+
 export const runtime = "nodejs";
 
 async function deliverResourceIfNeeded(
@@ -162,8 +182,9 @@ export async function POST(request: Request) {
         const invoice = await getInvoiceForSession(session);
         const order = await markOrderPaidFromSession(session, invoice);
         await recordCheckoutPaid(order);
+        const booked = await autoBookPreferredSlot(order);
         await deliverResourceIfNeeded(order, session, invoice);
-        await sendConsultationReceipt(order, session);
+        await sendConsultationReceipt(order, session, booked);
         await notifyPaidConsultationLead(order);
       }
       break;
@@ -173,8 +194,9 @@ export async function POST(request: Request) {
       const invoice = await getInvoiceForSession(session);
       const order = await markOrderPaidFromSession(session, invoice);
       await recordCheckoutPaid(order);
+      const booked = await autoBookPreferredSlot(order);
       await deliverResourceIfNeeded(order, session, invoice);
-      await sendConsultationReceipt(order, session);
+      await sendConsultationReceipt(order, session, booked);
       await notifyPaidConsultationLead(order);
       break;
     }
