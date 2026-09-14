@@ -12,9 +12,12 @@ export default function Privacy() {
         <header className="relative mb-14 text-center">
           <div className="dot-grid pointer-events-none absolute inset-0 -z-10 opacity-50" />
           <Scribble variant="spiral" color="#9d5cff" className="absolute right-10 top-0 hidden h-16 w-16 opacity-40 md:block" />
-          <span className="inline-flex items-center gap-2 rounded-full border-2 border-primary-dark bg-neutral-100 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-primary-dark shadow-pop-sm">
-            <ShieldCheck size={13} className="text-primary-violet" /> Data first. Humans always.
-          </span>
+          {/* Block wrapper: otherwise this pill and the `inline-block` h1 share a line on wide screens. */}
+          <div>
+            <span className="inline-flex items-center gap-2 rounded-full border-2 border-primary-dark bg-neutral-100 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-primary-dark shadow-pop-sm">
+              <ShieldCheck size={13} className="text-primary-violet" /> Data first. Humans always.
+            </span>
+          </div>
           <h1 className="text-h1 mt-6 inline-block font-display font-extrabold tracking-tight text-primary-dark">
             Privacy{" "}
             <span className="relative inline-block">

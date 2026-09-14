@@ -255,17 +255,17 @@ export function HomeContent({
             </Reveal>
 
             <Reveal delay={0.15}>
-              <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+              <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                 <Link
                   href="/booking"
-                  className="btn-pop inline-flex items-center justify-center gap-2 rounded-full border-2 border-primary-dark bg-accent-orange px-7 py-4 text-[15px] font-bold text-primary-dark shadow-pop"
+                  className="btn-pop inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full border-2 border-primary-dark bg-accent-orange px-7 py-4 text-[15px] font-bold text-primary-dark shadow-pop"
                 >
                   <CalendarCheck size={18} strokeWidth={2.5} />
                   Book a Confidential Session
                 </Link>
                 <Link
                   href="/services"
-                  className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-primary-dark bg-neutral-100 px-7 py-4 text-[15px] font-bold text-primary-dark transition-colors hover:bg-violet-tint"
+                  className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full border-2 border-primary-dark bg-neutral-100 px-7 py-4 text-[15px] font-bold text-primary-dark transition-colors hover:bg-violet-tint"
                 >
                   View Services
                   <ArrowRight size={18} strokeWidth={2.5} />
@@ -290,20 +290,23 @@ export function HomeContent({
             </Reveal>
           </div>
 
-          {/* Right — sticker card cluster */}
-          <div className="relative min-h-[460px] md:min-h-[540px]">
+          {/* Right — sticker card cluster. Below `sm:` all three cards render static in normal
+              flow (full width, stacked) so the floating "Confidentiality Promise" / "60 min"
+              cards don't cover rows of the "Private Case Room" card on a phone; at `sm:` and up
+              they return to the original absolute-positioned, rotated cluster. */}
+          <div className="relative sm:min-h-[460px] md:min-h-[540px]">
             <motion.div
               initial={{ opacity: 0, scale: 0.96, rotate: -3 }}
               animate={{ opacity: 1, scale: 1, rotate: -2 }}
               transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-              className="absolute inset-x-0 top-0 mx-auto max-w-[440px] rotate-[-2deg] rounded-[2rem] border-2 border-primary-dark bg-primary-dark p-6 text-on-primary shadow-pop-orange"
+              className="relative mx-auto max-w-[440px] rotate-[-2deg] rounded-[2rem] border-2 border-primary-dark bg-primary-dark p-6 text-on-primary shadow-pop-orange sm:absolute sm:inset-x-0 sm:top-0"
             >
-              <div className="flex items-center justify-between">
-                <div>
+              <div className="flex items-center justify-between gap-3">
+                <div className="min-w-0">
                   <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-on-primary/50">Private Case Room</p>
                   <h2 className="text-h3 mt-1.5 font-display font-bold text-on-primary">Workplace Strategy</h2>
                 </div>
-                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-400/15 px-3 py-1 text-[11px] font-bold text-emerald-300">
+                <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-emerald-400/15 px-3 py-1 text-[11px] font-bold text-emerald-300">
                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" /> Encrypted
                 </span>
               </div>
@@ -324,7 +327,7 @@ export function HomeContent({
             <motion.div
               animate={{ y: [0, 14, 0] }}
               transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute -left-2 bottom-20 w-[240px] rotate-[3deg] rounded-3xl border-2 border-primary-dark bg-neutral-100 p-5 shadow-pop-sm"
+              className="relative mt-4 w-full rotate-[3deg] rounded-3xl border-2 border-primary-dark bg-neutral-100 p-5 shadow-pop-sm sm:absolute sm:-left-2 sm:bottom-20 sm:mt-0 sm:w-[240px]"
             >
               <div className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-primary-dark bg-violet-tint text-primary-violet">
                 <ShieldCheck size={22} />
@@ -336,7 +339,7 @@ export function HomeContent({
             <motion.div
               animate={{ y: [0, -12, 0] }}
               transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute -right-1 bottom-0 w-[210px] rotate-[-4deg] rounded-3xl border-2 border-primary-dark bg-accent-orange p-5 text-primary-dark shadow-pop-sm"
+              className="relative mt-4 w-full rotate-[-4deg] rounded-3xl border-2 border-primary-dark bg-accent-orange p-5 text-primary-dark shadow-pop-sm sm:absolute sm:-right-1 sm:bottom-0 sm:mt-0 sm:w-[210px]"
             >
               <Sparkles size={22} strokeWidth={2.5} />
               <p className="mt-3 font-display text-4xl font-extrabold leading-none">60 min</p>
@@ -350,14 +353,32 @@ export function HomeContent({
 
       {/* ============================ MARQUEE ============================ */}
       <section className="border-y-2 border-primary-dark bg-primary-violet py-4 text-neutral-100">
+        {/*
+          `.marquee` animates `translateX(0 → -50%)` (app/globals.css), so it needs exactly two
+          identical halves for the loop to be seamless — the -50% frame must look pixel-identical
+          to the 0% frame. One pass of `marqueeItems` is only ~2,280px, narrower than the widest
+          viewport (2560px), so at 2-halves the container's trailing edge scrolled into view
+          before the loop wrapped, showing an empty band. Fix: each half now renders the item
+          list *twice* back to back (~4,560px per half, over the 2560px ceiling), so there's
+          always content to the edge of the viewport — while the outer structure is still exactly
+          two identical halves, so -50% still lands on an identical frame.
+        */}
         <div className="marquee gap-0">
-          {[0, 1].map((dup) => (
-            <div key={dup} className="flex items-center gap-8 pr-8" aria-hidden={dup === 1}>
-              {marqueeItems.map((item) => (
-                <span key={item} className="flex items-center gap-8 text-sm font-bold uppercase tracking-[0.18em] whitespace-nowrap">
-                  {item}
-                  <Scribble variant="star-fill" color="#ff9a4d" className="h-4 w-4" />
-                </span>
+          {[0, 1].map((half) => (
+            <div key={half} className="flex items-center">
+              {[0, 1].map((rep) => (
+                <div
+                  key={rep}
+                  className="flex items-center gap-8 pr-8"
+                  aria-hidden={!(half === 0 && rep === 0)}
+                >
+                  {marqueeItems.map((item) => (
+                    <span key={item} className="flex items-center gap-8 text-sm font-bold uppercase tracking-[0.18em] whitespace-nowrap">
+                      {item}
+                      <Scribble variant="star-fill" color="#ff9a4d" className="h-4 w-4" />
+                    </span>
+                  ))}
+                </div>
               ))}
             </div>
           ))}
@@ -366,7 +387,7 @@ export function HomeContent({
 
       {/* ============================ STATS ============================ */}
       <section className="px-margin-mobile py-16 md:px-margin-desktop md:py-20">
-        <div className="mx-auto grid max-w-max-width gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mx-auto grid max-w-max-width gap-5 sm:grid-cols-2 xl:grid-cols-4">
           {stats.map((stat, i) => (
             <Reveal key={stat.label} delay={i * 0.06}>
               <div className="h-full rounded-3xl border-2 border-primary-dark bg-neutral-100 p-6 transition-transform hover:-translate-y-1">
@@ -383,7 +404,11 @@ export function HomeContent({
       <section className="px-margin-mobile py-16 md:px-margin-desktop md:py-24">
         <div className="mx-auto max-w-max-width">
           <Reveal className="relative mx-auto mb-16 max-w-2xl text-center">
-            <Eyebrow color="violet">The Gap</Eyebrow>
+            {/* Wrapped so the pill and the `inline-block` heading below it don't share a line
+                at `xl:`+, where the centered column is wide enough for both. */}
+            <div>
+              <Eyebrow color="violet">The Gap</Eyebrow>
+            </div>
             <h2 className="text-h2 relative mt-6 inline-block font-display font-extrabold tracking-tight text-primary-dark">
               Caught in the{" "}
               <span className="relative inline-block">
@@ -497,7 +522,11 @@ export function HomeContent({
       <section id="services" className="px-margin-mobile py-16 md:px-margin-desktop md:py-24">
         <div className="mx-auto max-w-max-width">
           <Reveal className="relative mx-auto mb-16 max-w-2xl text-center">
-            <Eyebrow color="violet">Pricing</Eyebrow>
+            {/* Same fix as "The Gap" above — the pill needs its own line so it doesn't collide
+                with the inline-block heading at `xl:`+. */}
+            <div>
+              <Eyebrow color="violet">Pricing</Eyebrow>
+            </div>
             <h2 className="text-h2 relative mt-6 inline-block font-display font-extrabold tracking-tight text-primary-dark">
               A confidential reality check
               <Scribble variant="underline" color="#ff6a1a" strokeWidth={4} className="absolute -bottom-3 left-0 h-3.5 w-full" />
@@ -555,7 +584,7 @@ export function HomeContent({
               <p className="mb-2 text-xs font-bold uppercase tracking-[0.16em] text-primary-violet">Monthly Retainers</p>
               <div className="mb-8 h-0.5 w-16 bg-accent-orange" />
             </Reveal>
-            <div className="grid gap-5 md:grid-cols-3">
+            <div className="grid gap-5 lg:grid-cols-3">
               {serviceProducts.filter((s) => s.category === "retainer").map((service, i) => (
                 <Reveal key={service.slug} delay={i * 0.06} className="h-full">
                   <div className="flex h-full flex-col gap-4 rounded-3xl border-2 border-primary-dark bg-violet-tint p-7 transition-transform hover:-translate-y-1">
@@ -596,7 +625,7 @@ export function HomeContent({
               <p className="mb-2 text-xs font-bold uppercase tracking-[0.16em] text-primary-violet">Specialist Sessions</p>
               <div className="mb-8 h-0.5 w-16 bg-accent-orange" />
             </Reveal>
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-4">
               {serviceProducts.filter((s) => s.category === "specialist").map((service, i) => (
                 <Reveal key={service.slug} delay={i * 0.06} className="h-full">
                   <div className="flex h-full flex-col gap-4 rounded-3xl border-2 border-primary-dark bg-orange-tint p-7 transition-transform hover:-translate-y-1">
@@ -731,9 +760,12 @@ export function HomeContent({
 
         <div className="mx-auto max-w-max-width">
           <Reveal className="mb-16 text-center">
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-orange-light">
-              <span className="h-2 w-2 rounded-full bg-accent-orange" /> Low overhead · High efficiency
-            </span>
+            {/* Block wrapper: otherwise this pill and the `inline-block` h2 share a line at `xl:`+. */}
+            <div>
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-orange-light">
+                <span className="h-2 w-2 rounded-full bg-accent-orange" /> Low overhead · High efficiency
+              </span>
+            </div>
             <h2 className="text-h2 mt-6 inline-block font-display font-extrabold tracking-tight text-on-primary">
               From chaos to clarity in{" "}
               <span className="relative inline-block text-accent-orange">

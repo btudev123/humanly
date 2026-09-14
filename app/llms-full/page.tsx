@@ -110,7 +110,7 @@ export default async function LlmsFullPage() {
               <h3 className="text-h4 font-display font-bold text-primary-dark">
                 {serviceCategoryLabels[category]}
               </h3>
-              <ul className="mt-3 space-y-4 text-neutral-500">
+              <ul className="mt-3 space-y-4 text-neutral-500 [overflow-wrap:anywhere]">
                 {items.map((product) => (
                   <li key={product.slug}>
                     <strong className="text-primary-dark">{product.name}</strong> —{" "}
@@ -237,7 +237,7 @@ export default async function LlmsFullPage() {
           The canonical host is <strong>{siteConfig.url}</strong>. The <code>www</code> alias
           redirects to it and should not be cited.
         </p>
-        <ul className="mt-3 grid gap-1 text-neutral-500 sm:grid-cols-2">
+        <ul className="mt-3 grid gap-1 text-neutral-500 [overflow-wrap:anywhere] sm:grid-cols-2">
           {(
             [
               ["Home", "/"],

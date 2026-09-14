@@ -133,7 +133,9 @@ function MediaModal({
   return (
     <motion.div
       ref={ref}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm"
+      // overflow-y-auto: on tablets/landscape phones the 9:16 media can be taller than the
+      // viewport; without scroll the close button (and the rest of the modal) is unreachable.
+      className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto bg-black/80 p-4 backdrop-blur-sm"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -142,7 +144,7 @@ function MediaModal({
       }}
     >
       <motion.div
-        className="relative w-full max-w-2xl overflow-hidden rounded-2xl bg-neutral-900 shadow-2xl"
+        className="relative my-auto w-full max-w-2xl overflow-hidden rounded-2xl bg-neutral-900 shadow-2xl"
         initial={{ scale: 0.9, y: 20 }}
         animate={{ scale: 1, y: 0 }}
         exit={{ scale: 0.9, y: 20 }}
@@ -156,7 +158,7 @@ function MediaModal({
         </button>
 
         {isInstagram ? (
-          <div className="aspect-[9/16] w-full">
+          <div className="mx-auto aspect-[9/16] h-[80dvh] max-h-[80dvh] w-auto max-w-full">
             <iframe
               src={testimonial.mediaUrl}
               className="h-full w-full"
@@ -168,7 +170,7 @@ function MediaModal({
         ) : (
           <video
             src={testimonial.mediaUrl}
-            className="aspect-video w-full"
+            className="aspect-video max-h-[80dvh] w-full"
             controls
             autoPlay
             playsInline

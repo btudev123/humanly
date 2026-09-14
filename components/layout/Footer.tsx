@@ -119,11 +119,13 @@ export function Footer() {
         </div>
       </div>
 
-      {/* Floating contact CTA → contact page */}
+      {/* Floating contact CTA → contact page. Desktop only: on phones this sits over the
+          home sticky booking bar, /booking prices and slot buttons, and body copy. Contact
+          is still reachable from the nav drawer and the footer link column below. */}
       <Link
         href="/contact"
         aria-label="Contact Humanly"
-        className="fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full border-2 border-primary-dark bg-accent-orange text-primary-dark shadow-pop-sm transition-transform hover:scale-105"
+        className="fixed bottom-6 right-6 z-40 hidden h-14 w-14 items-center justify-center rounded-full border-2 border-primary-dark bg-accent-orange text-primary-dark shadow-pop-sm transition-transform hover:scale-105 md:flex"
       >
         <Mail size={24} strokeWidth={2.4} />
       </Link>

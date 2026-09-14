@@ -47,9 +47,9 @@ export default async function BookingDonePage({
             ["Email", params.email || "Provided during booking"],
             ["Reference", params.uid || "Cal.com booking reference"],
           ].map(([label, value]) => (
-            <div key={label} className="flex items-center justify-between gap-6 border-b-2 border-dashed border-neutral-300 pb-4 last:border-0">
+            <div key={label} className="flex flex-wrap items-center justify-between gap-x-6 gap-y-1 border-b-2 border-dashed border-neutral-300 pb-4 last:border-0">
               <span className="text-xs font-bold uppercase tracking-[0.16em] text-neutral-500">{label}</span>
-              <span className="text-right font-bold text-primary-dark">{value}</span>
+              <span className="min-w-0 text-right font-bold text-primary-dark [overflow-wrap:anywhere]">{value}</span>
             </div>
           ))}
         </div>
@@ -64,7 +64,7 @@ export default async function BookingDonePage({
             <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-2xl border-2 border-primary-dark bg-violet-tint text-primary-violet">
               <item.icon size={22} />
             </div>
-            <h2 className="font-display font-bold text-primary-dark">{item.title}</h2>
+            <h2 className="text-h4 font-display font-bold text-primary-dark break-words">{item.title}</h2>
             <p className="mt-2 text-sm leading-relaxed text-neutral-500">{item.copy}</p>
           </div>
         ))}

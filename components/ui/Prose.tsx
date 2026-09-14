@@ -117,7 +117,9 @@ const components: PortableTextComponents = {
 
 export function Prose({ value }: { value: PortableTextBlock[] }) {
   return (
-    <div className="space-y-6">
+    // [overflow-wrap:anywhere]: CMS copy is free text — an unbroken long word or URL must
+    // not be able to push the article column wider than the viewport.
+    <div className="space-y-6 [overflow-wrap:anywhere]">
       <PortableText value={value} components={components} />
     </div>
   );

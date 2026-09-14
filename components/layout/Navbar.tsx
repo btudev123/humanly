@@ -62,7 +62,7 @@ export function Navbar() {
         {!isBookPage && (
           <>
             {/* Desktop links */}
-            <div className="hidden items-center gap-1 rounded-full md:flex">
+            <div className="hidden items-center gap-1 rounded-full lg:flex">
               {navLinks.map((link) => {
                 const active = pathname === link.href;
                 return (
@@ -91,7 +91,7 @@ export function Navbar() {
             {/* Desktop CTA */}
             <Link
               href="/booking"
-              className="btn-pop hidden items-center gap-1.5 rounded-full border-2 border-primary-dark bg-accent-orange px-5 py-2.5 text-[14px] font-bold text-primary-dark shadow-pop-sm md:inline-flex"
+              className="btn-pop hidden items-center gap-1.5 rounded-full border-2 border-primary-dark bg-accent-orange px-5 py-2.5 text-[14px] font-bold text-primary-dark shadow-pop-sm lg:inline-flex"
             >
               Get Support
               <ArrowUpRight size={17} strokeWidth={2.5} />
@@ -102,7 +102,7 @@ export function Navbar() {
               onClick={() => setMobileOpen((o) => !o)}
               aria-expanded={mobileOpen}
               aria-label="Toggle navigation menu"
-              className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-primary-dark bg-neutral-100 text-primary-dark md:hidden"
+              className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-primary-dark bg-neutral-100 text-primary-dark lg:hidden"
             >
               {mobileOpen ? <X size={20} strokeWidth={2.5} /> : <Menu size={20} strokeWidth={2.5} />}
             </button>
@@ -127,7 +127,7 @@ export function Navbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -12 }}
             transition={{ duration: 0.22 }}
-            className="mt-2 overflow-hidden rounded-3xl border border-primary-dark/10 bg-neutral-100 p-3 shadow-soft md:hidden"
+            className="mt-2 max-h-[calc(100dvh-7.5rem)] overflow-y-auto overflow-x-hidden rounded-3xl border border-primary-dark/10 bg-neutral-100 p-3 shadow-soft lg:hidden"
             style={{ marginLeft: "var(--spacing-margin-mobile)", marginRight: "var(--spacing-margin-mobile)" }}
           >
             <div className="flex flex-col gap-1">

@@ -99,9 +99,12 @@ export default async function ServicesPage() {
         <Scribble variant="star-fill" color="#ff6a1a" className="absolute left-[10%] top-0 hidden h-8 w-8 animate-float md:block" />
         <Scribble variant="spiral" color="#9d5cff" className="absolute right-[10%] top-6 hidden h-16 w-16 opacity-50 md:block" />
 
-        <span className="inline-flex items-center gap-2 rounded-full border-2 border-primary-dark bg-neutral-100 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-primary-dark shadow-pop-sm">
-          <span className="h-2 w-2 rounded-full bg-accent-orange" /> Services
-        </span>
+        {/* Block wrapper: otherwise this pill and the `inline-block` h1 share a line on wide screens. */}
+        <div>
+          <span className="inline-flex items-center gap-2 rounded-full border-2 border-primary-dark bg-neutral-100 px-4 py-1.5 text-xs font-bold uppercase tracking-[0.14em] text-primary-dark shadow-pop-sm">
+            <span className="h-2 w-2 rounded-full bg-accent-orange" /> Services
+          </span>
+        </div>
         <h1 className="text-h1 mx-auto mt-6 inline-block font-display font-extrabold tracking-tight text-primary-dark">
           Expert HR advisory,{" "}
           <span className="relative inline-block">
@@ -174,7 +177,32 @@ export default async function ServicesPage() {
       {/* Comparison */}
       <section className="mx-auto mt-24 max-w-max-width px-margin-mobile md:px-margin-desktop">
         <h2 className="text-h2 mb-12 text-center font-display font-extrabold tracking-tight text-primary-dark">How Humanly compares</h2>
-        <div className="overflow-x-auto rounded-3xl border-2 border-primary-dark bg-neutral-100 shadow-pop-sm">
+
+        {/* Below md: same `comparison` data as stacked cards. A 4-column table forced a sideways
+            swipe on every phone with no visible affordance; a dl reads in one pass instead. */}
+        <div className="grid gap-4 md:hidden">
+          {comparison.map((row) => (
+            <div key={row.aspect} className="rounded-3xl border-2 border-primary-dark bg-neutral-100 p-5">
+              <h3 className="text-sm font-bold uppercase tracking-wider text-primary-dark break-words">{row.aspect}</h3>
+              <dl className="mt-4 space-y-2 text-sm">
+                <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                  <dt className="shrink-0 font-semibold text-neutral-400">Internal HR</dt>
+                  <dd className="min-w-0 text-right text-neutral-500 [overflow-wrap:anywhere]">{row.hr}</dd>
+                </div>
+                <div className="-mx-3 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 rounded-2xl bg-violet-tint px-3 py-2">
+                  <dt className="shrink-0 font-bold text-primary-violet">Humanly</dt>
+                  <dd className="min-w-0 text-right font-semibold text-primary-violet [overflow-wrap:anywhere]">{row.humanly}</dd>
+                </div>
+                <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                  <dt className="shrink-0 font-semibold text-neutral-400">Employment Lawyer</dt>
+                  <dd className="min-w-0 text-right text-neutral-500 [overflow-wrap:anywhere]">{row.lawyer}</dd>
+                </div>
+              </dl>
+            </div>
+          ))}
+        </div>
+
+        <div className="hidden overflow-x-auto rounded-3xl border-2 border-primary-dark bg-neutral-100 shadow-pop-sm md:block">
           <table className="w-full min-w-[640px] text-left">
             <thead>
               <tr className="border-b-2 border-primary-dark">

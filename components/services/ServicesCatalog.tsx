@@ -66,7 +66,7 @@ const secondaryCategoryOrder: {
     surfaceClass: "bg-violet-tint",
     checkClass: "text-primary-violet",
     ctaClass: "bg-primary-dark text-on-primary",
-    gridClass: "sm:grid-cols-2 lg:grid-cols-4 lg:grid-rows-[auto_auto_auto_auto_1fr_auto]",
+    gridClass: "sm:grid-cols-2 xl:grid-cols-4 xl:grid-rows-[auto_auto_auto_auto_1fr_auto]",
     /*
      * `forWho`, not `description`. Every specialist product's description restates its own
      * bullet list almost verbatim — e.g. Dubai Job Search reads "UAE job-market orientation,
@@ -97,7 +97,7 @@ const secondaryCategoryOrder: {
     surfaceClass: "bg-violet-tint",
     checkClass: "text-primary-violet",
     ctaClass: "bg-primary-dark text-on-primary",
-    gridClass: "md:grid-cols-3",
+    gridClass: "lg:grid-cols-3",
     blurb: (service) => service.description,
     priceSuffix: (service) => service.priceNote,
     priceSuffixClass: "text-h3 font-bold text-neutral-500",
@@ -402,7 +402,7 @@ function CoreLadderAccordion() {
 
 function FounderCredibility() {
   return (
-    <div className="mx-auto mt-10 flex max-w-5xl flex-col items-center gap-6 rounded-3xl border-2 border-primary-dark bg-neutral-100 p-7 sm:flex-row">
+    <div className="mx-auto mt-10 flex max-w-5xl flex-col items-center gap-6 rounded-3xl border-2 border-primary-dark bg-neutral-100 p-7 lg:flex-row">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src="/karma-harb.png"
@@ -419,7 +419,7 @@ function FounderCredibility() {
           investment group spanning the UAE, KSA &amp; Pakistan — before founding Humanly.
         </p>
       </div>
-      <div className="flex shrink-0 gap-3">
+      <div className="flex flex-wrap justify-center gap-3 lg:flex-nowrap lg:shrink-0">
         <a
           href={siteConfig.founderLinkedIn}
           target="_blank"
@@ -450,15 +450,16 @@ function FounderCredibility() {
  * service name instead of shouting over it.
  *
  * **Equal heights and shared baselines.** With `aligned`, the strip's grid declares one row
- * template (`lg:grid-rows-[auto_auto_auto_auto_1fr_auto]`) and every card spans all six rows as
+ * template (`xl:grid-rows-[auto_auto_auto_auto_1fr_auto]`) and every card spans all six rows as
  * a `subgrid`, so the six slots are sized by the tallest card and *every* card's price, blurb,
  * list and button start on the same line no matter how long its title wraps. The `1fr` row is
  * the included-list, so it absorbs the slack and the CTA lands flush on the bottom edge of all
  * four. Nothing is clipped: a long list makes the shared row taller for everyone.
  *
- * Below `lg:` the card is the flex column it has always been — `h-full` plus `flex-grow` on the
- * list still gives equal-height cards with a bottom-flush CTA, which is how the retainer row
- * already worked. In a browser with no `subgrid` support (~4% at time of writing) only the
+ * Below `xl:` (four columns only have room at `xl:` — at `lg:` they're too narrow and the CTA
+ * pill wraps to 4–5 lines) the card is the flex column it has always been — `h-full` plus
+ * `flex-grow` on the list still gives equal-height cards with a bottom-flush CTA, which is how
+ * the retainer row already worked. In a browser with no `subgrid` support (~4% at time of writing) only the
  * `grid-template-rows: subgrid` declaration is dropped: the cards still span the same six rows
  * so they stay equal height and nothing clips, they just lose the shared baselines and the CTA
  * sits under the list rather than on the bottom edge. Degraded, not broken.
@@ -489,10 +490,10 @@ function ServiceCard({
         surfaceClass,
         // `break-words` keeps a 200-character product name or bullet inside the card instead of
         // pushing the grid track wide and giving the page a horizontal scrollbar.
-        aligned && "break-words lg:row-span-6 lg:grid lg:grid-rows-subgrid",
+        aligned && "break-words xl:row-span-6 xl:grid xl:grid-rows-subgrid",
       )}
     >
-      <div className={aligned ? "lg:row-span-2 lg:grid lg:grid-rows-subgrid" : undefined}>
+      <div className={aligned ? "xl:row-span-2 xl:grid xl:grid-rows-subgrid" : undefined}>
         <h3 className="text-h4 font-display font-bold leading-snug text-primary-dark">{service.name}</h3>
         <p className="mt-1 text-body-sm text-neutral-500">{service.subtitle}</p>
       </div>
@@ -622,7 +623,7 @@ export function ServicesCatalog({ services }: { services: MergedService[] }) {
                 <Reveal
                   key={service.slug}
                   delay={index * 0.06}
-                  className={cn("h-full", strip.aligned && "lg:row-span-6 lg:grid lg:grid-rows-subgrid")}
+                  className={cn("h-full", strip.aligned && "xl:row-span-6 xl:grid xl:grid-rows-subgrid")}
                 >
                   <ServiceCard
                     service={service}

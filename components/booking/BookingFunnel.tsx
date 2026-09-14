@@ -14,10 +14,10 @@ import { AvailabilityPreview } from "@/components/booking/AvailabilityPreview";
 import { pushDataLayerEvent } from "@/lib/analytics/dataLayer";
 
 const fieldClass =
-  "rounded-2xl border-2 border-primary-dark/20 px-4 py-3 text-base font-normal normal-case tracking-normal text-primary-dark outline-none transition focus:border-primary-dark";
+  "w-full min-w-0 rounded-2xl border-2 border-primary-dark/20 px-4 py-3 text-base font-normal normal-case tracking-normal text-primary-dark outline-none transition focus:border-primary-dark";
 
 const labelClass =
-  "grid gap-2 text-xs font-bold uppercase tracking-[0.14em] text-neutral-500";
+  "grid min-w-0 gap-2 text-xs font-bold uppercase tracking-[0.14em] text-neutral-500";
 
 /**
  * One intake question. Uncontrolled on purpose — the whole form is remounted with a
@@ -295,15 +295,19 @@ export function BookingFunnel() {
                     <h3 className="text-h4 font-extrabold leading-snug text-primary-dark">
                       {service.name}
                     </h3>
-                    <p className="mt-1 flex items-center gap-1.5 text-xs font-semibold text-neutral-400">
-                      <Clock size={12} strokeWidth={2.5} />
-                      {service.duration}
+                    {/* Price pill lives on the duration line, not beside the name, so a
+                        2-col layout never lets it overlap a long service name. */}
+                    <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
+                      <span className="rounded-full bg-primary-dark px-2.5 py-1 text-sm font-extrabold text-white">
+                        {formatAed(service.amountAed)}
+                        {service.priceNote ?? ""}
+                      </span>
+                      <span className="flex items-center gap-1.5 text-xs font-semibold text-neutral-400">
+                        <Clock size={12} strokeWidth={2.5} />
+                        {service.duration}
+                      </span>
                     </p>
                   </div>
-                  <span className="shrink-0 rounded-full bg-primary-dark px-2.5 py-1 text-sm font-extrabold text-white">
-                    {formatAed(service.amountAed)}
-                    {service.priceNote ?? ""}
-                  </span>
                 </div>
                 <p className="text-sm leading-relaxed text-neutral-500 line-clamp-2">
                   {service.description}
@@ -386,8 +390,15 @@ export function BookingFunnel() {
         </div>
 
         {/* Remounted per service so answers to questions that no longer apply are dropped. */}
-        <form key={selectedProduct.slug} action={submit} onSubmit={guardMissingTime} className="mt-5 grid gap-4">
-          <div className="grid gap-4 sm:grid-cols-2">
+        <form
+          key={selectedProduct.slug}
+          action={submit}
+          onSubmit={guardMissingTime}
+          className="mt-5 grid grid-cols-[minmax(0,1fr)] gap-4"
+        >
+          {/* minmax(0,1fr): without it, a wide <select> option pins the auto track at its
+              content width and the Pay button below overflows the card on phones. */}
+          <div className="grid grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-2">
             <label className={labelClass}>
               Name
               <input name="name" required autoComplete="name" className={fieldClass} />
@@ -409,7 +420,7 @@ export function BookingFunnel() {
             </p>
           )}
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid grid-cols-[minmax(0,1fr)] gap-4 sm:grid-cols-2">
             {intakeForm.fields.map((field) => (
               <IntakeFieldInput key={field.id} field={field} />
             ))}

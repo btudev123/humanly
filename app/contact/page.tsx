@@ -32,7 +32,7 @@ export default function ContactPage() {
 
       <section className="mx-auto mt-14 grid max-w-4xl gap-6 px-margin-mobile sm:grid-cols-2 md:px-margin-desktop">
         {/* Email */}
-        <div className="flex flex-col rounded-3xl border-2 border-primary-dark bg-neutral-100 p-8 text-center shadow-pop-sm">
+        <div className="flex min-w-0 flex-col rounded-3xl border-2 border-primary-dark bg-neutral-100 p-8 text-center shadow-pop-sm">
           <Mail className="mx-auto mb-4 text-primary-violet" size={32} />
           <h2 className="text-h3 font-display font-bold text-primary-dark">Email us directly</h2>
           <p className="mt-2 flex-1 leading-relaxed text-neutral-500">
@@ -41,15 +41,15 @@ export default function ContactPage() {
           </p>
           <a
             href="mailto:hello@talkhumanly.com?subject=Confidential%20HR%20enquiry"
-            className="btn-pop mt-6 inline-flex items-center justify-center gap-2 rounded-full border-2 border-primary-dark bg-accent-orange px-7 py-3.5 text-[14px] font-bold text-primary-dark shadow-pop-sm"
+            className="btn-pop mt-6 inline-flex max-w-full items-center justify-center gap-2 rounded-full border-2 border-primary-dark bg-accent-orange px-5 py-3.5 text-[14px] font-bold text-primary-dark shadow-pop-sm sm:px-7"
           >
-            <Mail size={16} strokeWidth={2.5} />
-            hello@talkhumanly.com
+            <Mail size={16} strokeWidth={2.5} className="shrink-0" />
+            <span className="min-w-0 [overflow-wrap:anywhere]">hello@talkhumanly.com</span>
           </a>
         </div>
 
         {/* Book */}
-        <div className="flex flex-col rounded-3xl border-2 border-primary-dark bg-violet-tint p-8 text-center">
+        <div className="flex min-w-0 flex-col rounded-3xl border-2 border-primary-dark bg-violet-tint p-8 text-center">
           <CalendarCheck className="mx-auto mb-4 text-primary-violet" size={32} />
           <h2 className="text-h3 font-display font-bold text-primary-dark">Book directly</h2>
           <p className="mt-2 flex-1 leading-relaxed text-neutral-500">
@@ -74,9 +74,9 @@ export default function ContactPage() {
               { icon: Mail, label: "hello@talkhumanly.com" },
               { icon: MapPin, label: "Global · UAE, GCC & North America" },
             ].map((item) => (
-              <div key={item.label} className="flex items-center gap-3">
+              <div key={item.label} className="flex min-w-0 items-center gap-3">
                 <item.icon className="shrink-0 text-primary-violet" size={18} />
-                <p className="text-xs font-bold uppercase tracking-[0.08em] text-neutral-500">{item.label}</p>
+                <p className="min-w-0 text-xs font-bold uppercase tracking-[0.08em] text-neutral-500 [overflow-wrap:anywhere]">{item.label}</p>
               </div>
             ))}
           </div>

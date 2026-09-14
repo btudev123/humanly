@@ -145,7 +145,7 @@ export default async function BlogPostPage({
         <p className="text-caption font-bold uppercase tracking-[0.2em] text-primary-violet">
           {article.category}
         </p>
-        <h1 className="text-h1 mt-4 font-display font-extrabold tracking-tight text-primary-dark">
+        <h1 className="text-h1 mt-4 break-words font-display font-extrabold tracking-tight text-primary-dark">
           {article.title}
         </h1>
 
