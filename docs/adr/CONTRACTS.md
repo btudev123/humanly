@@ -160,6 +160,6 @@ The ADR's decision history stays as written; Decision B is superseded, not wrong
 | `app/booking/schedule/page.tsx` | auto-book → `redirect('/booking/done')`, else embed with `notice`. Payment gate untouched |
 | `components/booking/PaidScheduler.tsx` | optional `notice` prop; Dubai-zone date parts |
 | `components/booking/AvailabilityPreview.tsx` | Dubai-only; `full` = day buttons + time dropdown; `onAvailabilityChange` prop |
-| `lib/products.ts` | `serviceProducts` excludes hidden products; new `hiddenServiceProducts` |
+| `lib/products.ts` | `test-service` moved to `retiredServiceProducts` (no test product in production); `serviceProducts` = the 10 public services |
 
 `app/api/webhooks/cal/route.ts` is unchanged — the auto-booking reuses its `metadata.orderId` join.

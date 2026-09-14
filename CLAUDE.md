@@ -77,9 +77,13 @@ consultations. Positioning is **global-first** with regional guides for the UAE,
   `orders.metadata.calBooking`). If Cal.com refuses it, `/booking/schedule` falls back to the paid
   Cal.com embed (ADR-0001 Decision C′). Async items email a delivery link.
   `/booking?service=<slug>&slot=<iso>` preselects a service/time and resolves retired slugs.
-  Hidden products (`test-service`, AED 5, `/booking?test=1`) live in `hiddenServiceProducts`, never
-  in the public `serviceProducts`. The Cal.com webhook must point at the **apex** — `www` 308s and
-  Cal.com does not follow redirects.
+  There is **no test product in production** (owner, 2026-09-14): `test-service` is in the retired
+  archive only (name/price resolve for old orders; not sellable; its Cal link env is unset and its
+  event type deleted). `/booking/schedule` refuses any product with `needsScheduling: false`, so
+  neither an old test order nor a Document Review order can open a live calendar. Cal.com has exactly the 10 catalogue event
+  types, all `hidden` from the public cal.com profile (so nobody books a paid service for free) and
+  timezone-locked; hidden types still serve slots and direct/API bookings. The Cal.com webhook
+  must point at the **apex** — `www` 308s and Cal.com does not follow redirects.
 - **Booking intake is per-service** (`lib/intake.ts`): each service declares its own questions, which
   map onto the three `booking_intakes` columns (`concern`/`urgency`/`message`) plus labelled extras.
   Nothing is ever uploaded through the site — document review asks the client to reply to the

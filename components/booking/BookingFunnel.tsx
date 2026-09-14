@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState, useTransition } from "react";
 import { ArrowRight, Calendar, CalendarClock, CheckCircle2, Clock, Info, Lock, ShieldCheck } from "lucide-react";
 import {
   serviceProducts,
-  hiddenServiceProducts,
   getSellableServiceProduct,
   formatAed,
   type ServiceCategory,
@@ -86,22 +85,16 @@ export function BookingFunnel() {
   // Bumped to force the picker to refetch after checkout reports the chosen slot was taken.
   const [availabilityVersion, setAvailabilityVersion] = useState(0);
   const [error, setError] = useState("");
-  const [showHidden, setShowHidden] = useState(false);
   const [isPending, startTransition] = useTransition();
 
-  // Reveal hidden products (the internal test service) with ?test=1, honour ?service=<slug>
-  // (retired slugs resolve to their live replacement) so links from articles, services and
-  // resources land on the right one preselected, and honour ?slot=<iso> — the time carried over
-  // from the compact picker on /services.
+  // Honour ?service=<slug> (retired slugs resolve to their live replacement) so links from
+  // articles, services and resources land on the right one preselected, and ?slot=<iso> — the
+  // time carried over from the compact picker on /services.
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const testMode = params.get("test") === "1";
-    setShowHidden(testMode);
 
-    // Hidden products resolve only in test mode — otherwise `selected` would name a product the
-    // list can't show, and the page would display one service while checkout charged another.
     const requested = getSellableServiceProduct(params.get("service"));
-    if (requested && (testMode || !requested.hidden)) {
+    if (requested) {
       setSelected(requested.slug);
     }
 
@@ -114,10 +107,7 @@ export function BookingFunnel() {
     }
   }, []);
 
-  const availableProducts = useMemo(
-    () => (showHidden ? [...serviceProducts, ...hiddenServiceProducts] : serviceProducts),
-    [showHidden]
-  );
+  const availableProducts = serviceProducts;
 
   const visibleServices = useMemo(
     () =>

@@ -63,6 +63,15 @@ export default async function SchedulePage({
   // retired-slug order render as "The Session scheduling".
   const product = getServiceProduct(order.product_slug);
 
+  // A purchase with nothing to schedule (Document Review, the withdrawn internal test product)
+  // never gets a live Cal.com embed. Without this, `getCalLink()` would still render whatever
+  // calendar the product's env points at, letting an order that includes no call book one.
+  if (product && !product.needsScheduling) {
+    return (
+      <ScheduleBlocked message="This purchase doesn't include a call to schedule — it's delivered by email. Check your inbox for next steps." />
+    );
+  }
+
   // ADR-0001 Decision C — the slot the visitor picked in the pre-payment availability preview,
   // written to `orders.metadata` at checkout. A preference, not a hold: it only tells the embed
   // where to open. Dropped if it is malformed or already in the past, so a stale link never

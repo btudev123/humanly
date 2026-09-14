@@ -60,7 +60,7 @@ export type ServiceProduct = {
   calLinkEnv: string;
   /** Carries the "Recommended" badge and the highlighted card. */
   featured?: boolean;
-  /** Hidden from the public booking list; only revealed with `?test=1`. */
+  /** Hidden from public listings. No live product currently sets it; list filters still honour it. */
   hidden?: boolean;
 };
 
@@ -305,44 +305,12 @@ const withUsdReference = (seed: ServiceProductSeed): ServiceProduct => ({
 });
 
 /**
- * Internal pipeline test product. `hidden`, so it is only listed at `/booking?test=1`, and live
- * in production on purpose: it exercises the real path — Stripe (AED) → auto-booked Cal.com slot
- * on the hidden `talk-humanly/test-service` event type → webhook emails — for a charge small
- * enough to refund. It used to be gated on `NODE_ENV === "development"` at AED 1, which meant
- * production could never test the scheduled path and the charge sat below Stripe's AED minimum.
- * Never delete: test orders store this slug.
- */
-const testSeeds: ServiceProductSeed[] = [
-  {
-    slug: "test-service",
-    name: "Test Service",
-    subtitle: "Internal pipeline test",
-    description: "Internal end-to-end test of payment, booking and email. Not for clients.",
-    amountAed: 5,
-    duration: "15 minutes",
-    category: "specialist",
-    features: ["Internal test only"],
-    forWho: "The Humanly team, for pipeline testing.",
-    needsScheduling: true,
-    stripePriceEnv: "STRIPE_PRICE_TEST_SERVICE",
-    mode: "payment",
-    calLinkEnv: "NEXT_PUBLIC_CAL_LINK_TEST_SERVICE",
-    hidden: true,
-  },
-];
-
-/**
- * Everything currently for sale publicly. This is the list the public UI maps over — the home
- * page strips, `/services` (and its JSON-LD), `llms.txt`, internal links, the Sanity seed — so it
- * must never carry a hidden product: most of those call sites do not filter on `hidden`.
+ * Everything currently for sale — exactly the 10 services on `/services`. This is the list the
+ * public UI maps over (home page strips, `/services` and its JSON-LD, `llms.txt`, internal links,
+ * the Sanity seed), so nothing internal or unlisted belongs here. There is no live test product:
+ * the owner does not want one in production (2026-09-14).
  */
 export const serviceProducts: ServiceProduct[] = seeds.map(withUsdReference);
-
-/** Purchasable but unlisted (the internal test product). Only `/booking?test=1` lists these. */
-export const hiddenServiceProducts: ServiceProduct[] = testSeeds.map(withUsdReference);
-
-/** Live catalogue for slug resolution: public + hidden. Never map over this in public UI. */
-const sellableServiceProducts: ServiceProduct[] = [...serviceProducts, ...hiddenServiceProducts];
 
 /**
  * Products withdrawn in the Sept 2026 restructure.
@@ -435,6 +403,27 @@ export const retiredServiceProducts: ServiceProduct[] = [
     stripePriceEnv: "STRIPE_PRICE_HR_COMPLIANCE_ADVISORY",
     mode: "payment",
     calLinkEnv: "NEXT_PUBLIC_CAL_LINK_FULL_SUPPORT",
+  },
+  {
+    // Internal pipeline-test product, withdrawn from production 2026-09-14 at the owner's request.
+    // Archived rather than deleted because live `orders` rows store this slug (earlier test
+    // purchases). Not sellable, never listed, no scheduling; its Cal.com event type is deleted.
+    slug: "test-service",
+    name: "Test Service (internal, withdrawn)",
+    subtitle: "Internal pipeline test",
+    description: "Withdrawn internal test product.",
+    amount: usdCentsFromAed(5),
+    amountAed: 5,
+    duration: "15 minutes",
+    category: "specialist",
+    features: [],
+    forWho: "",
+    needsScheduling: false,
+    stripePriceEnv: "STRIPE_PRICE_TEST_SERVICE",
+    mode: "payment",
+    // Its own (unset) env, NOT a live product's: this must never resolve to a real, bookable
+    // calendar. `/booking/schedule` also refuses products that don't need scheduling.
+    calLinkEnv: "NEXT_PUBLIC_CAL_LINK_TEST_SERVICE",
   },
 ];
 
@@ -537,7 +526,7 @@ export function formatUsd(amount: number) {
  */
 export function getServiceProduct(slug: string | null | undefined) {
   if (!slug) return undefined;
-  const live = sellableServiceProducts.find((product) => product.slug === slug);
+  const live = serviceProducts.find((product) => product.slug === slug);
   if (live) return live;
 
   const retired = retiredServiceProducts.find((product) => product.slug === slug);
@@ -555,7 +544,7 @@ export function getServiceProduct(slug: string | null | undefined) {
 export function getSellableServiceProduct(slug: string | null | undefined) {
   if (!slug) return undefined;
   const resolved = LEGACY_SLUG_ALIASES[slug] ?? slug;
-  return sellableServiceProducts.find((product) => product.slug === resolved);
+  return serviceProducts.find((product) => product.slug === resolved);
 }
 
 export function getServicesByCategory(category: ServiceCategory) {
