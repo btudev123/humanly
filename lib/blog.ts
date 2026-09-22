@@ -36,6 +36,217 @@ export type BlogPost = {
 
 export const blogPosts: BlogPost[] = [
   {
+    slug: "hr-is-kind-of-the-villain",
+    title: "Yes, HR Is Kind of the Villain in Your Story. Let Me Explain.",
+    excerpt:
+      "HR is sometimes the punchline for a reason. Karma Harb explains what internal HR can influence, what it cannot control, and why Humanly exists to give employees an independent voice in their corner.",
+    category: "HR & Workplace",
+    author: "Karma Harb",
+    authorRole: "Founder of Humanly",
+    publishedAt: "2026-09-22",
+    readingMinutes: 6,
+    keywords: [
+      "HR advice",
+      "independent HR advice",
+      "employee support",
+      "workplace conflict",
+      "HR trust",
+      "confidential HR advice",
+    ],
+    lead:
+      "Yes, HR is kind of the villain in your story — sometimes. But the person across the desk may genuinely be on your side and still be constrained by budgets, rules and decisions made elsewhere. Here is what the memes leave out, and why independent HR advice fills the gap.",
+    blocks: [
+      {
+        type: "p",
+        text: "There are reels and TikToks going around — you've definitely seen them, or one of their hundred cousins. HR walks in and the room goes quiet. HR sends a “can we have a quick chat?” and your stomach drops. HR says “we're a family here” right before doing something no actual family would ever do.",
+      },
+      {
+        type: "p",
+        text: "So here's my confession: I work in HR, I watched them, and I laughed. Because honestly, a lot of it is true. That's the bit none of us really want to say out loud. Sometimes we ARE the punchline.",
+      },
+      {
+        type: "p",
+        text: "So before I stand up for my people, let me just hand you a few for free. Yes, “let's take this offline” sometimes means “please stop talking.” Yes, the open-door policy has a weird number of closed doors. And yes, “we'll look into it” comes in about five different levels of conviction, and you can usually tell which one you just got.",
+      },
+      {
+        type: "p",
+        text: "Fine. Guilty. But now let me tell you the part the reels, memes and TikToks leave out, because it's the part that actually matters to me.",
+      },
+
+      { type: "h2", text: "The Thing Nobody Films" },
+      {
+        type: "p",
+        text: "Most of the time, by the point someone finally comes to HR, they've been sitting on it for a while. And they turn up with a completely fair ask. Fix my manager. Change this policy. Get me the raise I clearly deserve. Make this unfair thing un-happen.",
+      },
+      {
+        type: "p",
+        text: "And here's the honest, slightly deflating truth: a lot of the time I want to help you, and I CAN'T. Not won't. Can't. There's a difference, and it matters.",
+      },
+      {
+        type: "p",
+        text: "Because what the reel never shows you is this: it's not that I have no say. At my level, I'm in the budget conversations. I give input. I argue for people all the time. But there's a difference between having a voice in the room and holding the final pen. I don't sign the number off by myself, and I'm usually not the one making the final call on the exact thing that's wrecking your week. A lot of it gets decided a few floors up, on numbers and priorities that were set long before you and I sat down.",
+      },
+      {
+        type: "p",
+        text: "Do I push? Yes. More than you'd think, and usually in places you'll never see. And sometimes it genuinely works. I HAVE changed leadership's minds before, talked a decision into a better shape, turned a flat no into a let-me-think-about-it. So no, I'm not powerless, and I don't want to pretend I am.",
+      },
+      {
+        type: "p",
+        text: "But it doesn't land every time, and that's the honest bit. Pushing and controlling the outcome are two different jobs, and I only ever got given one of them. I can make the case as hard as anyone in that room. I just can't promise you they'll buy it.",
+      },
+      {
+        type: "p",
+        text: "The way I think about it: you want the ship to turn, so you come to me because I'm standing closest to the wheel. What you can't see is that the wheel is bolted to something much bigger, and other people — whose names aren't anywhere in this conversation — decided where we're heading long before you and I sat down. I can lean on it with everything I've got. I still can't spin it.",
+      },
+
+      { type: "h2", text: "What I Actually Want You to Walk Away With" },
+      {
+        type: "p",
+        text: "So laugh at the reels. I do. Some of them are genuinely too close to the bone.",
+      },
+      {
+        type: "p",
+        text: "But next time you're deciding whether HR is the villain, try the more boring theory: that the person across the desk might actually be on your side, might really want to help, and might still be stuck inside a set of rules they didn't write and can't magic away for you.",
+      },
+      {
+        type: "p",
+        text: "We're not the whole system. We're just the part of it you can actually talk to. And most of us would so much rather you talked to us, even on the days we can't give you what you walked in for.",
+      },
+
+      { type: "h2", text: "Why I Built Humanly" },
+      {
+        type: "p",
+        text: "Because this is the bit I couldn't get past. Every single constraint I just described is real, and none of it is going anywhere. Internal HR, however much they want to help you, is always going to be sitting inside the company's constraints, budgets and reporting lines. That's the job. It's also the gap.",
+      },
+      {
+        type: "p",
+        text: "Humanly is HR advice with none of those strings on it. When you talk to me here, there's no wallet I'm quietly protecting, no decision three floors up I'm trying to manage around, and no side to be on except yours. Same experience, same straight answers, minus the handcuffs.",
+      },
+      {
+        type: "callout",
+        text: "If you've ever left an HR meeting wishing you had someone in your corner who had nothing to lose by being honest with you, that person is the entire point of Humanly. Book a call and let's actually talk it through. That's the one thing I can always help you with.",
+      },
+    ],
+  },
+  {
+    slug: "the-ladder-i-was-told-to-climb",
+    title: "The Ladder I Was Told to Climb",
+    excerpt:
+      "After nearly twenty years in HR, Karma Harb is questioning the CHRO path she spent a career climbing — and whether redefining ambition is failure or finally choosing for yourself.",
+    category: "Careers & Managers",
+    author: "Karma Harb",
+    authorRole: "Founder of Humanly",
+    publishedAt: "2026-09-22",
+    readingMinutes: 6,
+    keywords: [
+      "career change",
+      "mid-career",
+      "burnout",
+      "CHRO",
+      "ambition",
+      "arrival fallacy",
+      "resign or stay",
+      "career advice",
+    ],
+    lead:
+      "Questioning the career ladder does not mean you failed to climb it. After nearly twenty years in HR and years spent aiming for CHRO, I am asking whether that destination was ever mine — and what success looks like when ambition gives way to reevaluation.",
+    blocks: [
+      {
+        type: "p",
+        text: "I have spent close to twenty years in HR. I've designed executive pay structures, built people functions from nothing, sat in rooms where careers were decided, and helped hundreds of people navigate the hardest moments of their working lives. For most of that time, I knew exactly where I was going. I was going to be a Chief Human Resources Officer (CHRO).",
+      },
+      {
+        type: "p",
+        text: "Lately, I've been sitting with a question I never expected to ask: why?",
+      },
+
+      { type: "h2", text: "The Script We Were Handed" },
+      {
+        type: "p",
+        text: "If you're somewhere in your late thirties or forties, you probably know the script. Get a good education. Get a good job. Climb as fast as you can. Every promotion was proof you were doing life correctly, and the next title was always the one that would finally make it feel worth it.",
+      },
+      {
+        type: "p",
+        text: "We followed that script through a remarkable run of events. Many of us were starting out when 2008 hit. We built careers through years of economic uncertainty, then lived through a pandemic, then inflation, then constant instability in the world around us. Each one was described as once in a lifetime. They just kept coming.",
+      },
+      {
+        type: "p",
+        text: "In the last few weeks, I've had several conversations with people in my cohort who all said some version of the same thing: I'm done. Not done with work entirely, but done with running a race they're no longer sure they signed up for.",
+      },
+      {
+        type: "p",
+        text: "I recognized myself in every one of those conversations.",
+      },
+
+      { type: "h2", text: "My Own Question" },
+      {
+        type: "p",
+        text: "When I picture the next fifteen years of my career, I don't feel ambition. I feel tired. And that has forced me to look honestly at what the CHRO goal was really about.",
+      },
+      {
+        type: "p",
+        text: "Was it the influence? The money? The prestige of the title? The approval of the people who raised me to aim high? Probably some mix of all of them. What I can't find, when I look closely, is a clear picture of a life at the top that I actually want to live.",
+      },
+      {
+        type: "p",
+        text: "I don't think I'm alone in this, and I don't think it's a failure. Psychologists talk about the “arrival fallacy,” the belief that reaching the next milestone will bring lasting satisfaction. Many of us arrived at milestones and found the satisfaction didn't last. The natural next question is whether the destination was ever ours to begin with.",
+      },
+
+      { type: "h2", text: "Burnout or Reevaluation?" },
+      {
+        type: "p",
+        text: "Burnout is real. The World Health Organization describes it as the result of chronic workplace stress that hasn't been managed, and it shows up as exhaustion, cynicism about work, and a sense that you're no longer effective. If that's where you are, it deserves real attention.",
+      },
+      {
+        type: "p",
+        text: "But I'd suggest that much of what our generation is feeling is also something else: a long-overdue reevaluation. We were taught one definition of success, and we're now old enough, experienced enough, and worn down enough to question it. That questioning can feel like a crisis. It can also be the beginning of building a career on your own terms.",
+      },
+
+      { type: "h2", text: "Questions Worth Sitting With" },
+      {
+        type: "p",
+        text: "If any of this sounds familiar, here are the questions I've been asking myself. They're harder than they look.",
+      },
+      {
+        type: "list",
+        items: [
+          "When you imagine your next promotion, what specifically do you feel: excitement, relief, or obligation?",
+          "Whose voice do you hear when you think about “falling behind” — yours, a parent's, or your peers'?",
+          "If the title and pay stayed exactly as they are, what would you change about your work tomorrow?",
+          "Is it the work itself that drains you, or the organization, the role, or the pace?",
+          "What would success look like if nobody else ever saw it?",
+        ],
+      },
+      {
+        type: "p",
+        text: "The answers don't have to lead to a dramatic exit. For some people, they point to a different organization. For others, a lateral move, a reduced scope, a sabbatical, a portfolio career, or simply renegotiating what they give to work. Sometimes the answer is to stay and climb, but this time by choice rather than momentum.",
+      },
+
+      { type: "h2", text: "Where Humanly Fits" },
+      {
+        type: "p",
+        text: "I started Humanly because I kept seeing talented people make huge career decisions alone, often at their most exhausted, without anyone on their side who understood how organizations really work.",
+      },
+      {
+        type: "p",
+        text: "Humanly isn't therapy, and it doesn't replace it. If you're struggling to function day to day, not sleeping, or feeling hopeless, please speak to a doctor or mental health professional first. That support matters.",
+      },
+      {
+        type: "p",
+        text: "What Humanly offers is the career side of the conversation. Together we can separate what you want from what you were told to want, look honestly at whether the problem is your role, your employer, or the path itself, map realistic options you may not have considered, and plan how to act on your decision in a way that protects your finances, your reputation, and your energy.",
+      },
+      {
+        type: "p",
+        text: "If you're asking yourself whether to leave or stay, start with the free [Resign or Stay Framework](/resources/resign-or-stay). It's a structured way to get your thinking out of your head and onto the page. And if you want someone to think it through with you, [book a consultation](/booking).",
+      },
+      {
+        type: "p",
+        text: "I'm still working through my own answer. But I've stopped believing that questioning the ladder means I've failed at climbing it. It might just mean I'm finally ready to decide where I want to go.",
+      },
+    ],
+    source: "World Health Organization, ICD-11: Burn-out as an occupational phenomenon.",
+  },
+  {
     slug: "fifteen-years-then-suddenly-a-problem",
     title: "Fifteen Years, Then Suddenly a Problem",
     excerpt:
