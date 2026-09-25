@@ -594,9 +594,25 @@ const warnedMissingCalLinks = new Set<string>();
  * inline into a client bundle anyway — so a client-side call would always take the fallback.
  * The `typeof window` guard keeps the warning out of a visitor's console if that ever changes.
  */
+/**
+ * Reduce a `NEXT_PUBLIC_CAL_LINK_*` value to the bare `username/event-slug` form both the Cal embed
+ * and the v2 API expect. A value authored in Vercel as a full URL (`https://cal.com/talk-humanly/the-session`)
+ * is a real, observed misconfiguration: the embed's `calLink` prop and `parseCalLink` both need the
+ * path only, and a scheme/host prefix silently empties the availability preview and breaks auto-booking.
+ * Normalising here means a mis-set value degrades to the correct link instead of a dead booking page.
+ */
+export function normaliseCalLink(value: string): string {
+  const trimmed = value.trim();
+  if (!trimmed) return trimmed;
+  // Strip the scheme…
+  const withoutScheme = trimmed.replace(/^https?:\/\//i, "");
+  // …then any known Cal.com host ("cal.com", "app.cal.com", "cal.app").
+  return withoutScheme.replace(/^(?:[a-z0-9-]+\.)*cal\.(?:com|app)\//i, "");
+}
+
 export function getCalLink(product: ServiceProduct) {
   const configured = process.env[product.calLinkEnv];
-  if (configured) return configured;
+  if (configured) return normaliseCalLink(configured);
 
   if (typeof window === "undefined" && !warnedMissingCalLinks.has(product.calLinkEnv)) {
     warnedMissingCalLinks.add(product.calLinkEnv);

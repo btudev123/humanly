@@ -92,6 +92,16 @@ export function parseCalLink(calLinkEnv: string): { username: string; eventTypeS
   return { username, eventTypeSlug };
 }
 
+/**
+ * The Cal.com v2 API key. Reads `CAL_API_KEY` first and falls back to the historical
+ * `CALCOM_API_KEY` name, which was at one point created in Vercel instead. Reading both means the
+ * availability preview and auto-booking keep working through a naming mistake rather than
+ * silently no-opping as if the key were unset.
+ */
+export function getCalApiKey(): string | undefined {
+  return process.env.CAL_API_KEY || process.env.CALCOM_API_KEY;
+}
+
 /** Etc/GMT zones only exist for whole hours, from Etc/GMT+12 (UTC-12) to Etc/GMT-14 (UTC+14). */
 const MIN_OFFSET_HOURS = -12;
 const MAX_OFFSET_HOURS = 14;
@@ -181,7 +191,7 @@ export function normaliseTimeZone(timeZone: string): string {
  * module at all.
  */
 export async function getAvailableSlots(input: GetAvailableSlotsInput): Promise<AvailableSlot[]> {
-  const apiKey = process.env.CAL_API_KEY;
+  const apiKey = getCalApiKey();
   if (!apiKey) return [];
 
   try {

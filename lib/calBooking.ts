@@ -1,5 +1,5 @@
 import "server-only";
-import { parseCalLink } from "@/lib/cal";
+import { getCalApiKey, parseCalLink } from "@/lib/cal";
 import { getCalLink, getServiceProduct } from "@/lib/products";
 import {
   claimOrderCalBooking,
@@ -100,7 +100,7 @@ export async function bookPreferredSlot(order: OrderRecord | null | undefined): 
   const start = new Date(rawSlot);
   if (Number.isNaN(start.getTime()) || start.getTime() <= Date.now()) return { status: "skipped" };
 
-  const apiKey = process.env.CAL_API_KEY;
+  const apiKey = getCalApiKey();
   if (!apiKey) return { status: "skipped" };
 
   if (!(await claimOrderCalBooking(order.id))) {
@@ -210,7 +210,7 @@ export async function waitForCalBooking(orderId: string, timeoutMs = 8000): Prom
  * the order record is healed to `booked` so every later read agrees.
  */
 export async function recoverCalBooking(order: OrderRecord): Promise<BookPreferredSlotResult | null> {
-  const apiKey = process.env.CAL_API_KEY;
+  const apiKey = getCalApiKey();
   if (!apiKey) return null;
 
   try {
