@@ -20,6 +20,9 @@
   --color-orange-light: #ffc078;
   --color-orange-tint: #fff3e3;
 
+  /* === WhatsApp (third-party brand) === */
+  --color-whatsapp: #25d366;        /* WhatsApp green */
+
   /* === Secondary / decorative === */
   --color-secondary-pink: #ff5fb0;
   --color-coral: #ff4f5e;

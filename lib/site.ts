@@ -12,6 +12,16 @@ export const siteConfig = {
    */
   url: process.env.NEXT_PUBLIC_SITE_URL || process.env.APP_URL || "https://talkhumanly.com",
   email: process.env.NEXT_PUBLIC_CONTACT_EMAIL || "hello@talkhumanly.com",
+  /**
+   * WhatsApp deep-link target for the floating chat CTA in the site chrome.
+   * `digits` is the international number with no leading `+`, spaces or
+   * separators — it is interpolated directly into `https://wa.me/<digits>`.
+   */
+  whatsapp: {
+    display: "+971 58 547 2372",
+    digits: "971585472372",
+    message: "Hi Humanly, I'd like to make a confidential enquiry.",
+  },
   founder: "Karma Harb",
   founderRole: "Founder & Principal HR Advisor",
   /**
@@ -29,4 +39,8 @@ export const siteConfig = {
 
 export function absoluteUrl(path = "/") {
   return new URL(path, siteConfig.url).toString();
+}
+
+export function whatsappUrl(message: string = siteConfig.whatsapp.message) {
+  return `https://wa.me/${siteConfig.whatsapp.digits}?text=${encodeURIComponent(message)}`;
 }

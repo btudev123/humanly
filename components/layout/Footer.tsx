@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ArrowUpRight, Mail } from "lucide-react";
 import { BrandLogo } from "@/components/layout/BrandLogo";
 import { Scribble } from "@/components/ui/Scribble";
+import { WhatsAppButton } from "@/components/layout/WhatsAppButton";
 
 const columns: { title: string; links: { href: string; label: string }[] }[] = [
   {
@@ -129,6 +130,10 @@ export function Footer() {
       >
         <Mail size={24} strokeWidth={2.4} />
       </Link>
+
+      {/* Floating WhatsApp chat CTA — site-wide. Sits above the email button on
+          desktop, and clears the home page's sticky mobile booking bar on phones. */}
+      <WhatsAppButton />
     </footer>
   );
 }
