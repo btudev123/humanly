@@ -37,6 +37,7 @@ consultations. Positioning is **global-first** with regional guides for the UAE,
   scheduled breaks), plus the copy/design/CRO/SEO briefs a wave was built against.
 - `vercel.json` — Vercel Cron schedules. Currently one entry: the daily review-request job.
 
+
 ## Key conventions
 - **Brand & design**: see `DESIGN.md`. Poppins everywhere; palette `#3f1b73` / `#7c35e3` / `#fda544`.
   Use the CSS variables / Tailwind tokens (`text-primary-dark`, `bg-accent-orange`, …), not raw hex.
