@@ -21,7 +21,6 @@ The single source of truth for Humanly's brand on the web. Brand tokens live in
 - Minimum clear space ≈ the width of one stem. Don't recolour or redraw the logo; don't add effects.
 
 ## Color
-
 Brand palette (from the official brand guide). Defined as CSS variables in `app/globals.css`.
 
 | Token | Hex | Role |
