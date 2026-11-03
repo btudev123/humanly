@@ -17,8 +17,9 @@ export function WhatsAppIcon({ className }: { className?: string }) {
  * Floating WhatsApp chat button, rendered in the site chrome on every page
  * (except the Sanity Studio, which opts out of the chrome entirely).
  *
- * It sits directly above the floating email button on desktop and clears the
- * home page's sticky mobile booking bar on phones.
+ * Desktop (md+): 56px, directly above the floating email button.
+ * Phones: 48px, tucked closer to the edge, lifted to clear the home page's
+ * sticky booking bar (~80px tall) and the iOS home-indicator safe area.
  */
 export function WhatsAppButton() {
   return (
@@ -28,9 +29,9 @@ export function WhatsAppButton() {
       rel="noopener noreferrer"
       aria-label="Chat with Humanly on WhatsApp"
       title="Chat with Humanly on WhatsApp"
-      className="fixed bottom-24 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full border-2 border-primary-dark bg-whatsapp text-white shadow-pop-sm transition-transform hover:scale-105"
+      className="fixed bottom-[calc(5.5rem+env(safe-area-inset-bottom))] right-[calc(1rem+env(safe-area-inset-right))] z-40 flex h-12 w-12 items-center justify-center rounded-full border-2 border-primary-dark bg-whatsapp text-white shadow-pop-sm transition-transform hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-dark focus-visible:ring-offset-2 motion-reduce:transition-none motion-reduce:hover:scale-100 md:bottom-24 md:right-6 md:h-14 md:w-14"
     >
-      <WhatsAppIcon className="h-7 w-7" />
+      <WhatsAppIcon className="h-6 w-6 md:h-7 md:w-7" />
     </a>
   );
 }
